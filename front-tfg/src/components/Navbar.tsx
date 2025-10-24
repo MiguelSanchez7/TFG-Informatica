@@ -12,16 +12,15 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-1 rounded-2xl bg-gray-100 p-1">
+    <nav className="bg-transparent flex items-center gap-1 rounded-2xl p-1">
       {links.map((l) => {
         const active = pathname === l.href;
         return (
           <Link
             key={l.href}
             href={l.href}
-            className={`px-3 py-1.5 text-sm rounded-xl transition
-              ${active ? "bg-white shadow font-medium" : "hover:bg-white/60"}
-            `}
+            data-active={active ? "true" : "false"}
+            className="nav-pill px-3 py-1.5 text-sm rounded-xl transition-colors"
           >
             {l.label}
           </Link>

@@ -1,53 +1,115 @@
+// src/app/page.tsx
+import Link from "next/link";
+
 export default function Home() {
   return (
-    <section className="grid gap-10">
+    <main className="relative font-sans tracking-tight">
+      {/* Fondo azul marino muy sutil */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-[-10rem] h-[26rem] w-[26rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-[#0a0f1f]/30 to-[#1e293b]/20 blur-[100px]" />
+        <div className="absolute right-[-6rem] bottom-[-6rem] h-[18rem] w-[18rem] rounded-full bg-gradient-to-tr from-[#111827]/20 to-[#0f172a]/30 blur-[100px]" />
+      </div>
+
       {/* HERO */}
-      <div className="grid items-center gap-8 sm:grid-cols-2">
-        <div>
-          <h1 className="h1 text-brand-700 dark:text-white">
-            IA explicativa y generativa para decidir mejor
-          </h1>
-          <p className="lead mt-4">
-            Entrena con retos históricos, entiende las señales con XAI
-            (SHAP/contrafactuales) y practica gestión de riesgo en un entorno seguro.
-          </p>
+      <section className="mx-auto max-w-5xl px-6 pt-16 pb-10 text-center">
+        <p className="text-xs tracking-[0.25em] text-[#475569] dark:text-[#94a3b8] uppercase font-medium">
+          TFG · Plataforma educativa con IA
+        </p>
 
-          <div className="mt-6 flex gap-3">
-            <a href="/about" className="btn-primary">Objetivos del TFG</a>
-            <a href="#demo" className="btn-ghost">Ver demo</a>
-          </div>
+        <h1 className="mt-3 text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-[#0f172a] dark:text-[#f1f5f9]">
+          IA{" "}
+          <span className="bg-gradient-to-r from-[#1e293b] via-[#0f172a] to-[#1e293b] bg-clip-text text-transparent">
+            explicativa
+          </span>{" "}
+          y{" "}
+          <span className="bg-gradient-to-r from-[#1e293b] via-[#111827] to-[#0f172a] bg-clip-text text-transparent">
+            generativa
+          </span>{" "}
+          aplicada a la inversión
+        </h1>
+
+        <p className="mx-auto mt-5 max-w-3xl text-lg md:text-xl text-[#1e293b]/80 dark:text-[#cbd5e1]/80 font-light">
+          Entrena con retos históricos, entiende las señales con XAI
+          (SHAP/contrafactuales) y practica gestión de riesgo en un entorno seguro.
+        </p>
+
+        {/* Botones */}
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            href="/principiante"
+            className="btn-hero inline-flex w-full sm:w-auto items-center justify-center
+             px-8 py-4 text-[15px] font-medium tracking-wide uppercase
+             bg-[#0f172a] text-white border border-[#1e293b]
+             hover:bg-[#1e293b] hover:border-[#334155]
+             transition-all duration-200 rounded-md shadow-sm"
+          >
+            Modo principiante
+          </Link>
+
+          <Link
+            href="/avanzado"
+            className="btn-hero inline-flex w-full sm:w-auto items-center justify-center
+             px-8 py-4 text-[15px] font-medium tracking-wide uppercase
+             bg-[#111827] text-[#e2e8f0] border border-[#334155]
+             hover:bg-[#1e293b] hover:text-white hover:border-[#475569]
+             transition-all duration-200 rounded-md shadow-sm"
+          >
+            Modo avanzado
+          </Link>
         </div>
+      </section>
 
-        <div className="card">
-          <div className="aspect-[16/10] w-full rounded-xl bg-gradient-to-tr from-brand-100 to-white dark:from-white/10 dark:to-white/[0.06]" />
-          <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Aquí irá el gráfico OHLCV con overlays de atención/SHAP.
-          </p>
-        </div>
-      </div>
+      {/* Sección de módulos — “tiles” con borde lateral de acento */}
+{/* Sección de módulos — “tiles” con fondo ligeramente más oscuro */}
+<section className="mx-auto max-w-6xl px-6 pb-20">
+  <div className="grid gap-6 sm:grid-cols-3">
+    {[
+      {
+        href: "/retos",
+        title: "Retos históricos",
+        desc: "Decide comprar/evitar con datos hasta la fecha T. Sin fuga de futuro.",
+        cta: "Explorar →",
+      },
+      {
+        href: "/xai",
+        title: "Explicaciones XAI",
+        desc: "Top señales a favor/en contra, confianza y contrafactuales simples.",
+        cta: "Ver señales →",
+      },
+      {
+        href: "/riesgo",
+        title: "Laboratorio de riesgo",
+        desc: "Simula stop/objetivo, payoff y drawdown esperado con sliders.",
+        cta: "Simular →",
+      },
+    ].map((card, i) => (
+      <Link
+        key={i}
+        href={card.href}
+        className="group relative overflow-hidden rounded-xl p-6
+                   bg-[#94a3b8]/60 dark:bg-[#475569]/70
+                   border border-[#cbd5e1]/60 dark:border-[#374151]/60
+                   shadow-sm hover:shadow-md transition-all duration-300
+                   hover:-translate-y-0.5 backdrop-blur-sm
+                   before:content-[''] before:absolute before:inset-y-0 before:left-0 before:w-1.5
+                   before:bg-gradient-to-b before:from-[#1e293b] before:via-[#334155] before:to-[#1e293b]
+                   before:opacity-70 group-hover:before:opacity-100"
+      >
+        <h3 className="pl-4 text-lg font-semibold text-[#0f172a] dark:text-[#f3f4f6]">
+          {card.title}
+        </h3>
+        <p className="pl-4 mt-2 text-sm font-light text-[#1e293b]/80 dark:text-[#d1d5db]/80">
+          {card.desc}
+        </p>
+        <span className="pl-4 mt-4 inline-block text-sm font-medium text-[#1f2937] dark:text-[#e5e7eb] group-hover:underline underline-offset-4">
+          {card.cta}
+        </span>
+      </Link>
+    ))}
+  </div>
+</section>
 
-      {/* FEATURES */}
-      <div className="grid gap-4 sm:grid-cols-3" id="demo">
-        {[
-          {
-            title: "Retos históricos",
-            desc: "Decide comprar/evitar con datos hasta la fecha T. Sin fuga de futuro.",
-          },
-          {
-            title: "Explicaciones XAI",
-            desc: "Top señales a favor/en contra, confianza y contrafactuales simples.",
-          },
-          {
-            title: "Laboratorio riesgo",
-            desc: "Simula stop/objetivo, payoff y drawdown esperado con sliders.",
-          },
-        ].map((f) => (
-          <div key={f.title} className="card">
-            <h3 className="text-lg font-semibold">{f.title}</h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{f.desc}</p>
-          </div>
-        ))}
-      </div>
-    </section>
+
+    </main>
   );
 }
