@@ -23,9 +23,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_-10%,rgba(79,70,229,0.20),transparent_60%)] dark:bg-[radial-gradient(60%_60%_at_50%_-10%,rgba(99,102,241,0.25),transparent_60%)]" />
         </div>
 
-        <Header />
-        <main className="mx-auto max-w-6xl px-5 py-10">{children}</main>
-        <Footer />
+        {/* ---- NUEVO: wrapper a pantalla completa ---- */}
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          {/* main crece y empuja el Footer abajo */}
+          <main className="flex-1 mx-auto w-full max-w-6xl px-5 py-10">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
