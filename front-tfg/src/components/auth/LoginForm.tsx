@@ -1,34 +1,34 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
-import { users } from "@/data/mockUsers";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
+import { useAuthContext } from "@/contexts/AuthContext";
+import type { AuthUser } from "@/types/auth";
+
+type LoginStatus = "idle" | "success" | "error";
 
 export default function LoginForm() {
+  const { authenticate, initialized } = useAuthContext();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [activeUser, setActiveUser] = useState<(typeof users)[number] | null>(
-    null,
-  );
-
-  const credentialsMap = useMemo(() => {
-    return users.reduce((map, user) => {
-      map.set(user.username.toLowerCase(), user);
-      return map;
-    }, new Map<string, (typeof users)[number]>());
-  }, []);
+  const [status, setStatus] = useState<LoginStatus>("idle");
+  const [activeUser, setActiveUser] = useState<AuthUser | null>(null);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const user = credentialsMap.get(username.trim().toLowerCase());
-    if (!user || user.password !== password) {
+    if (!initialized) {
+      return;
+    }
+
+    const userFromContext = authenticate(username, password);
+    if (!userFromContext) {
       setStatus("error");
       setActiveUser(null);
       return;
     }
 
-    setActiveUser(user);
+    setActiveUser(userFromContext);
     setStatus("success");
   };
 
@@ -49,8 +49,8 @@ export default function LoginForm() {
           Inicia sesión en la plataforma
         </h1>
         <p className="text-sm text-slate-600 dark:text-slate-300">
-          Usa las credenciales de demostración para explorar el panel educativo
-          de finanzas.
+          Accede con tu cuenta creada o con cualquiera de los perfiles de
+          demostración.
         </p>
       </header>
 
@@ -90,27 +90,27 @@ export default function LoginForm() {
 
         <button
           type="submit"
-          className="mt-2 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-100 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus:ring-indigo-400/80 dark:focus:ring-offset-[#0b1020]"
+          disabled={!initialized}
+          className="mt-2 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus:ring-indigo-400/80 dark:focus:ring-offset-[#0b1020]"
         >
-          Acceder
+          {initialized ? "Acceder" : "Cargando..."}
         </button>
       </form>
 
-      <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
-        <p className="font-medium text-slate-700 dark:text-slate-100">
-          Usuarios de prueba disponibles
+      <div className="rounded-2xl border border-indigo-200/60 bg-indigo-50/70 p-4 text-sm text-indigo-900 dark:border-indigo-500/40 dark:bg-indigo-500/10 dark:text-indigo-100">
+        <p className="font-semibold">
+          ¿Aún no tienes cuenta?
         </p>
-        <ul className="grid gap-2">
-          {users.map((user) => (
-            <li
-              key={user.username}
-              className="flex items-center justify-between rounded-xl border border-slate-200/70 bg-white px-4 py-2 text-left text-xs font-medium uppercase tracking-[0.2em] text-slate-500 dark:border-white/10 dark:bg-[#111a3a] dark:text-slate-300"
-            >
-              <span>{user.username}</span>
-              <span>{user.password}</span>
-            </li>
-          ))}
-        </ul>
+        <p className="mt-1 text-xs text-indigo-800 dark:text-indigo-200/80">
+          Puedes registrarte en segundos y guardar tus progresos, o usar uno de
+          los perfiles de demostración incluidos.
+        </p>
+        <Link
+          href="/register"
+          className="mt-3 inline-flex items-center justify-center rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-indigo-50 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus:ring-indigo-400/60 dark:focus:ring-offset-[#0b1020]"
+        >
+          Crear cuenta
+        </Link>
       </div>
 
       {status === "success" && activeUser ? (
@@ -127,8 +127,8 @@ export default function LoginForm() {
         <div className="rounded-2xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-200">
           <p className="font-semibold">Credenciales no válidas</p>
           <p className="mt-1 text-xs text-rose-600 dark:text-rose-200/80">
-            Revisa el usuario y la contraseña. Puedes consultar los accesos de
-            prueba superiores.
+            Revisa el usuario y la contraseña o crea una nueva cuenta si aún no
+            dispones de acceso.
           </p>
           <button
             type="button"

@@ -1,11 +1,6 @@
-export type MockUser = {
-  username: string;
-  password: string;
-  name: string;
-  role: "principiante" | "intermedio" | "avanzado";
-};
+import type { AuthUser } from "@/types/auth";
 
-export const users: MockUser[] = [
+export const demoUsers: AuthUser[] = [
   {
     username: "ana_inversion",
     password: "finanzas123",
