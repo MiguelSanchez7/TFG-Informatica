@@ -3,6 +3,7 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const display = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-display" });
@@ -23,9 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_-10%,rgba(79,70,229,0.20),transparent_60%)] dark:bg-[radial-gradient(60%_60%_at_50%_-10%,rgba(99,102,241,0.25),transparent_60%)]" />
         </div>
 
-        <Header />
-        <main className="mx-auto max-w-6xl px-5 py-10">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main className="mx-auto max-w-6xl px-5 py-10">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
