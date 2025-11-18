@@ -1,0 +1,24 @@
+// prisma/schema.prisma
+// Configura Prisma para usar PostgreSQL y define el modelo User solicitado.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  alumno
+  profesor
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  nombre    String   @unique
+  password  String
+  rol       Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
