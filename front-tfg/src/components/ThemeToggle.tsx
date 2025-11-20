@@ -25,27 +25,57 @@ export default function ThemeToggle() {
   };
 
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-xl px-3 py-1.5 text-sm " +
+    "inline-flex items-center justify-center rounded-full w-9 h-9 text-sm " +
     "select-none transition cursor-pointer focus:outline-none " +
-    "focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[.98] " +
-    "whitespace-nowrap w-[122px] flex-shrink-0"; // <- ancho fijo + no encoge
+    "focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[.97] " +
+    "focus-visible:ring-sky-400/80 focus-visible:ring-offset-slate-100 " +
+    "dark:focus-visible:ring-offset-[#020617]";
 
   const light =
-    "text-white border border-white/25 bg-white/5 hover:bg-white/15 " +
-    "focus-visible:ring-white/60 focus-visible:ring-offset-[#0f172a]";
-
+    "text-slate-800 border border-slate-300 bg-white hover:bg-slate-100";
   const dark =
-    "text-[#0f172a] border border-black/15 bg-white hover:bg-slate-100 " +
-    "focus-visible:ring-[#0f172a]/40 focus-visible:ring-offset-white";
+    "text-slate-100 border border-slate-600 bg-slate-800 hover:bg-slate-700";
 
   return (
     <button
       onClick={toggle}
       aria-pressed={isDark}
-      title={`Cambiar a modo ${isDark ? "claro" : "oscuro"}`}
+      aria-label={`Cambiar a modo ${isDark ? "claro" : "oscuro"}`}
       className={`${base} ${isDark ? dark : light}`}
     >
-      {isDark ? "Modo claro" : "Modo oscuro"}
+      {/* Sol / Luna “serios” en SVG */}
+      {isDark ? (
+        // Luna
+        <svg
+          viewBox="0 0 24 24"
+          className="w-4 h-4"
+          aria-hidden="true"
+        >
+          <path
+            d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79Z"
+            fill="currentColor"
+          />
+        </svg>
+      ) : (
+        // Sol
+        <svg
+          viewBox="0 0 24 24"
+          className="w-4 h-4"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="4" fill="currentColor" />
+          <g stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <line x1="12" y1="2" x2="12" y2="5" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+            <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
+            <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
+            <line x1="2" y1="12" x2="5" y2="12" />
+            <line x1="19" y1="12" x2="22" y2="12" />
+            <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
+            <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
+          </g>
+        </svg>
+      )}
     </button>
   );
 }

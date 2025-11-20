@@ -1,9 +1,13 @@
 // src/app/page.tsx
 import Link from "next/link";
+import Navbar from "../components/Navbar";
+import { TestSupabase } from "../components/TestSupabase";
 
 export default function Home() {
   return (
-    <main className="relative font-sans tracking-tight">
+    <main className="relative font-sans tracking-tight min-h-screen bg-[#020617] text-[#e5e7eb]">
+      <Navbar />
+
       {/* Fondo azul marino muy sutil */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-[-10rem] h-[26rem] w-[26rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-[#0a0f1f]/30 to-[#1e293b]/20 blur-[100px]" />
@@ -11,12 +15,12 @@ export default function Home() {
       </div>
 
       {/* HERO */}
-      <section className="mx-auto max-w-5xl px-6 pt-16 pb-10 text-center">
+      <section className="mx-auto max-w-5xl px-6 pt-28 pb-10 text-center">
         <p className="text-xs tracking-[0.25em] text-[#475569] dark:text-[#94a3b8] uppercase font-medium">
           TFG · Plataforma educativa con IA
         </p>
 
-        <h1 className="mt-3 text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-[#0f172a] dark:text-[#f1f5f9]">
+        <h1 className="mt-3 text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-[#f9fafb]">
           IA{" "}
           <span className="bg-gradient-to-r from-[#1e293b] via-[#0f172a] to-[#1e293b] bg-clip-text text-transparent">
             explicativa
@@ -28,12 +32,12 @@ export default function Home() {
           aplicada a la inversión
         </h1>
 
-        <p className="mx-auto mt-5 max-w-3xl text-lg md:text-xl text-[#1e293b]/80 dark:text-[#cbd5e1]/80 font-light">
+        <p className="mx-auto mt-5 max-w-3xl text-lg md:text-xl text-[#cbd5e1]/80 font-light">
           Entrena con retos históricos, entiende las señales con XAI
           (SHAP/contrafactuales) y practica gestión de riesgo en un entorno seguro.
         </p>
 
-        {/* Botones */}
+        {/* Botones principales del hero */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/principiante"
@@ -59,57 +63,56 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sección de módulos — “tiles” con borde lateral de acento */}
-{/* Sección de módulos — “tiles” con fondo ligeramente más oscuro */}
-<section className="mx-auto max-w-6xl px-6 pb-20">
-  <div className="grid gap-6 sm:grid-cols-3">
-    {[
-      {
-        href: "/retos",
-        title: "Retos históricos",
-        desc: "Decide comprar/evitar con datos hasta la fecha T. Sin fuga de futuro.",
-        cta: "Explorar →",
-      },
-      {
-        href: "/xai",
-        title: "Explicaciones XAI",
-        desc: "Top señales a favor/en contra, confianza y contrafactuales simples.",
-        cta: "Ver señales →",
-      },
-      {
-        href: "/riesgo",
-        title: "Laboratorio de riesgo",
-        desc: "Simula stop/objetivo, payoff y drawdown esperado con sliders.",
-        cta: "Simular →",
-      },
-    ].map((card, i) => (
-      <Link
-        key={i}
-        href={card.href}
-        className="group relative overflow-hidden rounded-xl p-6
-                   bg-[#94a3b8]/60 dark:bg-[#475569]/70
-                   border border-[#cbd5e1]/60 dark:border-[#374151]/60
+      {/* Sección de módulos */}
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <div className="grid gap-6 sm:grid-cols-3">
+          {[
+            {
+              href: "/retos",
+              title: "Retos históricos",
+              desc: "Decide comprar/evitar con datos hasta la fecha T. Sin fuga de futuro.",
+              cta: "Explorar →",
+            },
+            {
+              href: "/xai",
+              title: "Explicaciones XAI",
+              desc: "Top señales a favor/en contra, confianza y contrafactuales simples.",
+              cta: "Ver señales →",
+            },
+            {
+              href: "/riesgo",
+              title: "Laboratorio de riesgo",
+              desc: "Simula stop/objetivo, payoff y drawdown esperado con sliders.",
+              cta: "Simular →",
+            },
+          ].map((card, i) => (
+            <Link
+              key={i}
+              href={card.href}
+              className="group relative overflow-hidden rounded-xl p-6
+                   bg-[#0f172a]/40
+                   border border-[#1f2937]
                    shadow-sm hover:shadow-md transition-all duration-300
                    hover:-translate-y-0.5 backdrop-blur-sm
                    before:content-[''] before:absolute before:inset-y-0 before:left-0 before:w-1.5
                    before:bg-gradient-to-b before:from-[#1e293b] before:via-[#334155] before:to-[#1e293b]
                    before:opacity-70 group-hover:before:opacity-100"
-      >
-        <h3 className="pl-4 text-lg font-semibold text-[#0f172a] dark:text-[#f3f4f6]">
-          {card.title}
-        </h3>
-        <p className="pl-4 mt-2 text-sm font-light text-[#1e293b]/80 dark:text-[#d1d5db]/80">
-          {card.desc}
-        </p>
-        <span className="pl-4 mt-4 inline-block text-sm font-medium text-[#1f2937] dark:text-[#e5e7eb] group-hover:underline underline-offset-4">
-          {card.cta}
-        </span>
-      </Link>
-    ))}
-  </div>
-</section>
+            >
+              <h3 className="pl-4 text-lg font-semibold text-[#f9fafb]">
+                {card.title}
+              </h3>
+              <p className="pl-4 mt-2 text-sm font-light text-[#cbd5e1]/80">
+                {card.desc}
+              </p>
+              <span className="pl-4 mt-4 inline-block text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4">
+                {card.cta}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-
+      <TestSupabase />
     </main>
   );
 }
