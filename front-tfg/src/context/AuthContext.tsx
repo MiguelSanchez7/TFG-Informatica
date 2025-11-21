@@ -15,10 +15,13 @@ export type AuthUser = {
   points?: number | null;
   level?: number | null;
   role?: string | null;
+  full_name?: string | null;
+  country?: string | null;
 };
 
 type AuthContextValue = {
   user: AuthUser | null;
+  setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
   login: (user: AuthUser) => void;
   logout: () => void;
 };
@@ -55,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => setUser(null);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

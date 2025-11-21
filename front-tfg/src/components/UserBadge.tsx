@@ -1,12 +1,12 @@
 // src/components/UserBadge.tsx
 "use client";
 
+import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 
 export default function UserBadge() {
   const { user, logout } = useAuth();
 
-  // Sin sesión → solo icono genérico
   if (!user) {
     return (
       <div
@@ -24,7 +24,6 @@ export default function UserBadge() {
     );
   }
 
-  // Con sesión
   const initial = user.username?.charAt(0).toUpperCase() ?? "?";
 
   return (
@@ -32,15 +31,23 @@ export default function UserBadge() {
       className="flex items-center gap-2 rounded-full bg-[#020617]/80
                  border border-[#334155] px-3 py-1.5 shadow-sm"
     >
-      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1e293b] text-sm font-semibold text-[#e5e7eb]">
+      {/* 👇 AQUÍ: el icono es el link al perfil */}
+      <Link
+        href="/profile"
+        className="flex items-center justify-center w-8 h-8 rounded-full
+                   bg-[#1e293b] text-sm font-semibold text-[#e5e7eb]
+                   hover:bg-[#111827] transition"
+      >
         {initial}
-      </div>
+      </Link>
+
       <div className="hidden sm:flex flex-col">
         <span className="text-[10px] uppercase tracking-[0.18em] text-[#9ca3af]">
           Conectado
         </span>
         <span className="text-sm text-[#e5e7eb]">{user.username}</span>
       </div>
+
       <button
         type="button"
         onClick={logout}

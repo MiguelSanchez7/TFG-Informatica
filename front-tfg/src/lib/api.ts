@@ -1,6 +1,17 @@
-// src/lib/api.ts
-export async function registerUser(username: string, email: string, password: string) {
-  const response = await fetch("http://localhost:8000/users", {
+// ⬅️ NUEVO: URL base del backend
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+
+// ===============================
+// Registro de usuario
+// ===============================
+export async function registerUser(
+  username: string,
+  email: string,
+  password: string
+) {
+  const response = await fetch(`${API_URL}/users`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -13,17 +24,20 @@ export async function registerUser(username: string, email: string, password: st
     try {
       const err = await response.json();
       errText = err.detail || errText;
-    } catch {
-      // ignoramos si no es JSON
-    }
+    } catch {}
+
     throw new Error(errText);
   }
 
   return response.json();
 }
 
+
+// ===============================
+// Login de usuario
+// ===============================
 export async function loginUser(email: string, password: string) {
-  const response = await fetch("http://localhost:8000/login", {
+  const response = await fetch(`${API_URL}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -36,11 +50,10 @@ export async function loginUser(email: string, password: string) {
     try {
       const err = await response.json();
       errText = err.detail || errText;
-    } catch {
-      // ignoramos si no es JSON
-    }
+    } catch {}
+
     throw new Error(errText);
   }
 
-  return response.json(); // devuelve el usuario
+  return response.json();
 }

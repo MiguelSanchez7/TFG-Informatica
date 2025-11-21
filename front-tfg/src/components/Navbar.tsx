@@ -1,4 +1,3 @@
-// src/components/Navbar.tsx
 "use client";
 
 import Link from "next/link";
@@ -18,7 +17,6 @@ export default function Navbar() {
                  shadow-sm"
     >
       <div className="flex w-full items-center px-4 sm:px-6 py-3">
-
         {/* IZQUIERDA */}
         <div className="flex items-center gap-3">
           <Link href="/" aria-label="Inicio">
@@ -34,7 +32,7 @@ export default function Navbar() {
           <ThemeToggle />
         </div>
 
-        {/* DERECHA: Pegado al borde */}
+        {/* DERECHA */}
         <div className="ml-auto flex items-center gap-3">
           {!user && (
             <>
@@ -61,7 +59,8 @@ export default function Navbar() {
               </Link>
             </>
           )}
-          <UserBadge />
+
+          {user && <UserBadge />}
         </div>
       </div>
     </nav>

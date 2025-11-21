@@ -130,6 +130,11 @@ class LoginRequest(BaseModel):
     password: constr(min_length=6, max_length=100)
 
 
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    country: Optional[str] = None
+
+
 # ========= ENDPOINTS =========
 
 @app.get("/users", response_model=List[UserPublic])
@@ -170,3 +175,22 @@ def login(payload: LoginRequest):
         raise HTTPException(status_code=401, detail=str(e))
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/users/{user_id}", response_model=UserPublic)
+def update_user(user_id: str, payload: UserUpdate):
+    update_data = {k: v for k, v in payload.dict().items() if v is not None}
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No se enviaron cambios.")
+
+    response = (
+        supabase.table("users")
+        .update(update_data)
+        .eq("id", user_id)
+        .execute()
+    )
+
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    return response.data[0]
