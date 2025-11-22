@@ -68,7 +68,7 @@ export default function Home() {
         <div className="grid gap-6 sm:grid-cols-3">
           {[
             {
-              href: "/retos",
+              href: "/retos-historicos",
               title: "Retos históricos",
               desc: "Decide comprar/evitar con datos hasta la fecha T. Sin fuga de futuro.",
               cta: "Explorar →",
