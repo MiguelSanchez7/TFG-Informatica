@@ -20,8 +20,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # ========= LÓGICA DE USUARIOS =========
+
 
 def create_user(username: str, email: str, password: str) -> Dict[str, Any]:
     # comprobar username
@@ -71,7 +71,10 @@ def create_user(username: str, email: str, password: str) -> Dict[str, Any]:
 def get_users() -> List[Dict[str, Any]]:
     response = (
         supabase.table("users")
-        .select("id, username, email, points, level, role, created_at")
+        .select(
+            "id, username, email, points, level, role, "
+            "name, surname, country, avatar_url, created_at"
+        )
         .order("created_at", desc=True)
         .execute()
     )
@@ -85,7 +88,10 @@ def authenticate_user(email: str, password: str) -> Dict[str, Any]:
     """
     response = (
         supabase.table("users")
-        .select("id, username, email, password_hash, points, level, role, created_at")
+        .select(
+            "id, username, email, password_hash, points, level, role, "
+            "name, surname, country, avatar_url, created_at"
+        )
         .eq("email", email)
         .execute()
     )
@@ -123,6 +129,12 @@ class UserPublic(BaseModel):
     points: Optional[int] = 0
     level: Optional[int] = 1
     role: Optional[str] = "user"
+    name: Optional[str] = None
+    surname: Optional[str] = None
+    country: Optional[str] = None
+    avatar_url: Optional[str] = None
+    # lo dejamos como Any para no romper si Supabase devuelve datetime raro
+    created_at: Optional[Any] = None
 
 
 class LoginRequest(BaseModel):
@@ -131,8 +143,10 @@ class LoginRequest(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    full_name: Optional[str] = None
+    name: Optional[str] = None
+    surname: Optional[str] = None
     country: Optional[str] = None
+    avatar_url: Optional[str] = None
 
 
 # ========= ENDPOINTS =========
@@ -175,6 +189,7 @@ def login(payload: LoginRequest):
         raise HTTPException(status_code=401, detail=str(e))
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.put("/users/{user_id}", response_model=UserPublic)
 def update_user(user_id: str, payload: UserUpdate):

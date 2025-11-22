@@ -15,13 +15,16 @@ export type AuthUser = {
   points?: number | null;
   level?: number | null;
   role?: string | null;
-  full_name?: string | null;
+  name?: string | null;
+  surname?: string | null;
   country?: string | null;
+  avatar_url?: string | null;
+  created_at?: string | null;
 };
 
 type AuthContextValue = {
   user: AuthUser | null;
-  setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
+  setUser: (u: AuthUser | null) => void;
   login: (user: AuthUser) => void;
   logout: () => void;
 };
