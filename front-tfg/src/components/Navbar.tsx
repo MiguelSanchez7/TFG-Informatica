@@ -5,16 +5,20 @@ import Image from "next/image";
 import ThemeToggle from "./ThemeToggle";
 import UserBadge from "./UserBadge";
 import { useAuth } from "../context/AuthContext";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  // Solo después de montar en cliente mostramos zona de usuario/login
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-40
-                 bg-white dark:bg-[#0a0f1f]
-                 border-b border-slate-300 dark:border-[#1e293b]
-                 shadow-sm"
+      className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-[#0a0f1f] border-b border-slate-300 dark:border-[#1e293b] shadow-sm"
     >
       <div className="flex w-full items-center px-4 sm:px-6 py-3">
         {/* IZQUIERDA */}
@@ -34,7 +38,9 @@ export default function Navbar() {
 
         {/* DERECHA */}
         <div className="ml-auto flex items-center gap-3">
-          {!user && (
+          {/* Hasta que no estemos montados, no mostramos nada
+              para que SSR y primer render del cliente coincidan */}
+          {mounted && !user && (
             <>
               <Link
                 href="/login"
@@ -60,7 +66,7 @@ export default function Navbar() {
             </>
           )}
 
-          {user && <UserBadge />}
+          {mounted && user && <UserBadge />}
         </div>
       </div>
     </nav>

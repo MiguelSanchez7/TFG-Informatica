@@ -1,4 +1,6 @@
 // src/app/page.tsx
+"use client";
+
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import { TestSupabase } from "../components/TestSupabase";
@@ -33,30 +35,21 @@ export default function Home() {
         </h1>
 
         <p className="mx-auto mt-5 max-w-3xl text-lg md:text-xl text-[#cbd5e1]/80 font-light">
-          Entrena con retos históricos, entiende las señales con XAI
-          (SHAP/contrafactuales) y practica gestión de riesgo en un entorno seguro.
+          Entrena con retos históricos, entiende las señales con XAI (SHAP/contrafactuales) y practica gestión de riesgo en un entorno seguro.
         </p>
 
         {/* Botones principales del hero */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/principiante"
-            className="btn-hero inline-flex w-full sm:w-auto items-center justify-center
-             px-8 py-4 text-[15px] font-medium tracking-wide uppercase
-             bg-[#0f172a] text-white border border-[#1e293b]
-             hover:bg-[#1e293b] hover:border-[#334155]
-             transition-all duration-200 rounded-md shadow-sm"
+            className="btn-hero inline-flex w-full sm:w-auto items-center justify-center px-8 py-4 text-[15px] font-medium tracking-wide uppercase bg-[#0f172a] text-white border border-[#1e293b] hover:bg-[#1e293b] hover:border-[#334155] transition-all duration-200 rounded-md shadow-sm"
           >
             Modo principiante
           </Link>
 
           <Link
             href="/avanzado"
-            className="btn-hero inline-flex w-full sm:w-auto items-center justify-center
-             px-8 py-4 text-[15px] font-medium tracking-wide uppercase
-             bg-[#111827] text-[#e2e8f0] border border-[#334155]
-             hover:bg-[#1e293b] hover:text-white hover:border-[#475569]
-             transition-all duration-200 rounded-md shadow-sm"
+            className="btn-hero inline-flex w-full sm:w-auto items-center justify-center px-8 py-4 text-[15px] font-medium tracking-wide uppercase bg-[#111827] text-[#e2e8f0] border border-[#334155] hover:bg-[#1e293b] hover:text-white hover:border-[#475569] transition-all duration-200 rounded-md shadow-sm"
           >
             Modo avanzado
           </Link>
@@ -89,21 +82,10 @@ export default function Home() {
             <Link
               key={i}
               href={card.href}
-              className="group relative overflow-hidden rounded-xl p-6
-                   bg-[#0f172a]/40
-                   border border-[#1f2937]
-                   shadow-sm hover:shadow-md transition-all duration-300
-                   hover:-translate-y-0.5 backdrop-blur-sm
-                   before:content-[''] before:absolute before:inset-y-0 before:left-0 before:w-1.5
-                   before:bg-gradient-to-b before:from-[#1e293b] before:via-[#334155] before:to-[#1e293b]
-                   before:opacity-70 group-hover:before:opacity-100"
+              className="group relative overflow-hidden rounded-xl p-6 bg-[#0f172a]/40 border border-[#1f2937] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 backdrop-blur-sm before:content-[''] before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-gradient-to-b before:from-[#1e293b] before:via-[#334155] before:to-[#1e293b] before:opacity-70 group-hover:before:opacity-100"
             >
-              <h3 className="pl-4 text-lg font-semibold text-[#f9fafb]">
-                {card.title}
-              </h3>
-              <p className="pl-4 mt-2 text-sm font-light text-[#cbd5e1]/80">
-                {card.desc}
-              </p>
+              <h3 className="pl-4 text-lg font-semibold text-[#f9fafb]">{card.title}</h3>
+              <p className="pl-4 mt-2 text-sm font-light text-[#cbd5e1]/80">{card.desc}</p>
               <span className="pl-4 mt-4 inline-block text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4">
                 {card.cta}
               </span>
