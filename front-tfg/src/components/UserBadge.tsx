@@ -25,22 +25,33 @@ export default function UserBadge() {
   }
 
   const initial = user.username?.charAt(0).toUpperCase() ?? "?";
+  const avatar = user.avatar_url; // ← FOTO DE PERFIL
 
   return (
     <div
       className="flex items-center gap-2 rounded-full bg-[#020617]/80
                  border border-[#334155] px-3 py-1.5 shadow-sm"
     >
-      {/* 👇 AQUÍ: el icono es el link al perfil */}
+      {/* FOTO o INICIAL (link al perfil) */}
       <Link
         href="/profile"
         className="flex items-center justify-center w-8 h-8 rounded-full
                    bg-[#1e293b] text-sm font-semibold text-[#e5e7eb]
-                   hover:bg-[#111827] transition"
+                   hover:bg-[#111827] transition overflow-hidden"
       >
-        {initial}
+        {avatar ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={avatar}
+            alt="avatar"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          initial
+        )}
       </Link>
 
+      {/* Texto de usuario */}
       <div className="hidden sm:flex flex-col">
         <span className="text-[10px] uppercase tracking-[0.18em] text-[#9ca3af]">
           Conectado
@@ -48,6 +59,7 @@ export default function UserBadge() {
         <span className="text-sm text-[#e5e7eb]">{user.username}</span>
       </div>
 
+      {/* Botón salir */}
       <button
         type="button"
         onClick={logout}
