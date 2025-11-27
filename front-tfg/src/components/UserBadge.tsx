@@ -63,7 +63,7 @@ export default function UserBadge() {
       <button
         type="button"
         onClick={logout}
-        className="ml-1 text-[10px] text-[#9ca3af] hover:text-[#e5e7eb] uppercase tracking-[0.18em]"
+        className="ml-1 text-[10px] text-[#9ca3af] hover:text-[#e5e7eb] uppercase tracking-[0.18em] cursor-pointer"
       >
         Salir
       </button>
