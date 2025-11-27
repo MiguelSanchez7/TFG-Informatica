@@ -8,13 +8,13 @@ export default function Header() {
   const headerBase =
     "site-header sticky top-0 z-40 w-full border-b backdrop-blur transition-colors";
   const headerLight = "bg-[#0f172a] text-white border-white/10";
-  const headerDark = "dark:bg-[#e5e7eb] dark:text-[#0f172a] dark:border-black/10";
+  const headerDark =
+    "dark:bg-[#e5e7eb] dark:text-[#0f172a] dark:border-black/10";
 
-  const logoBase =
-    "logo-dot h-8 w-8 rounded-full transition-colors";
+  const logoBase = "logo-dot h-8 w-8 rounded-full transition-colors";
   const logoLight = "bg-white ring-4 ring-white/30";
   const logoDark =
-    "dark:bg-[#0f172a] dark:ring-4 dark:ring-[rgba(0,0,0,.14)]";
+    "dark:bg-[#0f172a] dark:ring-4 dark:ring[rgba(0,0,0,.14)]";
 
   return (
     <header className={`${headerBase} ${headerLight} ${headerDark}`}>

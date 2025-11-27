@@ -13,7 +13,9 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
-  const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
+  const [messageType, setMessageType] = useState<"success" | "error" | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -24,6 +26,13 @@ export default function RegisterPage() {
 
     try {
       const user = await registerUser(username, email, password);
+
+      // 👉 tras registrarse, guardamos al usuario en el contexto
+      //    y redirigimos a la home con sesión iniciada
+      login(user);
+      router.push("/");
+
+      // (opcional: por si la redirección tarda un poco)
       setMessage(`Usuario creado correctamente: ${user.username}`);
       setMessageType("success");
       setPassword("");
@@ -74,8 +83,8 @@ export default function RegisterPage() {
               Regístrate para empezar a practicar inversión
             </h2>
             <p className="mt-1 text-sm text-[#94a3b8]">
-              Crea tu cuenta para acceder a los retos históricos, explicaciones XAI
-              y el laboratorio de riesgo.
+              Crea tu cuenta para acceder a los retos históricos, explicaciones
+              XAI y el laboratorio de riesgo.
             </p>
 
             {/* Mensaje de estado */}
@@ -172,13 +181,12 @@ export default function RegisterPage() {
               </button>
             </form>
 
-              <p className="mt-5 text-xs text-[#6b7280]">
-                ¿Ya tienes cuenta?{" "}
-                <Link href="/login" className="text-[#e5e7eb] hover:underline">
-                  Inicia sesión aquí
-                </Link>
-              </p>
-
+            <p className="mt-5 text-xs text-[#6b7280]">
+              ¿Ya tienes cuenta?{" "}
+              <Link href="/login" className="text-[#e5e7eb] hover:underline">
+                Inicia sesión aquí
+              </Link>
+            </p>
           </div>
         </div>
       </div>

@@ -17,9 +17,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-[#0a0f1f] border-b border-slate-300 dark:border-[#1e293b] shadow-sm"
-    >
+    <nav className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-[#0a0f1f] border-b border-slate-300 dark:border-[#1e293b] shadow-sm">
       <div className="flex w-full items-center px-4 sm:px-6 py-3">
         {/* IZQUIERDA */}
         <div className="flex items-center gap-3">
