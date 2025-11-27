@@ -109,11 +109,18 @@ export default function ProfilePage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // avatar actual que se muestra en el perfil
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  // nueva URL de avatar pendiente de guardar (si es distinta a la del usuario)
+  const [pendingAvatarUrl, setPendingAvatarUrl] = useState<string | null>(null);
+
   // sincronizar inputs cuando cambie el usuario del contexto
   useEffect(() => {
     setFirstName(user?.name ?? "");
     setLastName(user?.surname ?? "");
     setCountry(user?.country ?? "");
+    setAvatarPreview(user?.avatar_url ?? null);
+    setPendingAvatarUrl(null);
   }, [user]);
 
   if (!user) {
@@ -137,8 +144,6 @@ export default function ProfilePage() {
     ? new Date(user.created_at).toLocaleDateString("es-ES")
     : "—";
 
-  const avatarUrl: string | null = user.avatar_url ?? null;
-
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -146,14 +151,39 @@ export default function ProfilePage() {
     setError(null);
 
     try {
+      // Construimos solo los campos que realmente cambian
+      const payload: Record<string, any> = {};
+
+      if (firstName !== (user.name ?? "")) {
+        payload.name = firstName || null;
+      }
+
+      if (lastName !== (user.surname ?? "")) {
+        payload.surname = lastName || null;
+      }
+
+      if (country !== (user.country ?? "")) {
+        payload.country = country || null;
+      }
+
+      if (
+        pendingAvatarUrl !== null &&
+        pendingAvatarUrl !== (user.avatar_url ?? null)
+      ) {
+        payload.avatar_url = pendingAvatarUrl;
+      }
+
+      // Si no hay ningún cambio, error
+      if (Object.keys(payload).length === 0) {
+        setError("No se enviaron cambios.");
+        setSaving(false);
+        return;
+      }
+
       const res = await fetch(`${API_URL}/users/${user.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: firstName || null,
-          surname: lastName || null,
-          country: country || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -170,6 +200,7 @@ export default function ProfilePage() {
       const updated = await res.json();
       setUser(updated);
       setMessage("Perfil guardado correctamente");
+      setPendingAvatarUrl(null);
     } catch (err: any) {
       setError(err.message || "Error inesperado al guardar el perfil");
     } finally {
@@ -209,27 +240,11 @@ export default function ProfilePage() {
 
       const publicUrl = publicData.publicUrl;
 
-      // Guardar la URL en nuestro backend
-      const res = await fetch(`${API_URL}/users/${user.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar_url: publicUrl }),
-      });
-
-      if (!res.ok) {
-        let msg = "No se pudo actualizar la foto de perfil";
-        try {
-          const data = await res.json();
-          if (data.detail) msg = data.detail;
-        } catch {
-          // ignore
-        }
-        throw new Error(msg);
-      }
-
-      const updated = await res.json();
-      setUser(updated);
-      setMessage("Foto de perfil actualizada");
+      // Solo actualizamos el "preview" local y marcamos avatar pendiente de guardar.
+      setAvatarPreview(publicUrl);
+      setPendingAvatarUrl(publicUrl);
+      // No llamamos al backend aquí, se hará en handleSubmit
+      // y no mostramos mensaje de éxito todavía.
     } catch (err: any) {
       setError(
         err.message || "Error inesperado al subir la foto de perfil"
@@ -291,10 +306,10 @@ export default function ProfilePage() {
                              flex items-center justify-center 
                              text-3xl font-bold shadow-inner overflow-hidden"
                 >
-                  {avatarUrl ? (
+                  {avatarPreview ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={avatarUrl}
+                      src={avatarPreview}
                       alt={displayName}
                       className="w-full h-full object-cover"
                     />
@@ -305,14 +320,13 @@ export default function ProfilePage() {
 
                 {/* Badge de nivel centrado */}
                 <span
-                    className="absolute left-1/2 -translate-x-1/2 -bottom-4
+                  className="absolute left-1/2 -translate-x-1/2 -bottom-4
                               rounded-full bg-emerald-500 px-2 py-0.5
                               text-[10px] font-semibold uppercase tracking-[0.16em]
                               text-[#e5fdf4] shadow shadow-emerald-900/70"
-                  >
-                    {levelLabel}
+                >
+                  {levelLabel}
                 </span>
-
 
                 {/* Botón para cambiar avatar */}
                 <label
@@ -374,7 +388,7 @@ export default function ProfilePage() {
               )}
 
               {user.surname && (
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start justify_between gap-4">
                   <span className="text-[#64748b]">Apellidos</span>
                   <span className="text-right text-[#e5e7eb]">
                     {user.surname}

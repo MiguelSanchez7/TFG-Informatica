@@ -193,11 +193,18 @@ def login(payload: LoginRequest):
 
 @app.put("/users/{user_id}", response_model=UserPublic)
 def update_user(user_id: str, payload: UserUpdate):
-    update_data = {k: v for k, v in payload.dict().items() if v is not None}
+    # Solo tenemos en cuenta los campos que llegan en la petición
+    update_data = {
+        k: v
+        for k, v in payload.dict(exclude_unset=True).items()
+        if v is not None
+    }
 
+    # ✅ Si no hay NINGÚN campo con valor -> error
     if not update_data:
         raise HTTPException(status_code=400, detail="No se enviaron cambios.")
 
+    # ✅ Si hay al menos un campo (name, surname, country o avatar_url) -> se actualiza
     response = (
         supabase.table("users")
         .update(update_data)
