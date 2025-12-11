@@ -3,98 +3,150 @@
 
 import Link from "next/link";
 import Navbar from "../components/Navbar";
+import { useAuth } from "../context/AuthContext";
 import { TestSupabase } from "../components/TestSupabase";
 
 export default function Home() {
+  const { user } = useAuth();
+
+  const displayName = user?.username || user?.email || "Inversor";
+  const level = user?.level ?? 4;
+  const xp = user?.xp ?? 720;
+  const xpTarget = user?.xpTarget ?? 1000;
+  const progress = Math.min(100, Math.round((xp / xpTarget) * 100));
+
   return (
     <main className="relative font-sans tracking-tight min-h-screen bg-[#020617] text-[#e5e7eb]">
       <Navbar />
 
-      {/* Fondo azul marino muy sutil */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-[-10rem] h-[26rem] w-[26rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-[#0a0f1f]/30 to-[#1e293b]/20 blur-[100px]" />
-        <div className="absolute right-[-6rem] bottom-[-6rem] h-[18rem] w-[18rem] rounded-full bg-gradient-to-tr from-[#111827]/20 to-[#0f172a]/30 blur-[100px]" />
-      </div>
+      <div className="mx-auto max-w-6xl px-6 pt-28 pb-16">
+        {/* Cabecera principal */}
+        <header className="text-center mb-10">
+          <p className="text-xs tracking-[0.25em] text-[#64748b] uppercase font-medium">
+            Hola, {displayName}
+          </p>
 
-      {/* HERO */}
-      <section className="mx-auto max-w-5xl px-6 pt-28 pb-10 text-center">
-        <p className="text-xs tracking-[0.25em] text-[#475569] dark:text-[#94a3b8] uppercase font-medium">
-          TFG · Plataforma educativa con IA
-        </p>
+          <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#f9fafb]">
+            Aprende a invertir de manera
+            <span className="block mt-1 bg-gradient-to-r from-[#38bdf8] via-[#a855f7] to-[#f97316] bg-clip-text text-transparent">
+              sencilla y divertida
+            </span>
+          </h1>
 
-        <h1 className="mt-3 text-4xl sm:text-5xl md:text-6xl font-bold leading-tight text-[#f9fafb]">
-          IA{" "}
-          <span className="bg-gradient-to-r from-[#1e293b] via-[#0f172a] to-[#1e293b] bg-clip-text text-transparent">
-            explicativa
-          </span>{" "}
-          y{" "}
-          <span className="bg-gradient-to-r from-[#1e293b] via-[#111827] to-[#0f172a] bg-clip-text text-transparent">
-            generativa
-          </span>{" "}
-          aplicada a la inversión
-        </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base md:text-lg text-[#cbd5e1]/80 font-light">
+            Descubre y entiende conceptos de inversión desde nivel básico a nivel experto.
+            Entrena tus decisiones con datos históricos y disfruta del proceso en un entorno seguro.
+          </p>
 
-        <p className="mx-auto mt-5 max-w-3xl text-lg md:text-xl text-[#cbd5e1]/80 font-light">
-          Entrena con retos históricos, entiende las señales con XAI (SHAP/contrafactuales) y practica gestión de riesgo en un entorno seguro.
-        </p>
-
-        {/* Botones principales del hero */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link
-            href="/principiante"
-            className="btn-hero inline-flex w-full sm:w-auto items-center justify-center px-8 py-4 text-[15px] font-medium tracking-wide uppercase bg-[#0f172a] text-white border border-[#1e293b] hover:bg-[#1e293b] hover:border-[#334155] transition-all duration-200 rounded-md shadow-sm"
-          >
-            Modo principiante
-          </Link>
-
-          <Link
-            href="/avanzado"
-            className="btn-hero inline-flex w-full sm:w-auto items-center justify-center px-8 py-4 text-[15px] font-medium tracking-wide uppercase bg-[#111827] text-[#e2e8f0] border border-[#334155] hover:bg-[#1e293b] hover:text-white hover:border-[#475569] transition-all duration-200 rounded-md shadow-sm"
-          >
-            Modo avanzado
-          </Link>
-        </div>
-      </section>
-
-      {/* Sección de módulos */}
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="grid gap-6 sm:grid-cols-3">
-          {[
-            {
-              href: "/retos-historicos",
-              title: "Retos históricos",
-              desc: "Decide comprar/evitar con datos hasta la fecha T. Sin fuga de futuro.",
-              cta: "Explorar →",
-            },
-            {
-              href: "/xai",
-              title: "Explicaciones XAI",
-              desc: "Top señales a favor/en contra, confianza y contrafactuales simples.",
-              cta: "Ver señales →",
-            },
-            {
-              href: "/riesgo",
-              title: "Laboratorio de riesgo",
-              desc: "Simula stop/objetivo, payoff y drawdown esperado con sliders.",
-              cta: "Simular →",
-            },
-          ].map((card, i) => (
-            <Link
-              key={i}
-              href={card.href}
-              className="group relative overflow-hidden rounded-xl p-6 bg-[#0f172a]/40 border border-[#1f2937] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 backdrop-blur-sm before:content-[''] before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-gradient-to-b before:from-[#1e293b] before:via-[#334155] before:to-[#1e293b] before:opacity-70 group-hover:before:opacity-100"
-            >
-              <h3 className="pl-4 text-lg font-semibold text-[#f9fafb]">{card.title}</h3>
-              <p className="pl-4 mt-2 text-sm font-light text-[#cbd5e1]/80">{card.desc}</p>
-              <span className="pl-4 mt-4 inline-block text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4">
-                {card.cta}
+          {/* Barra de nivel / XP */}
+          <div className="mt-6 mx-auto max-w-xl">
+            <div className="flex items-center justify-between text-xs text-[#94a3b8] mb-1">
+              <span>Lvl. {level}</span>
+              <span>
+                {xp}/{xpTarget} XP
               </span>
-            </Link>
-          ))}
-        </div>
-      </section>
+            </div>
+            <div className="h-2 w-full rounded-full bg-[#020617] border border-[#1f2937] overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#38bdf8] via-[#22c55e] to-[#facc15]"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        </header>
 
-      <TestSupabase />
+        {/* Tarjetas principales */}
+        <section className="grid gap-6 md:grid-cols-3">
+          {/* Retos históricos */}
+          <Link
+            href="/retos-historicos"
+            className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <div className="mb-4 flex h-20 items-center justify-center">
+              {/* Icono tipo velas */}
+              <div className="relative h-14 w-14 rounded-lg border border-[#1f2937] bg-[#020617] flex items-end justify-center gap-1 px-2">
+                <div className="w-1.5 h-6 bg-[#38bdf8] rounded-sm" />
+                <div className="w-1.5 h-9 bg-[#22c55e] rounded-sm" />
+                <div className="w-1.5 h-4 bg-[#f97316] rounded-sm" />
+              </div>
+            </div>
+            <h2 className="text-lg font-semibold text-[#f9fafb] mb-2 text-center md:text-left">
+              Retos históricos
+            </h2>
+            <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
+              Practica con datos históricos reales. Decide comprar, mantener o evitar sin fuga de futuro.
+            </p>
+            <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
+              Ir a retos históricos →
+            </span>
+          </Link>
+
+          {/* Aprende conceptos */}
+          <Link
+            href="/conceptos"
+            className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <div className="mb-4 flex h-20 items-center justify-center">
+              {/* Icono tipo pizarra */}
+              <div className="relative h-14 w-16 rounded-lg border border-[#1f2937] bg-[#020617] flex items-center justify-center">
+                <div className="absolute inset-2 border border-[#1f2937] rounded-md" />
+                <div className="w-8 h-0.5 bg-[#38bdf8] absolute top-4 left-4" />
+                <div className="w-5 h-0.5 bg-[#22c55e] absolute top-6 left-4" />
+                <div className="w-3 h-0.5 bg-[#f97316] absolute top-8 left-4" />
+              </div>
+            </div>
+            <h2 className="text-lg font-semibold text-[#f9fafb] mb-2 text-center md:text-left">
+              Aprende conceptos
+            </h2>
+            <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
+              Revisa conceptos clave de inversión con ejemplos visuales y preguntas cortas para afianzar la teoría.
+            </p>
+            <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
+              Ir a conceptos →
+            </span>
+          </Link>
+
+          {/* Diseña tu estrategia */}
+          <Link
+            href="/estrategia"
+            className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <div className="mb-4 flex h-20 items-center justify-center">
+              {/* Icono tipo gráfico de línea */}
+              <div className="relative h-14 w-16 rounded-lg border border-[#1f2937] bg-[#020617] flex items-center justify-center">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-8 w-8 text-[#22c55e]"
+                  aria-hidden="true"
+                >
+                  <polyline
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    points="3 17 9 11 13 15 21 7"
+                  />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-lg font-semibold text-[#f9fafb] mb-2 text-center md:text-left">
+              Diseña tu estrategia
+            </h2>
+            <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
+              Define tamaño de posición, stops y objetivos. Simula el impacto en tu curva de capital antes de ejecutar.
+            </p>
+            <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
+              Ir al laboratorio de estrategia →
+            </span>
+          </Link>
+        </section>
+
+        {/* Solo para tus pruebas con Supabase */}
+        <div className="mt-10">
+          <TestSupabase />
+        </div>
+      </div>
     </main>
   );
 }
