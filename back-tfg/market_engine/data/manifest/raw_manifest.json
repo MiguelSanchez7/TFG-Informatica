@@ -1,0 +1,398 @@
+{
+  "source": "Yahoo Finance",
+  "start_date": "2008-01-01",
+  "end_date": "2025-12-31",
+  "downloaded_at": "2026-01-15T10:58:07.172155+00:00",
+  "tickers": {
+    "AAPL": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "MSFT": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "GOOGL": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "AMZN": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "META": {
+      "rows": 3424,
+      "from": "2012-05-18",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "NVDA": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "TSLA": {
+      "rows": 3901,
+      "from": "2010-06-29",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "INTC": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "CSCO": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "IBM": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "JPM": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "BAC": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "GS": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "MS": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "V": {
+      "rows": 4475,
+      "from": "2008-03-19",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "MA": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "AXP": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "KO": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "PEP": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "MCD": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "NKE": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "WMT": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "DIS": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "BA": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "CAT": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "JNJ": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "PFE": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "UNH": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "PG": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    },
+    "XOM": {
+      "rows": 4528,
+      "from": "2008-01-02",
+      "to": "2025-12-30",
+      "columns": [
+        "adj_close",
+        "close",
+        "high",
+        "low",
+        "open",
+        "volume"
+      ]
+    }
+  }
+}
