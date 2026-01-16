@@ -1,53 +1,152 @@
+// src/app/page.tsx
+"use client";
+
+import Link from "next/link";
+import Navbar from "../components/Navbar";
+import { useAuth } from "../context/AuthContext";
+import { TestSupabase } from "../components/TestSupabase";
+
 export default function Home() {
+  const { user } = useAuth();
+
+  const displayName = user?.username || user?.email || "Inversor";
+  const level = user?.level ?? 4;
+  const xp = user?.xp ?? 720;
+  const xpTarget = user?.xpTarget ?? 1000;
+  const progress = Math.min(100, Math.round((xp / xpTarget) * 100));
+
   return (
-    <section className="grid gap-10">
-      {/* HERO */}
-      <div className="grid items-center gap-8 sm:grid-cols-2">
-        <div>
-          <h1 className="h1 text-brand-700 dark:text-white">
-            IA explicativa y generativa para decidir mejor
+    <main className="relative font-sans tracking-tight min-h-screen bg-[#020617] text-[#e5e7eb]">
+      <Navbar />
+
+      <div className="mx-auto max-w-6xl px-6 pt-28 pb-16">
+        {/* Cabecera principal */}
+        <header className="text-center mb-10">
+          <p className="text-xs tracking-[0.25em] text-[#64748b] uppercase font-medium">
+            Hola, {displayName}
+          </p>
+
+          <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#f9fafb]">
+            Aprende a invertir de manera
+            <span className="block mt-1 bg-gradient-to-r from-[#38bdf8] via-[#a855f7] to-[#f97316] bg-clip-text text-transparent">
+              sencilla y divertida
+            </span>
           </h1>
-          <p className="lead mt-4">
-            Entrena con retos históricos, entiende las señales con XAI
-            (SHAP/contrafactuales) y practica gestión de riesgo en un entorno seguro.
+
+          <p className="mx-auto mt-4 max-w-2xl text-base md:text-lg text-[#cbd5e1]/80 font-light">
+            Descubre y entiende conceptos de inversión desde nivel básico a nivel experto.
+            Entrena tus decisiones con datos históricos y disfruta del proceso en un entorno seguro.
           </p>
 
-          <div className="mt-6 flex gap-3">
-            <a href="/about" className="btn-primary">Objetivos del TFG</a>
-            <a href="#demo" className="btn-ghost">Ver demo</a>
+          {/* Barra de nivel / XP */}
+          <div className="mt-6 mx-auto max-w-xl">
+            <div className="flex items-center justify-between text-xs text-[#94a3b8] mb-1">
+              <span>Lvl. {level}</span>
+              <span>
+                {xp}/{xpTarget} XP
+              </span>
+            </div>
+            <div className="h-2 w-full rounded-full bg-[#020617] border border-[#1f2937] overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#38bdf8] via-[#22c55e] to-[#facc15]"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
           </div>
-        </div>
+        </header>
 
-        <div className="card">
-          <div className="aspect-[16/10] w-full rounded-xl bg-gradient-to-tr from-brand-100 to-white dark:from-white/10 dark:to-white/[0.06]" />
-          <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-            Aquí irá el gráfico OHLCV con overlays de atención/SHAP.
-          </p>
+        {/* Tarjetas principales */}
+        <section className="grid gap-6 md:grid-cols-3">
+          {/* Retos históricos */}
+          <Link
+            href="/retos-historicos"
+            className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <div className="mb-4 flex h-20 items-center justify-center">
+              {/* Icono tipo velas */}
+              <div className="relative h-14 w-14 rounded-lg border border-[#1f2937] bg-[#020617] flex items-end justify-center gap-1 px-2">
+                <div className="w-1.5 h-6 bg-[#38bdf8] rounded-sm" />
+                <div className="w-1.5 h-9 bg-[#22c55e] rounded-sm" />
+                <div className="w-1.5 h-4 bg-[#f97316] rounded-sm" />
+              </div>
+            </div>
+            <h2 className="text-lg font-semibold text-[#f9fafb] mb-2 text-center md:text-left">
+              Retos históricos
+            </h2>
+            <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
+              Practica con datos históricos reales. Decide comprar, mantener o evitar sin fuga de futuro.
+            </p>
+            <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
+              Ir a retos históricos →
+            </span>
+          </Link>
+
+          {/* Aprende conceptos */}
+          <Link
+            href="/conceptos"
+            className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <div className="mb-4 flex h-20 items-center justify-center">
+              {/* Icono tipo pizarra */}
+              <div className="relative h-14 w-16 rounded-lg border border-[#1f2937] bg-[#020617] flex items-center justify-center">
+                <div className="absolute inset-2 border border-[#1f2937] rounded-md" />
+                <div className="w-8 h-0.5 bg-[#38bdf8] absolute top-4 left-4" />
+                <div className="w-5 h-0.5 bg-[#22c55e] absolute top-6 left-4" />
+                <div className="w-3 h-0.5 bg-[#f97316] absolute top-8 left-4" />
+              </div>
+            </div>
+            <h2 className="text-lg font-semibold text-[#f9fafb] mb-2 text-center md:text-left">
+              Aprende conceptos
+            </h2>
+            <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
+              Revisa conceptos clave de inversión con ejemplos visuales y preguntas cortas para afianzar la teoría.
+            </p>
+            <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
+              Ir a conceptos →
+            </span>
+          </Link>
+
+          {/* Diseña tu estrategia */}
+          <Link
+            href="/estrategia"
+            className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <div className="mb-4 flex h-20 items-center justify-center">
+              {/* Icono tipo gráfico de línea */}
+              <div className="relative h-14 w-16 rounded-lg border border-[#1f2937] bg-[#020617] flex items-center justify-center">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-8 w-8 text-[#22c55e]"
+                  aria-hidden="true"
+                >
+                  <polyline
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    points="3 17 9 11 13 15 21 7"
+                  />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-lg font-semibold text-[#f9fafb] mb-2 text-center md:text-left">
+              Diseña tu estrategia
+            </h2>
+            <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
+              Define tamaño de posición, stops y objetivos. Simula el impacto en tu curva de capital antes de ejecutar.
+            </p>
+            <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
+              Ir al laboratorio de estrategia →
+            </span>
+          </Link>
+        </section>
+
+        {/* Solo para tus pruebas con Supabase */}
+        <div className="mt-10">
+          <TestSupabase />
         </div>
       </div>
-
-      {/* FEATURES */}
-      <div className="grid gap-4 sm:grid-cols-3" id="demo">
-        {[
-          {
-            title: "Retos históricos",
-            desc: "Decide comprar/evitar con datos hasta la fecha T. Sin fuga de futuro.",
-          },
-          {
-            title: "Explicaciones XAI",
-            desc: "Top señales a favor/en contra, confianza y contrafactuales simples.",
-          },
-          {
-            title: "Laboratorio riesgo",
-            desc: "Simula stop/objetivo, payoff y drawdown esperado con sliders.",
-          },
-        ].map((f) => (
-          <div key={f.title} className="card">
-            <h3 className="text-lg font-semibold">{f.title}</h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{f.desc}</p>
-          </div>
-        ))}
-      </div>
-    </section>
+    </main>
   );
 }

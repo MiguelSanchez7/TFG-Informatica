@@ -1,1 +1,153 @@
 @import "tailwindcss";
+
+/* Transiciones suaves al cambiar de tema */
+* { transition: background-color 150ms linear, color 150ms linear, border-color 150ms linear; }
+
+/* Modo oscuro cuando <html> tiene .dark */
+html.dark, html.dark body {
+  background-color: #0b1220;  /* navy muy oscuro */
+  color: #e5e7eb;             /* slate-200 */
+}
+
+/* Transición suave al cambiar de tema */
+* { transition: background-color .15s linear, color .15s linear, border-color .15s linear; }
+
+/* Base dark más legible */
+html.dark, html.dark body {
+  background-color: #0f172a; /* slate-900 (azul marino) */
+  color: #e5e7eb;            /* slate-200 */
+}
+
+
+/* Asegura que todo texto heredado sea blanco */
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark p,
+html.dark span,
+html.dark a,
+html.dark li,
+html.dark div {
+  color: #ffffff !important;
+}
+
+/* EXCEPCIÓN: botones del hero deben ser fondo blanco y texto oscuro en modo oscuro */
+html.dark a.btn-hero {
+  color: #0f172a !important;         /* texto negro-azulado */
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+html.dark a.btn-hero:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* === Navbar (modo invertido) === */
+nav.navbar {
+  background-color: #0f172a; /* oscuro por defecto (modo claro) */
+  color: #ffffff;            /* texto blanco */
+}
+
+/* En modo oscuro: fondo blanco y texto negro */
+html.dark nav.navbar {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Asegura que los enlaces del navbar también cambien */
+html.dark nav.navbar a,
+html.dark nav.navbar button,
+html.dark nav.navbar span {
+  color: #0f172a !important;
+}
+
+nav.navbar a,
+nav.navbar button,
+nav.navbar span {
+  color: #ffffff;
+}
+
+/* En modo oscuro, forzar que SOLO el header tenga texto oscuro sobre fondo blanco,
+   para contradecir la regla global que pone todo en blanco. */
+html.dark .site-header,
+html.dark .site-header * {
+  color: #0f172a !important;
+}
+
+html.dark .site-header,
+html.dark .site-header * { color: #0f172a !important; }
+
+/* Header base en modo oscuro (texto oscuro) */
+html.dark .site-header { color: #0f172a; }
+
+/* Enlaces “normales” del header en modo oscuro (dejan que los pills activos
+   pongan su propio color con las clases dark:bg / dark:text) */
+html.dark .site-header a { color: #0f172a; }
+/* --- Overrides específicos del header en modo oscuro --- */
+html.dark .site-header {
+  background-color: #e5e7eb !important;
+  color: #0f172a !important;
+  border-color: rgba(0,0,0,.1) !important;
+}
+
+html.dark .site-header * {
+  color: #0f172a !important;
+}
+
+/* Fondo del cuerpo en oscuro */
+html.dark, html.dark body { background-color: #0f172a; }
+
+/* Logo en oscuro del mismo color */
+html.dark .site-header .logo-dot { background-color: #0f172a !important; }
+
+
+/* =========================================================
+   OVERRIDES ESPECÍFICOS PARA EL HEADER (GANAN A LO DEMÁS)
+   ========================================================= */
+
+/* Pills base: transparent y heredan color del header */
+.site-header .nav-pill {
+  background: transparent;
+  color: inherit;
+  border-radius: 0.75rem; /* por si Tailwind se pisa con globales */
+  padding: 0.375rem 0.75rem;
+  transition: background-color .15s linear, color .15s linear, box-shadow .15s linear;
+}
+
+/* -------- MODO CLARO (header oscuro #0f172a) -------- */
+/* Inactivo: texto blanco, hover sutil */
+html:not(.dark) .site-header .nav-pill[data-active="false"] {
+  color: #ffffff !important;
+}
+html:not(.dark) .site-header .nav-pill[data-active="false"]:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* ACTIVO en claro: pill blanco con texto #0f172a */
+html:not(.dark) .site-header .nav-pill[data-active="true"] {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+
+/* -------- MODO OSCURO (header BLANCO) -------- */
+/* Inactivo en oscuro: texto #0f172a, fondo transparente/hover claro */
+html.dark .site-header .nav-pill[data-active="false"] {
+  color: #0f172a !important;
+  background: transparent !important;
+}
+html.dark .site-header .nav-pill[data-active="false"]:hover {
+  background: #f1f5f9 !important; /* slate-100 */
+}
+
+/* ACTIVO en oscuro: pill azul #0f172a con texto blanco */
+html.dark .site-header .nav-pill[data-active="true"] {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+
+/* CÍRCULO (logo): azul en modo oscuro */
+html.dark .site-header .logo-dot {
+  background-color: #0f172a !important;
+  box-shadow: none !important;
+}
