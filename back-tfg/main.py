@@ -8,6 +8,13 @@ from pydantic import BaseModel, EmailStr, constr
 
 from supabase_client import supabase
 
+from market_engine.service import (
+    get_random_scenario,
+    get_scenario,
+    reveal_scenario
+)
+
+
 
 app = FastAPI(title="TFG Inversión - Backend")
 
@@ -216,3 +223,25 @@ def update_user(user_id: str, payload: UserUpdate):
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
     return response.data[0]
+
+# ========= MARKET ENGINE =========
+
+@app.get("/market/scenario/random")
+def api_random_scenario():
+    return get_random_scenario()
+
+
+@app.get("/market/scenario/{scenario_id}")
+def api_get_scenario(scenario_id: str):
+    return get_scenario(scenario_id)
+
+
+@app.post("/market/scenario/{scenario_id}/reveal")
+def api_reveal_scenario(scenario_id: str, body: dict):
+    action = body.get("action")
+
+    if action not in {"BUY", "HOLD", "SELL"}:
+        raise HTTPException(status_code=400, detail="Invalid action")
+
+    return reveal_scenario(scenario_id, action)
+
