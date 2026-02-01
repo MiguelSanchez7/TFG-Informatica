@@ -1,0 +1,48 @@
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+.next/
+
+# =========================
+# Python / Backend
+# =========================
+venv/
+.env
+.env.*
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================
+# IDEs / OS
+# =========================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs & temp
+# =========================
+*.log
+*.tmp
+
+# =========================
+# Secrets
+# =========================
+supabase_key.txt
+secrets.json
