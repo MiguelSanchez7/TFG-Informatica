@@ -16,11 +16,27 @@ def _load_scenarios_df() -> pd.DataFrame:
     return pd.read_parquet(path)
 
 
+def _normalize_scenario_id(value) -> str:
+    # Siempre trabajamos con scenario_id como STRING (UUID incluido)
+    if value is None:
+        raise ValueError("Invalid scenario_id: None")
+    return str(value).strip()
+
+
 def get_scenario(scenario_id: str) -> dict:
+    scenario_id_norm = _normalize_scenario_id(scenario_id)
+
     scenarios = _load_scenarios_df()
-    row_s = scenarios[scenarios["scenario_id"] == scenario_id]
+
+    # Normalizamos la columna scenario_id a string para comparar seguro
+    if "scenario_id" not in scenarios.columns:
+        raise ValueError("scenarios.parquet no tiene la columna 'scenario_id'")
+
+    scenarios_ids = scenarios["scenario_id"].astype(str)
+    row_s = scenarios[scenarios_ids == scenario_id_norm]
+
     if row_s.empty:
-        raise ValueError(f"Scenario not found: {scenario_id}")
+        raise ValueError(f"Scenario not found: {scenario_id_norm}")
 
     s = row_s.iloc[0]
     ticker = s["ticker"]
@@ -39,15 +55,13 @@ def get_scenario(scenario_id: str) -> dict:
     # IA reglas
     pred = predict_from_row(feat_row)
 
-    # Payload listo para el front
     payload = {
-        "scenario_id": scenario_id,
+        "scenario_id": scenario_id_norm,  # UUID/string
         "ticker": ticker,
         "anchor_date": str(t.date()),
-        "horizon_days": int(s["horizon_days"]),
-        "context_days": int(s["context_days"]),
+        "horizon_days": int(s.get("horizon_days", HORIZON_DAYS)),
+        "context_days": int(s.get("context_days", CONTEXT_DAYS)),
 
-        # History para graficar (solo lo necesario)
         "history": [
             {
                 "date": str(idx.date()),
@@ -58,7 +72,6 @@ def get_scenario(scenario_id: str) -> dict:
             for idx, r in df_upto_t.iterrows()
         ],
 
-        # Features en t (para mostrar al usuario)
         "features_at_t": {
             "adj_close": float(feat_row["adj_close"]),
             "ret_1d": None if pd.isna(feat_row["ret_1d"]) else float(feat_row["ret_1d"]),
@@ -70,14 +83,13 @@ def get_scenario(scenario_id: str) -> dict:
             "vol_rel20": float(feat_row["vol_rel20"]),
         },
 
-        # Recomendación IA (reglas)
         "ai": prediction_to_dict(pred),
     }
 
     return payload
 
 
-def get_random_scenario(ticker: str | None = None, seed: int = 42) -> dict:
+def get_random_scenario(ticker: str | None = None, seed: int | None = None) -> dict:
     scenarios = _load_scenarios_df()
 
     if ticker is not None:
@@ -85,17 +97,15 @@ def get_random_scenario(ticker: str | None = None, seed: int = 42) -> dict:
         if scenarios.empty:
             raise ValueError(f"No scenarios for ticker: {ticker}")
 
+    # seed=None => aleatorio real, seed=int => reproducible
     s = scenarios.sample(1, random_state=seed).iloc[0]
-    return get_scenario(str(s["scenario_id"]))
+
+    # IMPORTANTE: scenario_id es UUID/string
+    random_id = _normalize_scenario_id(s["scenario_id"])
+    return get_scenario(random_id)
 
 
 def _score_action(action: str, y_real: float) -> float:
-    """
-    scoring educativo simple:
-    - BUY  -> score = y_real
-    - SELL -> score = -y_real
-    - HOLD -> score = 0
-    """
     action = action.upper().strip()
     if action not in ("BUY", "HOLD", "SELL"):
         raise ValueError(f"Invalid action: {action}")
@@ -108,42 +118,43 @@ def _score_action(action: str, y_real: float) -> float:
 
 
 def reveal_scenario(scenario_id: str, user_action: str) -> dict:
-    """
-    Devuelve el futuro real (t -> t+h) y la comparación usuario vs IA.
-    """
+    scenario_id_norm = _normalize_scenario_id(scenario_id)
+
     scenarios = _load_scenarios_df()
-    row_s = scenarios[scenarios["scenario_id"] == scenario_id]
+    scenarios_ids = scenarios["scenario_id"].astype(str)
+    row_s = scenarios[scenarios_ids == scenario_id_norm]
+
     if row_s.empty:
-        raise ValueError(f"Scenario not found: {scenario_id}")
+        raise ValueError(f"Scenario not found: {scenario_id_norm}")
 
     s = row_s.iloc[0]
     ticker = s["ticker"]
     t = pd.to_datetime(s["anchor_date"])
-    h = int(s["horizon_days"])
+    h = int(s.get("horizon_days", HORIZON_DAYS))
 
     df = pd.read_parquet(FEATURES_DIR / f"{ticker}.parquet")
     if t not in df.index:
         raise ValueError(f"Anchor date not found in features for {ticker}: {t}")
 
-    # IA (acción en t)
     pred = predict_from_row(df.loc[t])
     ai_action = pred.action
 
-    # Construimos futuro: siguientes h días de mercado (excluyendo t)
-    future = df.loc[t:].iloc[: h + 1]  # incluye t y h días después
+    # Futuro: siguientes h días (incluyendo t)
+    future = df.loc[t:].iloc[: h + 1]
     if len(future) < h + 1:
         raise ValueError(f"Not enough future data for reveal: {ticker} {t} (need {h} days)")
 
     price_t = float(future.iloc[0]["adj_close"])
     price_th = float(future.iloc[-1]["adj_close"])
-
     y_real = (price_th / price_t) - 1.0
 
     user_score = _score_action(user_action, y_real)
     ai_score = _score_action(ai_action, y_real)
 
+    pred_dict = prediction_to_dict(pred)
+
     payload = {
-        "scenario_id": scenario_id,
+        "scenario_id": scenario_id_norm,
         "ticker": ticker,
         "anchor_date": str(t.date()),
         "horizon_days": h,
@@ -155,7 +166,6 @@ def reveal_scenario(scenario_id: str, user_action: str) -> dict:
         "user_score": float(user_score),
         "ai_score": float(ai_score),
 
-        # Para graficar el reveal
         "future_path": [
             {
                 "date": str(idx.date()),
@@ -166,10 +176,9 @@ def reveal_scenario(scenario_id: str, user_action: str) -> dict:
             for idx, r in future.iterrows()
         ],
 
-        # razones IA (para mostrar junto al reveal)
-        "ai_reasons": prediction_to_dict(pred)["reasons"],
-        "ai_confidence": prediction_to_dict(pred)["confidence"],
-        "ai_rule_score": prediction_to_dict(pred)["score"],
+        "ai_reasons": pred_dict.get("reasons"),
+        "ai_confidence": pred_dict.get("confidence"),
+        "ai_rule_score": pred_dict.get("score"),
     }
 
     return payload

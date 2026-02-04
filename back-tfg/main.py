@@ -131,12 +131,22 @@ def update_user_endpoint(user_id: str, payload: UserUpdate):
 
 @app.get("/market/scenario/random")
 def api_random_scenario():
-    return get_random_scenario()
+    try:
+        return get_random_scenario()
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/market/scenario/{scenario_id}")
 def api_get_scenario(scenario_id: str):
-    return get_scenario(scenario_id)
+    try:
+        return get_scenario(scenario_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/market/scenario/{scenario_id}/reveal")
@@ -146,4 +156,9 @@ def api_reveal_scenario(scenario_id: str, body: dict):
     if action not in {"BUY", "HOLD", "SELL"}:
         raise HTTPException(status_code=400, detail="Invalid action")
 
-    return reveal_scenario(scenario_id, action)
+    try:
+        return reveal_scenario(scenario_id, action)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

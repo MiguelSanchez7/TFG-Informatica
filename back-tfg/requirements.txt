@@ -1,3 +1,7 @@
 fastapi
 uvicorn
 pandas
+pyarrow
+bcrypt
+supabase
+python-dotenv
