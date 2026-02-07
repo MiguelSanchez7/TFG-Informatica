@@ -8,6 +8,11 @@ END_DATE = "2025-12-31"
 HORIZON_DAYS = 20          # revelar a 20 días de mercado
 CONTEXT_DAYS = 252         # mostrar ~1 año de histórico hasta t
 
+# Multi-turn mode (TFG)
+STEP_DAYS = 5      # días que avanza cada turno
+MAX_TURNS = 5      # número máximo de turnos
+
+
 # Tickers (30)
 TICKERS = [
     "AAPL","MSFT","GOOGL","AMZN","META","NVDA","TSLA","INTC","CSCO","IBM",
