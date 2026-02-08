@@ -158,15 +158,6 @@ export default function MarketChart({ scenario }: Props) {
 
   return (
     <div className="mt-4">
-      <div className="text-sm opacity-80">
-        Contexto (azul) + futuro (verde/rojo). La línea vertical marca el anchor_date.
-        {typeof yReal === "number" && (
-          <>
-            {" "}
-            Resultado real (y_real): <span className="font-semibold">{formatPct(yReal)}</span>
-          </>
-        )}
-      </div>
 
       <div className="mt-3 border rounded-lg p-3">
         <div style={{ width: "100%", height: 380 }}>
