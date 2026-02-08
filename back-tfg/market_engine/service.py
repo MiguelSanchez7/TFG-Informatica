@@ -135,6 +135,8 @@ def start_multiturn_session(scenario_id: str) -> dict:
         "user_score": 0.0,
         "ai_score": 0.0,
         "finished": False,
+
+        # ✅ Esto es el historial de TURNOS (no tocar el nombre interno)
         "history": [],
     }
 
@@ -163,6 +165,8 @@ def get_multiturn_state(scenario_id: str) -> dict:
         "finished": st["finished"],
         "user_score": st["user_score"],
         "ai_score": st["ai_score"],
+
+        # ✅ HISTORIAL DE PRECIOS para el gráfico (NO ROMPER FRONT)
         "history": [
             {
                 "date": str(idx.date()),
@@ -172,6 +176,10 @@ def get_multiturn_state(scenario_id: str) -> dict:
             }
             for idx, r in context.iterrows()
         ],
+
+        # ✅ NUEVO: HISTORIAL DE TURNOS con y_step (para scripts/estadísticas)
+        "turn_history": st["history"],
+
         "features_at_t": {
             "adj_close": float(feat_row["adj_close"]),
             "sma20": float(feat_row["sma20"]),
@@ -224,7 +232,7 @@ def step_multiturn_session(scenario_id: str, user_action: str) -> dict:
         "to": str(t_next.date()),
         "user_action": user_action,
         "ai_action": ai_action,
-        "y_step": y,
+        "y_step": float(y),
     })
 
     st["turn"] += 1

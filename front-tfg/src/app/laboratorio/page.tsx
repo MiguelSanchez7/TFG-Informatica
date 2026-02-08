@@ -50,18 +50,28 @@ function extractScenarioId(data: any): string {
   return data?.scenario_id ?? data?.id ?? data?.scenarioId ?? "";
 }
 
-function findAdjCloseByDateFromHistory(scenario: any, dateStr: string): number | null {
+function findAdjCloseByDateFromHistory(
+  scenario: any,
+  dateStr: string
+): number | null {
   if (!scenario || !Array.isArray(scenario.history) || !dateStr) return null;
   const row = scenario.history.find((r: any) => r?.date === dateStr);
   const v = row?.adj_close;
   return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 
-// BUY acierta si sube, SELL acierta si baja, HOLD acierta si casi no se mueve
+/**
+ * ✅ Baremo coherente (zona neutral):
+ * - BUY correcto si y > +eps
+ * - SELL correcto si y < -eps
+ * - HOLD correcto si |y| <= eps
+ *
+ * Para STEP_DAYS=5, eps=1% suele ser razonable.
+ */
 function isActionCorrect(action: Action, y: number): boolean {
-  const HOLD_EPS = 0.002; // 0.2%
-  if (action === "BUY") return y > 0;
-  if (action === "SELL") return y < 0;
+  const HOLD_EPS = 0.02; // 2% (para multi-turn de 5 días)
+  if (action === "BUY") return y > HOLD_EPS;
+  if (action === "SELL") return y < -HOLD_EPS;
   return Math.abs(y) <= HOLD_EPS;
 }
 
@@ -109,7 +119,8 @@ export default function LaboratorioPage() {
 
   const finished = Boolean(scenario?.finished);
   const turn = typeof scenario?.turn === "number" ? scenario.turn : null;
-  const maxTurns = typeof scenario?.max_turns === "number" ? scenario.max_turns : 5;
+  const maxTurns =
+    typeof scenario?.max_turns === "number" ? scenario.max_turns : 5;
 
   const estado = !scenario
     ? "—"
@@ -120,7 +131,8 @@ export default function LaboratorioPage() {
     : "ESCENARIO";
 
   const aiAction = scenario?.ai?.action ?? scenario?.ai_action ?? null;
-  const aiConfidence = scenario?.ai?.confidence ?? scenario?.ai_confidence ?? null;
+  const aiConfidence =
+    scenario?.ai?.confidence ?? scenario?.ai_confidence ?? null;
 
   const aiRuleScore =
     typeof scenario?.ai?.score === "number"
@@ -142,20 +154,26 @@ export default function LaboratorioPage() {
   ========================= */
 
   async function startMultiTurn(id: string) {
-    const res = await fetch(`http://localhost:8000/market/multiturn/start/${id}`, {
-      method: "POST",
-    });
+    const res = await fetch(
+      `http://localhost:8000/market/multiturn/start/${id}`,
+      {
+        method: "POST",
+      }
+    );
     const data = await res.json();
     setScenario(data);
     setStarted(true);
   }
 
   async function stepMultiTurn(id: string, action: Action) {
-    const res = await fetch(`http://localhost:8000/market/multiturn/step/${id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
-    });
+    const res = await fetch(
+      `http://localhost:8000/market/multiturn/step/${id}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      }
+    );
     const data = await res.json();
     return data;
   }
@@ -221,7 +239,6 @@ export default function LaboratorioPage() {
       return;
     }
 
-    // ✅ CLAVE: si ya terminó, no hacemos nada.
     if (finished) {
       setError("La sesión ya ha finalizado. Pulsa Random para empezar otra.");
       return;
@@ -242,9 +259,15 @@ export default function LaboratorioPage() {
       const newAnchor = nextScenario?.anchor_date;
       const newPrice = findAdjCloseByDateFromHistory(nextScenario, newAnchor);
 
-      // Cálculo variación + correcto/incorrecto
-      if (prevPrice != null && newPrice != null && prevPrice !== 0 && prevAnchor && newAnchor) {
-        const y = (newPrice / prevPrice) - 1.0;
+      // Variación + correcto/incorrecto
+      if (
+        prevPrice != null &&
+        newPrice != null &&
+        prevPrice !== 0 &&
+        prevAnchor &&
+        newAnchor
+      ) {
+        const y = newPrice / prevPrice - 1.0;
         const correct = isActionCorrect(action, y);
 
         setLastResult({
@@ -261,8 +284,6 @@ export default function LaboratorioPage() {
       }
 
       setScenario(nextScenario);
-
-      // Si justo aquí termina, mostramos banner y listo (botones se deshabilitan por finished=true)
     } catch (e: any) {
       setError(e?.message ?? "Error");
     } finally {
@@ -278,7 +299,8 @@ export default function LaboratorioPage() {
     "px-4 py-2 rounded-md bg-slate-700 text-white hover:bg-slate-800 transition " +
     "disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border border-slate-500";
 
-  const inputClass = "px-3 py-2 border border-slate-500 rounded w-96 max-w-full bg-transparent";
+  const inputClass =
+    "px-3 py-2 border border-slate-500 rounded w-96 max-w-full bg-transparent";
 
   const resultBoxClass = (ok: boolean) =>
     ok
@@ -288,7 +310,6 @@ export default function LaboratorioPage() {
   const endBoxClass =
     "border border-indigo-400/60 bg-indigo-900/30 text-indigo-100";
 
-  // ✅ Deshabilitar acciones si: loading o no started o finished
   const actionsDisabled = loading || !started || finished;
 
   /* =========================
@@ -324,13 +345,25 @@ export default function LaboratorioPage() {
 
         {/* ACCIONES */}
         <div className="mt-4 flex gap-3 flex-wrap">
-          <button className={btnClass} onClick={() => onAction("BUY")} disabled={actionsDisabled}>
+          <button
+            className={btnClass}
+            onClick={() => onAction("BUY")}
+            disabled={actionsDisabled}
+          >
             BUY
           </button>
-          <button className={btnClass} onClick={() => onAction("HOLD")} disabled={actionsDisabled}>
+          <button
+            className={btnClass}
+            onClick={() => onAction("HOLD")}
+            disabled={actionsDisabled}
+          >
             HOLD
           </button>
-          <button className={btnClass} onClick={() => onAction("SELL")} disabled={actionsDisabled}>
+          <button
+            className={btnClass}
+            onClick={() => onAction("SELL")}
+            disabled={actionsDisabled}
+          >
             SELL
           </button>
         </div>
@@ -339,15 +372,27 @@ export default function LaboratorioPage() {
 
         {/* INFO */}
         <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
-          <div><b>Ticker:</b> {ticker}</div>
-          <div><b>Anchor:</b> {anchor}</div>
-          <div><b>Estado:</b> {estado}</div>
-          <div><b>Turno:</b> {turn ?? "—"} / {maxTurns}</div>
-          <div><b>Tu score acumulado:</b> {userScoreAccum ?? "—"}</div>
-          <div><b>Score IA acumulado:</b> {aiScoreAccum ?? "—"}</div>
+          <div>
+            <b>Ticker:</b> {ticker}
+          </div>
+          <div>
+            <b>Anchor:</b> {anchor}
+          </div>
+          <div>
+            <b>Estado:</b> {estado}
+          </div>
+          <div>
+            <b>Turno:</b> {turn ?? "—"} / {maxTurns}
+          </div>
+          <div>
+            <b>Tu score acumulado:</b> {userScoreAccum ?? "—"}
+          </div>
+          <div>
+            <b>Score IA acumulado:</b> {aiScoreAccum ?? "—"}
+          </div>
         </div>
 
-        {/* ✅ FIN DE SESIÓN */}
+        {/* FIN DE SESIÓN */}
         {scenario && finished && (
           <div className={`mt-6 p-4 rounded-lg text-sm ${endBoxClass}`}>
             <div className="font-semibold text-base">✅ Sesión finalizada</div>
@@ -364,9 +409,15 @@ export default function LaboratorioPage() {
             <h2 className="text-lg font-semibold">Recomendación IA</h2>
 
             <div className="mt-3 text-sm">
-              <div><b>Acción IA:</b> {aiAction}</div>
-              <div><b>Confianza:</b> {aiConfidence ?? "—"}</div>
-              <div><b>Rule score:</b> {aiRuleScore?.toFixed?.(3) ?? "—"}</div>
+              <div>
+                <b>Acción IA:</b> {aiAction}
+              </div>
+              <div>
+                <b>Confianza:</b> {aiConfidence ?? "—"}
+              </div>
+              <div>
+                <b>Rule score:</b> {aiRuleScore?.toFixed?.(3) ?? "—"}
+              </div>
             </div>
 
             <div className="mt-4">
@@ -378,7 +429,9 @@ export default function LaboratorioPage() {
                   return (
                     <li key={i}>
                       {formatted}
-                      {explanation && <span className="opacity-70"> ({explanation})</span>}
+                      {explanation && (
+                        <span className="opacity-70"> ({explanation})</span>
+                      )}
                     </li>
                   );
                 })}
@@ -392,16 +445,22 @@ export default function LaboratorioPage() {
 
         {/* MENSAJE DE RESULTADO (ENCIMA DEL GRÁFICO) */}
         {lastResult && (
-          <div className={`mt-3 mb-3 p-3 rounded-md text-sm ${resultBoxClass(lastResult.correct)}`}>
+          <div
+            className={`mt-3 mb-3 p-3 rounded-md text-sm ${resultBoxClass(
+              lastResult.correct
+            )}`}
+          >
             <div className="font-semibold">
               {lastResult.correct ? "✔ Acción correcta" : "✘ Acción incorrecta"}
             </div>
             <div className="opacity-90 mt-1">
-              Acción: <b>{lastResult.action}</b> · {lastResult.prevAnchor} ({fmtPrice(lastResult.prevPrice)}) →{" "}
-              {lastResult.newAnchor} ({fmtPrice(lastResult.newPrice)}) · Variación: <b>{fmtPct(lastResult.y)}</b>
+              Acción: <b>{lastResult.action}</b> · {lastResult.prevAnchor} (
+              {fmtPrice(lastResult.prevPrice)}) → {lastResult.newAnchor} (
+              {fmtPrice(lastResult.newPrice)}) · Variación:{" "}
+              <b>{fmtPct(lastResult.y)}</b>
             </div>
             <div className="opacity-70 mt-1">
-              Nota: BUY acierta si sube, SELL acierta si baja, HOLD solo si se mueve muy poco.
+              Baremo: BUY si sube &gt; 1%, SELL si baja &lt; -1%, HOLD si |variación| ≤ 1%.
             </div>
           </div>
         )}
