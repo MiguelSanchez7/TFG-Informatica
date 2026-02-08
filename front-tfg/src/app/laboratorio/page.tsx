@@ -43,7 +43,7 @@ function getReasonExplanation(formattedReason: string): string | null {
 }
 
 /* =====================================================
-   HELPERS PARA MULTI-TURN
+   HELPERS
 ===================================================== */
 
 function extractScenarioId(data: any): string {
@@ -65,8 +65,6 @@ function findAdjCloseByDateFromHistory(
  * - BUY correcto si y > +eps
  * - SELL correcto si y < -eps
  * - HOLD correcto si |y| <= eps
- *
- * Para STEP_DAYS=5, eps=2% suele ser razonable.
  */
 function isActionCorrect(action: Action, y: number): boolean {
   const HOLD_EPS = 0.02; // 2% (multi-turn de 5 días)
@@ -75,14 +73,26 @@ function isActionCorrect(action: Action, y: number): boolean {
   return Math.abs(y) <= HOLD_EPS;
 }
 
-function fmtPct(x: number): string {
+function fmtPct2(x: number): string {
   const pct = x * 100;
   const sign = pct > 0 ? "+" : "";
   return `${sign}${pct.toFixed(2)}%`;
 }
 
-function fmtPrice(x: number): string {
+function fmtPrice2(x: number): string {
   return x.toFixed(2);
+}
+
+function fmtMaybePct2(x: any): string {
+  const n = Number(x);
+  if (!Number.isFinite(n)) return "—";
+  return fmtPct2(n);
+}
+
+function fmtMaybeInt(x: any): string {
+  const n = Number(x);
+  if (!Number.isFinite(n)) return "—";
+  return Math.round(n).toString();
 }
 
 /* =====================================================
@@ -96,10 +106,8 @@ export default function LaboratorioPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Multi-turn activo
   const [started, setStarted] = useState(false);
 
-  // Resultado de la última acción
   const [lastResult, setLastResult] = useState<null | {
     action: Action;
     y: number;
@@ -111,7 +119,7 @@ export default function LaboratorioPage() {
   }>(null);
 
   /* =========================
-     DATOS DERIVADOS
+     DERIVADOS
   ========================= */
 
   const ticker = scenario?.ticker ?? "—";
@@ -126,6 +134,7 @@ export default function LaboratorioPage() {
   const aiConfidence =
     scenario?.ai?.confidence ?? scenario?.ai_confidence ?? null;
 
+  // OJO: este "score" es el de reglas, NO el acierto
   const aiRuleScore =
     typeof scenario?.ai?.score === "number"
       ? scenario.ai.score
@@ -166,7 +175,7 @@ export default function LaboratorioPage() {
   }
 
   /* =========================
-     ACCIONES UI
+     UI ACTIONS
   ========================= */
 
   async function onRandom() {
@@ -272,10 +281,9 @@ export default function LaboratorioPage() {
   }
 
   /* =========================
-     ESTILOS
+     STYLES
   ========================= */
 
-  // Botones generales (Random / Cargar)
   const btnClass =
     "px-4 py-2 rounded-md bg-slate-700 text-white hover:bg-slate-800 transition " +
     "disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border border-slate-500";
@@ -283,7 +291,6 @@ export default function LaboratorioPage() {
   const inputClass =
     "px-3 py-2 border border-slate-500 rounded w-96 max-w-full bg-transparent";
 
-  // ✅ Botones modernos (BUY/HOLD/SELL)
   const actionBtnClass =
     "w-32 sm:w-36 px-4 py-2 rounded-full border border-slate-500 " +
     "bg-slate-800/40 text-slate-100 hover:bg-slate-700/60 " +
@@ -312,7 +319,7 @@ export default function LaboratorioPage() {
           Simulación histórica multi-turn con decisiones BUY / HOLD / SELL.
         </p>
 
-        {/* CONTROLES: Random + ID + Cargar */}
+        {/* CONTROLES */}
         <div className="mt-6 flex flex-wrap gap-3 items-center">
           <button className={btnClass} onClick={onRandom} disabled={loading}>
             Random
@@ -333,7 +340,7 @@ export default function LaboratorioPage() {
 
         {error && <p className="mt-4 text-rose-300">{error}</p>}
 
-        {/* INFO: (sin Estado) 3 arriba + 2 abajo */}
+        {/* INFO (formateada) */}
         <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-2">
             <div>
@@ -352,12 +359,12 @@ export default function LaboratorioPage() {
             </div>
 
             <div>
-              <span className="opacity-70">Tu score acumulado:</span>{" "}
-              <b className="font-semibold">{userScoreAccum ?? "—"}</b>
+              <span className="opacity-70">Rentabilidad acumulada (tú):</span>{" "}
+              <b className="font-semibold">{fmtMaybePct2(userScoreAccum)}</b>
             </div>
             <div>
-              <span className="opacity-70">Score IA acumulado:</span>{" "}
-              <b className="font-semibold">{aiScoreAccum ?? "—"}</b>
+              <span className="opacity-70">Rentabilidad acumulada (IA):</span>{" "}
+              <b className="font-semibold">{fmtMaybePct2(aiScoreAccum)}</b>
             </div>
           </div>
 
@@ -372,7 +379,7 @@ export default function LaboratorioPage() {
           )}
         </div>
 
-        {/* RECOMENDACIÓN IA */}
+        {/* IA */}
         {scenario && aiAction && (
           <div className="mt-6 border border-slate-600 rounded-lg p-5">
             <h2 className="text-lg font-semibold">Recomendación IA</h2>
@@ -389,10 +396,8 @@ export default function LaboratorioPage() {
               </div>
 
               <div>
-                <div className="opacity-70">Rule score</div>
-                <div className="font-semibold">
-                  {aiRuleScore?.toFixed?.(3) ?? "—"}
-                </div>
+                <div className="opacity-70">Fuerza de señal (reglas)</div>
+                <div className="font-semibold">{fmtMaybeInt(aiRuleScore)}</div>
               </div>
             </div>
 
@@ -419,7 +424,6 @@ export default function LaboratorioPage() {
         {/* GRÁFICO */}
         <h2 className="mt-8 text-lg font-medium">Gráfico</h2>
 
-        {/* ✅ BUY/HOLD/SELL centrados + mismo ancho + estilo moderno */}
         <div className="mt-3 flex justify-center gap-3 flex-wrap">
           <button
             className={actionBtnClass}
@@ -444,7 +448,6 @@ export default function LaboratorioPage() {
           </button>
         </div>
 
-        {/* ✅ MENSAJE MÁS PEQUEÑO (debajo de BUY/HOLD/SELL) */}
         {lastResult && (
           <div
             className={`mt-3 mx-auto max-w-3xl p-2 rounded-md text-xs ${resultBoxClass(
@@ -455,18 +458,16 @@ export default function LaboratorioPage() {
               {lastResult.correct ? "✔ Acción correcta" : "✘ Acción incorrecta"}
             </div>
             <div className="opacity-90 mt-1">
-              <b>{lastResult.action}</b> · {lastResult.prevAnchor} ({fmtPrice(lastResult.prevPrice)})
-              {" "}→{" "}
-              {lastResult.newAnchor} ({fmtPrice(lastResult.newPrice)})
-              {" "}·{" "}
-              <b>{fmtPct(lastResult.y)}</b>
+              <b>{lastResult.action}</b> · {lastResult.prevAnchor} (
+              {fmtPrice2(lastResult.prevPrice)}) → {lastResult.newAnchor} (
+              {fmtPrice2(lastResult.newPrice)}) · <b>{fmtPct2(lastResult.y)}</b>
             </div>
           </div>
         )}
 
         <MarketChart scenario={scenario} />
 
-        {/* DEBUG */}
+        {/* JSON */}
         <div className="mt-8">
           <h2 className="text-lg font-medium">Respuesta (JSON)</h2>
           <pre className="mt-2 p-4 border border-slate-600 rounded overflow-auto max-h-[55vh] text-sm">
