@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getRandomScenario, getScenarioById } from "@/lib/api";
+import { getRandomScenario, getScenarioById, API_URL } from "@/lib/api";
 import MarketChart from "@/components/marketchart";
 
 type Action = "BUY" | "HOLD" | "SELL";
@@ -95,6 +95,12 @@ function fmtMaybeInt(x: any): string {
   return Math.round(n).toString();
 }
 
+function fmtEur2(x: any): string {
+  const n = Number(x);
+  if (!Number.isFinite(n)) return "—";
+  return n.toFixed(2) + " €";
+}
+
 /* =====================================================
    PAGE
 ===================================================== */
@@ -107,6 +113,9 @@ export default function LaboratorioPage() {
   const [error, setError] = useState("");
 
   const [started, setStarted] = useState(false);
+
+  // ✅ NUEVO: cantidad de acciones (solo para BUY/SELL)
+  const [quantity, setQuantity] = useState<number>(1);
 
   const [lastResult, setLastResult] = useState<null | {
     action: Action;
@@ -150,25 +159,27 @@ export default function LaboratorioPage() {
   const userScoreAccum = scenario?.user_score ?? null;
   const aiScoreAccum = scenario?.ai_score ?? null;
 
+  // ✅ NUEVO: wallet (si backend lo devuelve)
+  const wallet = scenario?.wallet ?? null;
+
   /* =========================
      MULTI-TURN API
   ========================= */
 
   async function startMultiTurn(id: string) {
-    const res = await fetch(
-      `http://localhost:8000/market/multiturn/start/${id}`,
-      { method: "POST" }
-    );
+    const res = await fetch(`${API_URL}/market/multiturn/start/${id}`, {
+      method: "POST",
+    });
     const data = await res.json();
     setScenario(data);
     setStarted(true);
   }
 
-  async function stepMultiTurn(id: string, action: Action) {
-    const res = await fetch(`http://localhost:8000/market/multiturn/step/${id}`, {
+  async function stepMultiTurn(id: string, action: Action, qty: number) {
+    const res = await fetch(`${API_URL}/market/multiturn/step/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({ action, quantity: qty }),
     });
     const data = await res.json();
     return data;
@@ -189,6 +200,9 @@ export default function LaboratorioPage() {
       const id = extractScenarioId(data);
       setScenario(data);
       setScenarioId(id);
+
+      // ✅ reset cantidad
+      setQuantity(1);
 
       if (id) await startMultiTurn(id);
     } catch (e: any) {
@@ -214,6 +228,9 @@ export default function LaboratorioPage() {
       const data = await getScenarioById(id);
       setScenario(data);
       setScenarioId(id);
+
+      setQuantity(1);
+
       await startMultiTurn(id);
     } catch (e: any) {
       setError(e?.message ?? "Error");
@@ -244,7 +261,10 @@ export default function LaboratorioPage() {
       const prevAnchor = scenario?.anchor_date;
       const prevPrice = findAdjCloseByDateFromHistory(scenario, prevAnchor);
 
-      const nextScenario = await stepMultiTurn(id, action);
+      const qtyToSend =
+        action === "HOLD" ? 0 : Math.max(1, Math.floor(quantity || 1));
+
+      const nextScenario = await stepMultiTurn(id, action, qtyToSend);
 
       const newAnchor = nextScenario?.anchor_date;
       const newPrice = findAdjCloseByDateFromHistory(nextScenario, newAnchor);
@@ -340,6 +360,34 @@ export default function LaboratorioPage() {
 
         {error && <p className="mt-4 text-rose-300">{error}</p>}
 
+        {/* ✅ NUEVO: CARTERA (recuadro extra, sin tocar tu diseño) */}
+        {wallet && (
+          <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
+            <div className="font-semibold mb-2">Cartera del escenario (simulada)</div>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-4 gap-y-2">
+              <div>
+                <span className="opacity-70">Cash:</span>{" "}
+                <b className="font-semibold">{fmtEur2(wallet.cash)}</b>
+              </div>
+              <div>
+                <span className="opacity-70">Acciones:</span>{" "}
+                <b className="font-semibold">{wallet.shares ?? "—"}</b>
+              </div>
+              <div>
+                <span className="opacity-70">Valor total:</span>{" "}
+                <b className="font-semibold">{fmtEur2(wallet.portfolio_value)}</b>
+              </div>
+              <div>
+                <span className="opacity-70">PnL:</span>{" "}
+                <b className="font-semibold">
+                  {Number(wallet.pnl_total) >= 0 ? "+" : ""}
+                  {fmtEur2(wallet.pnl_total)}
+                </b>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* INFO (formateada) */}
         <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-2">
@@ -424,11 +472,25 @@ export default function LaboratorioPage() {
         {/* GRÁFICO */}
         <h2 className="mt-8 text-lg font-medium">Gráfico</h2>
 
-        <div className="mt-3 flex justify-center gap-3 flex-wrap">
+        {/* ✅ NUEVO: cantidad (sin romper tu layout) */}
+        <div className="mt-3 flex justify-center gap-3 flex-wrap items-center">
+          <div className="flex items-center gap-2 text-sm opacity-90">
+            <span className="opacity-70">Cantidad:</span>
+            <input
+              type="number"
+              min={1}
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+              className="px-3 py-2 border border-slate-500 rounded w-28 bg-transparent"
+              disabled={actionsDisabled}
+            />
+          </div>
+
           <button
             className={actionBtnClass}
             onClick={() => onAction("BUY")}
             disabled={actionsDisabled}
+            title="Compra (usa la cantidad indicada)"
           >
             BUY
           </button>
@@ -436,6 +498,7 @@ export default function LaboratorioPage() {
             className={actionBtnClass}
             onClick={() => onAction("HOLD")}
             disabled={actionsDisabled}
+            title="Mantener (ignora cantidad)"
           >
             HOLD
           </button>
@@ -443,6 +506,7 @@ export default function LaboratorioPage() {
             className={actionBtnClass}
             onClick={() => onAction("SELL")}
             disabled={actionsDisabled}
+            title="Vende (usa la cantidad indicada)"
           >
             SELL
           </button>

@@ -110,6 +110,9 @@ def get_random_scenario(seed: int | None = None) -> dict:
 
 ACTIVE_SESSIONS: Dict[str, dict] = {}
 
+# ✅ Dinero inicial por escenario
+INITIAL_CASH = 100_000.0
+
 
 def start_multiturn_session(scenario_id: str) -> dict:
     scenario_id = _normalize_scenario_id(scenario_id)
@@ -136,11 +139,30 @@ def start_multiturn_session(scenario_id: str) -> dict:
         "ai_score": 0.0,
         "finished": False,
 
-        # ✅ Esto es el historial de TURNOS (no tocar el nombre interno)
+        # ✅ Historial de turnos (ya lo tenías)
         "history": [],
+
+        # ✅ Wallet por escenario (NO persistente)
+        "initial_cash": float(INITIAL_CASH),
+        "cash": float(INITIAL_CASH),
+        "shares": 0,
     }
 
     return get_multiturn_state(scenario_id)
+
+
+def _wallet_snapshot(st: dict, price: float) -> dict:
+    cash = float(st["cash"])
+    shares = int(st["shares"])
+    portfolio_value = cash + shares * float(price)
+    pnl_total = portfolio_value - float(st["initial_cash"])
+    return {
+        "initial_cash": float(st["initial_cash"]),
+        "cash": cash,
+        "shares": shares,
+        "portfolio_value": float(portfolio_value),
+        "pnl_total": float(pnl_total),
+    }
 
 
 def get_multiturn_state(scenario_id: str) -> dict:
@@ -156,6 +178,9 @@ def get_multiturn_state(scenario_id: str) -> dict:
     feat_row = df.loc[t]
     pred = predict_from_row(feat_row)
 
+    price_t = float(df.loc[t]["adj_close"])
+    wallet = _wallet_snapshot(st, price_t)
+
     return {
         "scenario_id": scenario_id,
         "ticker": st["ticker"],
@@ -166,7 +191,10 @@ def get_multiturn_state(scenario_id: str) -> dict:
         "user_score": st["user_score"],
         "ai_score": st["ai_score"],
 
-        # ✅ HISTORIAL DE PRECIOS para el gráfico (NO ROMPER FRONT)
+        # ✅ Wallet (nuevo)
+        "wallet": wallet,
+
+        # ✅ HISTORIAL DE PRECIOS (NO ROMPER FRONT)
         "history": [
             {
                 "date": str(idx.date()),
@@ -177,7 +205,7 @@ def get_multiturn_state(scenario_id: str) -> dict:
             for idx, r in context.iterrows()
         ],
 
-        # ✅ NUEVO: HISTORIAL DE TURNOS con y_step (para scripts/estadísticas)
+        # ✅ HISTORIAL DE TURNOS con y_step
         "turn_history": st["history"],
 
         "features_at_t": {
@@ -193,7 +221,7 @@ def get_multiturn_state(scenario_id: str) -> dict:
     }
 
 
-def step_multiturn_session(scenario_id: str, user_action: str) -> dict:
+def step_multiturn_session(scenario_id: str, user_action: str, quantity: int = 0) -> dict:
     scenario_id = _normalize_scenario_id(scenario_id)
     if scenario_id not in ACTIVE_SESSIONS:
         raise ValueError("Session not started")
@@ -216,11 +244,42 @@ def step_multiturn_session(scenario_id: str, user_action: str) -> dict:
 
     t_next = df.index[next_idx]
 
-    price_t = df.loc[t]["adj_close"]
-    price_next = df.loc[t_next]["adj_close"]
+    price_t = float(df.loc[t]["adj_close"])
+    price_next = float(df.loc[t_next]["adj_close"])
     y = (price_next / price_t) - 1.0
 
-    user_score = _score_action(user_action, y)
+    # =========================
+    # ✅ WALLET: ejecutar BUY/SELL con quantity (capando si no llega)
+    # =========================
+    action = user_action.upper().strip()
+    qty_req = int(quantity or 0)
+    if qty_req < 0:
+        qty_req = 0
+
+    executed_qty = 0
+    cash_before = float(st["cash"])
+    shares_before = int(st["shares"])
+
+    if action == "BUY" and qty_req > 0:
+        max_affordable = int(cash_before // price_t) if price_t > 0 else 0
+        executed_qty = min(qty_req, max_affordable)
+        st["cash"] = cash_before - executed_qty * price_t
+        st["shares"] = shares_before + executed_qty
+
+    elif action == "SELL" and qty_req > 0:
+        executed_qty = min(qty_req, shares_before)
+        st["cash"] = cash_before + executed_qty * price_t
+        st["shares"] = shares_before - executed_qty
+
+    # HOLD → nada
+
+    cash_after_trade = float(st["cash"])
+    shares_after_trade = int(st["shares"])
+
+    # =========================
+    # Scores (lo tuyo)
+    # =========================
+    user_score = _score_action(action, y)
     ai_score = _score_action(ai_action, y)
 
     st["user_score"] += user_score
@@ -230,9 +289,16 @@ def step_multiturn_session(scenario_id: str, user_action: str) -> dict:
         "turn": st["turn"] + 1,
         "from": str(t.date()),
         "to": str(t_next.date()),
-        "user_action": user_action,
+        "user_action": action,
         "ai_action": ai_action,
         "y_step": float(y),
+
+        # ✅ extra: trade info (no rompe nada)
+        "quantity_requested": int(qty_req),
+        "quantity_executed": int(executed_qty),
+        "price_t": float(price_t),
+        "cash_after_trade": float(cash_after_trade),
+        "shares_after_trade": int(shares_after_trade),
     })
 
     st["turn"] += 1

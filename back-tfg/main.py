@@ -71,8 +71,10 @@ class UserUpdate(BaseModel):
     avatar_url: Optional[str] = None
 
 
+# ✅ CAMBIO: ahora la acción puede traer quantity (nº acciones)
 class StepRequest(BaseModel):
     action: str
+    quantity: Optional[int] = 0
 
 
 # ======================================================
@@ -188,8 +190,12 @@ def api_step_multiturn(scenario_id: str, body: StepRequest):
     if action not in {"BUY", "HOLD", "SELL"}:
         raise HTTPException(status_code=400, detail="Invalid action")
 
+    quantity = int(body.quantity or 0)
+    if quantity < 0:
+        raise HTTPException(status_code=400, detail="Invalid quantity")
+
     try:
-        return step_multiturn_session(scenario_id, action)
+        return step_multiturn_session(scenario_id, action, quantity)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
