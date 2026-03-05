@@ -43,7 +43,37 @@ function getReasonExplanation(formattedReason: string): string | null {
 }
 
 /* =====================================================
-   HELPERS
+   HELPERS (FORMATO ES)
+===================================================== */
+
+const NF_ES_2 = new Intl.NumberFormat("es-ES", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const NF_ES_0 = new Intl.NumberFormat("es-ES", {
+  maximumFractionDigits: 0,
+});
+
+function fmtNumberES2(x: any): string {
+  const n = Number(x);
+  if (!Number.isFinite(n)) return "—";
+  return NF_ES_2.format(n);
+}
+
+function fmtIntES(x: any): string {
+  const n = Number(x);
+  if (!Number.isFinite(n)) return "—";
+  return NF_ES_0.format(Math.round(n));
+}
+
+function fmtEurES(x: any): string {
+  const n = Number(x);
+  if (!Number.isFinite(n)) return "—";
+  return `${fmtNumberES2(n)} €`;
+}
+
+/* =====================================================
+   HELPERS (SCENARIO)
 ===================================================== */
 
 function extractScenarioId(data: any): string {
@@ -67,7 +97,7 @@ function findAdjCloseByDateFromHistory(
  * - HOLD correcto si |y| <= eps
  */
 function isActionCorrect(action: Action, y: number): boolean {
-  const HOLD_EPS = 0.02; // 2% (multi-turn de 5 días)
+  const HOLD_EPS = 0.02; // 2%
   if (action === "BUY") return y > HOLD_EPS;
   if (action === "SELL") return y < -HOLD_EPS;
   return Math.abs(y) <= HOLD_EPS;
@@ -80,25 +110,13 @@ function fmtPct2(x: number): string {
 }
 
 function fmtPrice2(x: number): string {
-  return x.toFixed(2);
+  return fmtNumberES2(x);
 }
 
 function fmtMaybePct2(x: any): string {
   const n = Number(x);
   if (!Number.isFinite(n)) return "—";
   return fmtPct2(n);
-}
-
-function fmtMaybeInt(x: any): string {
-  const n = Number(x);
-  if (!Number.isFinite(n)) return "—";
-  return Math.round(n).toString();
-}
-
-function fmtEur2(x: any): string {
-  const n = Number(x);
-  if (!Number.isFinite(n)) return "—";
-  return n.toFixed(2) + " €";
 }
 
 /* =====================================================
@@ -114,7 +132,6 @@ export default function LaboratorioPage() {
 
   const [started, setStarted] = useState(false);
 
-  // ✅ NUEVO: cantidad de acciones (solo para BUY/SELL)
   const [quantity, setQuantity] = useState<number>(1);
 
   const [lastResult, setLastResult] = useState<null | {
@@ -143,7 +160,6 @@ export default function LaboratorioPage() {
   const aiConfidence =
     scenario?.ai?.confidence ?? scenario?.ai_confidence ?? null;
 
-  // OJO: este "score" es el de reglas, NO el acierto
   const aiRuleScore =
     typeof scenario?.ai?.score === "number"
       ? scenario.ai.score
@@ -159,8 +175,40 @@ export default function LaboratorioPage() {
   const userScoreAccum = scenario?.user_score ?? null;
   const aiScoreAccum = scenario?.ai_score ?? null;
 
-  // ✅ NUEVO: wallet (si backend lo devuelve)
   const wallet = scenario?.wallet ?? null;
+
+  /* =========================
+     ✅ NUEVO: RESULTADO FINAL (GANAS/PIERDES)
+  ========================= */
+
+  // Capital inicial (tu juego arranca siempre en 100k)
+  const INITIAL_CAPITAL = 100000;
+
+  const finalValue =
+    wallet && Number.isFinite(Number(wallet.portfolio_value))
+      ? Number(wallet.portfolio_value)
+      : null;
+
+  const deltaValue =
+    finalValue != null ? finalValue - INITIAL_CAPITAL : null;
+
+  const EPS_EUR = 0.01; // tolerancia por redondeos (1 céntimo)
+
+  const outcome =
+    deltaValue == null
+      ? null
+      : deltaValue > EPS_EUR
+      ? "WIN"
+      : deltaValue < -EPS_EUR
+      ? "LOSS"
+      : "FLAT";
+
+  const outcomeBoxClass =
+    outcome === "WIN"
+      ? "border border-emerald-500/60 bg-emerald-900/25 text-emerald-100"
+      : outcome === "LOSS"
+      ? "border border-rose-500/60 bg-rose-900/25 text-rose-100"
+      : "border border-slate-500/60 bg-slate-900/25 text-slate-100";
 
   /* =========================
      MULTI-TURN API
@@ -201,7 +249,6 @@ export default function LaboratorioPage() {
       setScenario(data);
       setScenarioId(id);
 
-      // ✅ reset cantidad
       setQuantity(1);
 
       if (id) await startMultiTurn(id);
@@ -360,35 +407,7 @@ export default function LaboratorioPage() {
 
         {error && <p className="mt-4 text-rose-300">{error}</p>}
 
-        {/* ✅ NUEVO: CARTERA (recuadro extra, sin tocar tu diseño) */}
-        {wallet && (
-          <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
-            <div className="font-semibold mb-2">Cartera del escenario (simulada)</div>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-4 gap-y-2">
-              <div>
-                <span className="opacity-70">Cash:</span>{" "}
-                <b className="font-semibold">{fmtEur2(wallet.cash)}</b>
-              </div>
-              <div>
-                <span className="opacity-70">Acciones:</span>{" "}
-                <b className="font-semibold">{wallet.shares ?? "—"}</b>
-              </div>
-              <div>
-                <span className="opacity-70">Valor total:</span>{" "}
-                <b className="font-semibold">{fmtEur2(wallet.portfolio_value)}</b>
-              </div>
-              <div>
-                <span className="opacity-70">PnL:</span>{" "}
-                <b className="font-semibold">
-                  {Number(wallet.pnl_total) >= 0 ? "+" : ""}
-                  {fmtEur2(wallet.pnl_total)}
-                </b>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* INFO (formateada) */}
+        {/* INFO */}
         <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-2">
             <div>
@@ -417,13 +436,38 @@ export default function LaboratorioPage() {
           </div>
 
           {scenario && finished && (
-            <div className={`mt-4 p-3 rounded-lg text-sm ${endBoxClass}`}>
-              <div className="font-semibold text-base">✅ Sesión finalizada</div>
-              <div className="opacity-90 mt-1">
-                Has llegado al máximo de turnos ({maxTurns}). Para continuar,
-                pulsa <b>Random</b> o carga otro <b>ID</b>.
+            <>
+              <div className={`mt-4 p-3 rounded-lg text-sm ${endBoxClass}`}>
+                <div className="font-semibold text-base">✅ Sesión finalizada</div>
+                <div className="opacity-90 mt-1">
+                  Has llegado al máximo de turnos ({maxTurns}). Para continuar,
+                  pulsa <b>Random</b> o carga otro <b>ID</b>.
+                </div>
               </div>
-            </div>
+
+              {/* ✅ NUEVO: Mensaje final de resultado */}
+              {finalValue != null && deltaValue != null && (
+                <div className={`mt-3 p-3 rounded-lg text-sm ${outcomeBoxClass}`}>
+                  <div className="font-semibold text-base">
+                    {outcome === "WIN"
+                      ? "🏆 Has terminado con ganancias"
+                      : outcome === "LOSS"
+                      ? "📉 Has terminado con pérdidas"
+                      : "➖ Has terminado en tablas"}
+                  </div>
+
+                  <div className="opacity-90 mt-1">
+                    Capital inicial: <b>{fmtEurES(INITIAL_CAPITAL)}</b> ·
+                    Valor final: <b>{fmtEurES(finalValue)}</b> ·
+                    Resultado:{" "}
+                    <b>
+                      {deltaValue > 0 ? "+" : ""}
+                      {fmtEurES(deltaValue)}
+                    </b>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -445,7 +489,7 @@ export default function LaboratorioPage() {
 
               <div>
                 <div className="opacity-70">Fuerza de señal (reglas)</div>
-                <div className="font-semibold">{fmtMaybeInt(aiRuleScore)}</div>
+                <div className="font-semibold">{fmtIntES(aiRuleScore)}</div>
               </div>
             </div>
 
@@ -469,10 +513,40 @@ export default function LaboratorioPage() {
           </div>
         )}
 
+        {/* CARTERA */}
+        {wallet && (
+          <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
+            <div className="font-semibold mb-2">Cartera</div>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-4 gap-y-2">
+              <div>
+                <span className="opacity-70">Cash:</span>{" "}
+                <b className="font-semibold">{fmtEurES(wallet.cash)}</b>
+              </div>
+              <div>
+                <span className="opacity-70">Acciones:</span>{" "}
+                <b className="font-semibold">{fmtIntES(wallet.shares)}</b>
+              </div>
+              <div>
+                <span className="opacity-70">Valor total:</span>{" "}
+                <b className="font-semibold">
+                  {fmtEurES(wallet.portfolio_value)}
+                </b>
+              </div>
+              <div>
+                <span className="opacity-70">Beneficio/Pérdida:</span>{" "}
+                <b className="font-semibold">
+                  {Number(wallet.pnl_total) >= 0 ? "+" : ""}
+                  {fmtEurES(wallet.pnl_total)}
+                </b>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* GRÁFICO */}
         <h2 className="mt-8 text-lg font-medium">Gráfico</h2>
 
-        {/* ✅ NUEVO: cantidad (sin romper tu layout) */}
+        {/* cantidad */}
         <div className="mt-3 flex justify-center gap-3 flex-wrap items-center">
           <div className="flex items-center gap-2 text-sm opacity-90">
             <span className="opacity-70">Cantidad:</span>
@@ -480,7 +554,9 @@ export default function LaboratorioPage() {
               type="number"
               min={1}
               value={quantity}
-              onChange={(e) => setQuantity(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+              onChange={(e) =>
+                setQuantity(Math.max(1, Math.floor(Number(e.target.value) || 1)))
+              }
               className="px-3 py-2 border border-slate-500 rounded w-28 bg-transparent"
               disabled={actionsDisabled}
             />
