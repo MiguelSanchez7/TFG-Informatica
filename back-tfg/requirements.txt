@@ -5,3 +5,6 @@ pyarrow
 bcrypt
 supabase
 python-dotenv
+scikit-learn
+joblib
+email-validator

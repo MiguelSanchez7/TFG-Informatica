@@ -30,7 +30,8 @@ CLEAN_DIR = DATA_DIR / "clean"
 FEATURES_DIR = DATA_DIR / "features"
 SCENARIOS_DIR = DATA_DIR / "scenarios"
 MANIFEST_DIR = DATA_DIR / "manifest"
+MODELS_DIR = DATA_DIR / "models"
 
-for d in [RAW_DIR, CLEAN_DIR, FEATURES_DIR, SCENARIOS_DIR, MANIFEST_DIR]:
+for d in [RAW_DIR, CLEAN_DIR, FEATURES_DIR, SCENARIOS_DIR, MANIFEST_DIR, MODELS_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
