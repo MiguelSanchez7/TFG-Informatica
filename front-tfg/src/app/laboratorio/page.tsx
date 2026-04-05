@@ -7,42 +7,6 @@ import MarketChart from "@/components/marketchart";
 type Action = "BUY" | "HOLD" | "SELL";
 
 /* =====================================================
-   EXPLICACIONES IA
-===================================================== */
-
-const IA_REASON_EXPLANATIONS: Record<string, string> = {
-  "Trend up": "tendencia alcista (el precio viene subiendo)",
-  "Trend down": "tendencia bajista (el precio viene cayendo)",
-  "RSI overbought": "sobrecomprado (podría corregir)",
-  "RSI oversold": "sobrevendido (podría rebotar)",
-  "RSI neutral": "RSI neutro (sin señal extrema)",
-  "High volatility": "volatilidad alta (precio inestable)",
-  "Volatility OK": "volatilidad baja/moderada (precio estable)",
-  "Unusually high volume": "mucho volumen (movimiento con fuerza)",
-  "Unusually low volume": "poco volumen (movimiento con poca fuerza)",
-  "Drawdown mild": "caída previa leve",
-  "Drawdown deep": "caída previa fuerte",
-};
-
-function formatMathSpacing(text: string): string {
-  return text
-    .replace(/<=/g, " <= ")
-    .replace(/>=/g, " >= ")
-    .replace(/</g, " < ")
-    .replace(/>/g, " > ")
-    .replace(/=/g, " = ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function getReasonExplanation(formattedReason: string): string | null {
-  const key = Object.keys(IA_REASON_EXPLANATIONS).find((k) =>
-    formattedReason.startsWith(k)
-  );
-  return key ? IA_REASON_EXPLANATIONS[key] : null;
-}
-
-/* =====================================================
    HELPERS (FORMATO ES)
 ===================================================== */
 
@@ -159,18 +123,7 @@ export default function LaboratorioPage() {
   const aiAction = scenario?.ai?.action ?? scenario?.ai_action ?? null;
   const aiConfidence =
     scenario?.ai?.confidence ?? scenario?.ai_confidence ?? null;
-
-  const aiRuleScore =
-    typeof scenario?.ai?.score === "number"
-      ? scenario.ai.score
-      : typeof scenario?.ai_rule_score === "number"
-      ? scenario.ai_rule_score
-      : null;
-
-  const aiReasons =
-    (Array.isArray(scenario?.ai?.reasons) && scenario.ai.reasons) ||
-    (Array.isArray(scenario?.ai_reasons) && scenario.ai_reasons) ||
-    [];
+  const aiModelType = scenario?.ai?.model_type ?? "MLPClassifier";
 
   const userScoreAccum = scenario?.user_score ?? null;
   const aiScoreAccum = scenario?.ai_score ?? null;
@@ -488,27 +441,9 @@ export default function LaboratorioPage() {
               </div>
 
               <div>
-                <div className="opacity-70">Fuerza de señal (reglas)</div>
-                <div className="font-semibold">{fmtIntES(aiRuleScore)}</div>
+                <div className="opacity-70">Modelo</div>
+                <div className="font-semibold">{aiModelType}</div>
               </div>
-            </div>
-
-            <div className="mt-4">
-              <div className="text-sm font-semibold">Razones IA:</div>
-              <ul className="list-disc pl-5 space-y-1 mt-2 text-sm">
-                {aiReasons.map((raw: string, i: number) => {
-                  const formatted = formatMathSpacing(raw);
-                  const explanation = getReasonExplanation(formatted);
-                  return (
-                    <li key={i}>
-                      {formatted}
-                      {explanation && (
-                        <span className="opacity-70"> ({explanation})</span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
             </div>
           </div>
         )}
