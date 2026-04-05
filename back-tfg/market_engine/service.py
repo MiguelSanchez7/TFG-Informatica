@@ -16,9 +16,6 @@ from market_engine.models.mlp import (
     MLPPredictor,
     prediction_to_dict as mlp_prediction_to_dict,
 )
-# Estas son las reglas antiguas.
-# Ahora se usan solo como respaldo si el MLP todavía no está entrenado.
-from market_engine.models.rules import predict_from_row, prediction_to_dict
 
 
 # Devuelve la lista de tickers disponibles en el proyecto.
@@ -63,21 +60,12 @@ MLP_PREDICTOR = MLPPredictor()
 # row es la fila del día actual con las features del mercado.
 # prediction_date es la fecha del escenario/turno que queremos predecir.
 def _predict_ai_from_row(row: pd.Series, prediction_date: pd.Timestamp) -> dict:
-    # Intentamos usar el MLP entrenado solo con datos anteriores a prediction_date.
-    try:
-        prediction = MLP_PREDICTOR.predict_from_row(
-            row,
-            prediction_date=str(prediction_date.date()),
-        )  # predicción del modelo
-        return mlp_prediction_to_dict(prediction)  # la convertimos a dict simple
-    except (ValueError, FileNotFoundError):
-        pass
-
-    # Si no hay modelo entrenado aún, usamos las reglas antiguas.
-    prediction = predict_from_row(row)  # predicción basada en reglas
-    result = prediction_to_dict(prediction)  # la convertimos a dict
-    result["model_type"] = "rules_fallback"  # marcamos que vino del fallback
-    return result
+    # Usamos únicamente el MLP entrenado para la fecha del escenario.
+    prediction = MLP_PREDICTOR.predict_from_row(
+        row,
+        prediction_date=str(prediction_date.date()),
+    )
+    return mlp_prediction_to_dict(prediction)
 
 
 # Devuelve un escenario concreto para enseñarlo en el front.
@@ -169,6 +157,7 @@ def start_multiturn_session(scenario_id: str) -> dict:
         "scenario_id": scenario_id,
         "ticker": ticker,
         "current_date": anchor,  # fecha actual de juego
+        "model_date": anchor,  # fecha con la que se entrenó el modelo de toda la partida
         "turn": 0,  # turno actual
         "user_score": 0.0,  # puntuación acumulada del usuario
         "ai_score": 0.0,  # puntuación acumulada de la IA
@@ -209,10 +198,11 @@ def get_multiturn_state(scenario_id: str) -> dict:
     st = ACTIVE_SESSIONS[scenario_id]  # estado guardado de la partida
     df = pd.read_parquet(FEATURES_DIR / f"{st['ticker']}.parquet")  # features del ticker
     t = st["current_date"]  # fecha actual del turno
+    model_date = st["model_date"]  # fecha inicial del escenario usada para el modelo
 
     context = df.loc[:t].tail(CONTEXT_DAYS)  # histórico que se enseñará
     feat_row = df.loc[t]  # fila del mercado en la fecha actual
-    pred = _predict_ai_from_row(feat_row, t)  # recomendación actual de la IA
+    pred = _predict_ai_from_row(feat_row, model_date)  # recomendación actual usando el modelo inicial
 
     price_t = float(df.loc[t]["adj_close"])  # precio actual
     wallet = _wallet_snapshot(st, price_t)  # resumen de cartera
@@ -264,8 +254,9 @@ def step_multiturn_session(scenario_id: str, user_action: str, quantity: int = 0
 
     df = pd.read_parquet(FEATURES_DIR / f"{st['ticker']}.parquet")  # features del ticker
     t = st["current_date"]  # fecha actual
+    model_date = st["model_date"]  # fecha inicial del escenario usada para el modelo
 
-    pred = _predict_ai_from_row(df.loc[t], t)  # decisión de la IA en la fecha t
+    pred = _predict_ai_from_row(df.loc[t], model_date)  # decisión de la IA usando el modelo inicial
     ai_action = pred["action"]  # acción de la IA: BUY, HOLD o SELL
 
     idx = df.index.get_loc(t)  # posición actual dentro del DataFrame
