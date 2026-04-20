@@ -10,10 +10,12 @@ export default function Home() {
   const { user } = useAuth();
 
   const displayName = user?.username || user?.email || "Inversor";
-  const level = user?.level ?? 4;
-  const xp = user?.xp ?? 720;
-  const xpTarget = user?.xpTarget ?? 1000;
-  const progress = Math.min(100, Math.round((xp / xpTarget) * 100));
+  const level = user?.level ?? 1;
+  const levelName = user?.level_name ?? "Novato";
+  const xp = user?.xp ?? 0;
+  const xpInLevel = user?.xp_in_level ?? xp;
+  const xpForNextLevel = user?.xp_for_next_level ?? 100;
+  const progress = user?.level_progress ?? 0;
 
   return (
     <main className="relative font-sans tracking-tight min-h-screen bg-[#020617] text-[#e5e7eb]">
@@ -41,9 +43,11 @@ export default function Home() {
           {/* Barra de nivel / XP */}
           <div className="mt-6 mx-auto max-w-xl">
             <div className="flex items-center justify-between text-xs text-[#94a3b8] mb-1">
-              <span>Lvl. {level}</span>
               <span>
-                {xp}/{xpTarget} XP
+                Lvl. {level} - {levelName}
+              </span>
+              <span>
+                {xpInLevel}/{xpForNextLevel || xpInLevel} XP
               </span>
             </div>
             <div className="h-2 w-full rounded-full bg-[#020617] border border-[#1f2937] overflow-hidden">

@@ -7,17 +7,29 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
+import { getUser } from "../lib/api";
 
 export type AuthUser = {
   id: string;
   username: string;
   email: string;
-  points?: number | null;
+  xp?: number | null;
   level?: number | null;
+  level_name?: string | null;
+  level_min_xp?: number | null;
+  next_level_xp?: number | null;
+  next_level?: number | null;
+  xp_in_level?: number | null;
+  xp_for_next_level?: number | null;
+  xp_to_next_level?: number | null;
+  level_progress?: number | null;
+  xpTarget?: number | null;
   role?: string | null;
   name?: string | null;
   surname?: string | null;
   country?: string | null;
+  investorType?: string | null;
+  riskProfile?: string | null;
   avatar_url?: string | null;
   created_at?: string | null;
 };
@@ -40,7 +52,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const stored = window.localStorage.getItem("tfg-user");
     if (stored) {
       try {
-        setUser(JSON.parse(stored));
+        const storedUser = JSON.parse(stored) as AuthUser;
+        setUser(storedUser);
+
+        getUser(storedUser.id)
+          .then((freshUser) => setUser(freshUser))
+          .catch(() => {
+            window.localStorage.removeItem("tfg-user");
+            setUser(null);
+          });
       } catch {
         window.localStorage.removeItem("tfg-user");
       }

@@ -58,6 +58,67 @@ export async function loginUser(email: string, password: string) {
   return response.json();
 }
 
+export async function getUser(userId: string) {
+  const response = await fetch(`${API_URL}/users/${userId}`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    let errText = "Error obteniendo usuario";
+    try {
+      const err = await response.json();
+      errText = err.detail || errText;
+    } catch {}
+
+    throw new Error(errText);
+  }
+
+  return response.json();
+}
+
+// ===============================
+// Experiencia de usuario
+// ===============================
+export async function addUserXp(userId: string, xp: number) {
+  const response = await fetch(`${API_URL}/users/${userId}/xp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ xp }),
+  });
+
+  if (!response.ok) {
+    let errText = "Error actualizando la experiencia";
+    try {
+      const err = await response.json();
+      errText = err.detail || errText;
+    } catch {}
+
+    throw new Error(errText);
+  }
+
+  return response.json();
+}
+
+export async function getConcepts() {
+  const response = await fetch(`${API_URL}/concepts`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    let errText = "Error obteniendo conceptos";
+    try {
+      const err = await response.json();
+      errText = err.detail || errText;
+    } catch {}
+
+    throw new Error(errText);
+  }
+
+  return response.json();
+}
+
 // ===============================
 // Market Engine
 // ===============================

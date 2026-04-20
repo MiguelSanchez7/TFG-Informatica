@@ -16,9 +16,12 @@ from market_engine.service import (
 from app.services.user_service import (
     create_user,
     get_users,
+    get_user,
     authenticate_user,
-    update_user
+    update_user,
+    add_user_xp,
 )
+from app.services.concept_service import get_concepts
 
 # ======================================================
 # APP
@@ -49,8 +52,17 @@ class UserPublic(BaseModel):
     id: str
     username: str
     email: EmailStr
-    points: Optional[int] = 0
+    xp: Optional[int] = 0
     level: Optional[int] = 1
+    level_name: Optional[str] = "Novato"
+    level_min_xp: Optional[int] = 0
+    next_level_xp: Optional[int] = None
+    next_level: Optional[int] = None
+    xp_in_level: Optional[int] = 0
+    xp_for_next_level: Optional[int] = 0
+    xp_to_next_level: Optional[int] = 0
+    level_progress: Optional[int] = 0
+    xpTarget: Optional[int] = 100
     role: Optional[str] = "user"
     name: Optional[str] = None
     surname: Optional[str] = None
@@ -62,6 +74,10 @@ class UserPublic(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: constr(min_length=6, max_length=100)
+
+
+class UserXpAdd(BaseModel):
+    xp: int
 
 
 class UserUpdate(BaseModel):
@@ -77,6 +93,32 @@ class StepRequest(BaseModel):
     quantity: Optional[int] = 0
 
 
+class ConceptLesson(BaseModel):
+    id: str
+    slug: str
+    level: str
+    title: str
+    summary: str
+    whyItMatters: str
+    keyIdeas: List[str]
+    example: str
+    checkQuestion: str
+    checkAnswer: str
+    orderIndex: Optional[int] = None
+
+
+class ConceptGlossaryItem(BaseModel):
+    id: str
+    term: str
+    definition: str
+    orderIndex: Optional[int] = None
+
+
+class ConceptsResponse(BaseModel):
+    lessons: List[ConceptLesson]
+    glossary: List[ConceptGlossaryItem]
+
+
 # ======================================================
 # ENDPOINTS USUARIOS
 # ======================================================
@@ -85,6 +127,16 @@ class StepRequest(BaseModel):
 def list_users():
     try:
         return get_users()
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/users/{user_id}", response_model=UserPublic)
+def get_user_endpoint(user_id: str):
+    try:
+        return get_user(user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -138,6 +190,24 @@ def update_user_endpoint(user_id: str, payload: UserUpdate):
 # ======================================================
 # MARKET ENGINE — SINGLE SHOT (NO TOCAR)
 # ======================================================
+
+@app.post("/users/{user_id}/xp", response_model=UserPublic)
+def add_user_xp_endpoint(user_id: str, payload: UserXpAdd):
+    try:
+        return add_user_xp(user_id, payload.xp)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/concepts", response_model=ConceptsResponse)
+def get_concepts_endpoint():
+    try:
+        return get_concepts()
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/market/scenario/random")
 def api_random_scenario():
