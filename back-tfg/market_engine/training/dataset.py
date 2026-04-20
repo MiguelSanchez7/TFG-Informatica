@@ -8,17 +8,16 @@ import pandas as pd
 from market_engine.config import FEATURES_DIR, STEP_DAYS, TICKERS
 
 
-# Estas columnas serán la X del modelo.
-# Cada una describe cómo estaba el mercado en una fecha.
+# FEATURE_COLUMNS = columnas X que entran al MLP.
 FEATURE_COLUMNS = [
     "ret_1d",         # retorno de 1 día
     "sma20",          # media móvil de 20 días
     "sma50",          # media móvil de 50 días
-    "rsi14",          # indicador RSI de 14 días
-    "vol20",          # volatilidad en ventana de 20 días
-    "drawdown60",     # caída respecto al máximo reciente
+    "rsi14",          # RSI a 14 días
+    "vol20",          # volatilidad a 20 días
+    "drawdown60",     # caída desde máximo reciente
     "vol_rel20",      # volumen relativo
-    "trend_gap",      # separación relativa entre sma20 y sma50
+    "trend_gap",      # diferencia entre sma20 y sma50
     "price_vs_sma20", # distancia del precio a sma20
     "price_vs_sma50", # distancia del precio a sma50
 ]
@@ -26,27 +25,29 @@ FEATURE_COLUMNS = [
 
 @dataclass
 class TemporalDatasetSplit:
-    train_df: pd.DataFrame      # datos para entrenar
-    test_df: pd.DataFrame       # datos para probar
-    feature_columns: list[str]  # columnas X usadas por el modelo
-    horizon_days: int           # días al futuro que miramos
-    buy_threshold: float        # umbral para decir BUY
-    sell_threshold: float       # umbral para decir SELL
-    train_end_date: str         # fecha límite usada al construir train
+    train_df: pd.DataFrame      # filas que sí usamos para entrenar
+    test_df: pd.DataFrame       # filas reservadas para probar
+    feature_columns: list[str]  # nombres de las columnas X
+    horizon_days: int           # cuántos días al futuro miramos
+    buy_threshold: float        # umbral a partir del cual es BUY
+    sell_threshold: float       # umbral por debajo del cual es SELL
+    train_end_date: str         # fecha límite usada en el corte temporal
 
 
 def add_model_features(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()  # copiamos para no modificar el DataFrame original
+    # Hacemos una copia para no tocar el DataFrame original.
+    df = df.copy()
 
-    # trend_gap mide si la sma20 está por encima o por debajo de la sma50.
+    # trend_gap = cuánto se separa la sma20 de la sma50.
     df["trend_gap"] = (df["sma20"] / df["sma50"]) - 1.0
 
-    # price_vs_sma20 mide qué tan lejos está el precio actual de la sma20.
+    # price_vs_sma20 = cuánto se aleja el precio de la sma20.
     df["price_vs_sma20"] = (df["adj_close"] / df["sma20"]) - 1.0
 
-    # price_vs_sma50 hace lo mismo pero contra la sma50.
+    # price_vs_sma50 = cuánto se aleja el precio de la sma50.
     df["price_vs_sma50"] = (df["adj_close"] / df["sma50"]) - 1.0
 
+    # Devolvemos el DataFrame ya preparado para el MLP.
     return df
 
 
@@ -55,15 +56,15 @@ def label_from_future_return(
     buy_threshold: float,
     sell_threshold: float,
 ) -> str:
-    # Si la rentabilidad futura supera buy_threshold, etiquetamos BUY.
+    # Si la rentabilidad futura supera buy_threshold, la Y será BUY.
     if future_return >= buy_threshold:
         return "BUY"
 
-    # Si la rentabilidad futura cae por debajo de sell_threshold, es SELL.
+    # Si cae por debajo de sell_threshold, la Y será SELL.
     if future_return <= sell_threshold:
         return "SELL"
 
-    # Si queda entre medias, es HOLD.
+    # Si queda entre ambos umbrales, la Y será HOLD.
     return "HOLD"
 
 
@@ -73,62 +74,66 @@ def build_labeled_dataset(
     buy_threshold: float = 0.02,
     sell_threshold: float = -0.02,
 ) -> pd.DataFrame:
-    # Si no se pasan tickers, usamos todos los del proyecto.
+    # Si no se pasan tickers, usamos todos los definidos en config.
     tickers = list(tickers or TICKERS)
 
-    # Aquí iremos guardando un DataFrame por cada ticker.
+    # frames guardará un DataFrame por empresa.
     frames: list[pd.DataFrame] = []
 
     for ticker in tickers:
-        # Buscamos el parquet de features del ticker actual.
+        # path = parquet de features de la empresa actual.
         path = FEATURES_DIR / f"{ticker}.parquet"
         if not path.exists():
-            continue  # si no existe, saltamos ese ticker
+            # Si esa empresa no tiene parquet, la saltamos.
+            continue
 
-        # Cargamos el parquet y ordenamos por fecha.
+        # Cargamos las features y ordenamos por fecha.
         df = pd.read_parquet(path).sort_index()
 
-        # Añadimos las features extra del modelo.
+        # Añadimos las columnas extra que usará el MLP.
         df = add_model_features(df)
 
-        # date será la fecha actual de cada fila.
+        # date = fecha actual de la fila.
         df["date"] = pd.to_datetime(df.index)
 
-        # future_date es la fecha real a horizon_days pasos vista desde esa fila.
+        # future_date = fecha que hay horizon_days por delante.
         df["future_date"] = pd.Series(df.index, index=df.index).shift(-horizon_days)
+
+        # Convertimos future_date a tipo fecha.
         df["future_date"] = pd.to_datetime(df["future_date"])
 
-        # future_adj_close es el precio dentro de horizon_days pasos.
+        # future_adj_close = precio futuro usado para etiquetar.
         df["future_adj_close"] = df["adj_close"].shift(-horizon_days)
 
-        # future_return es la subida o bajada futura en porcentaje decimal.
+        # future_return = rentabilidad futura en tanto por uno.
         df["future_return"] = (df["future_adj_close"] / df["adj_close"]) - 1.0
 
-        # target será la Y del modelo: BUY, HOLD o SELL.
+        # target = Y del modelo: BUY, HOLD o SELL.
         df["target"] = df["future_return"].apply(
             lambda x: label_from_future_return(
                 future_return=float(x),
                 buy_threshold=buy_threshold,
                 sell_threshold=sell_threshold,
             )
-            if pd.notna(x)   # solo etiquetamos si x no es NaN
+            # Solo etiquetamos si x tiene valor y no es NaN.
+            if pd.notna(x)
             else None
         )
 
-        # Guardamos también el ticker como columna normal.
+        # ticker = empresa a la que pertenece cada fila.
         df["ticker"] = ticker
 
-        # Añadimos este DataFrame a la lista general.
+        # Guardamos este DataFrame en la lista general.
         frames.append(df)
 
-    # Si no se pudo cargar ningún ticker, lanzamos error.
+    # Si no se cargó ningún ticker, no podemos entrenar.
     if not frames:
         raise ValueError("No feature files were found to build the dataset")
 
-    # Unimos todos los tickers en un único DataFrame grande.
+    # Unimos todas las empresas en un único dataset.
     dataset = pd.concat(frames, axis=0, ignore_index=True)
 
-    # Quitamos filas con valores vacíos en X, target o future_return.
+    # Quitamos filas con huecos en X, target, future_return o future_date.
     dataset = dataset.dropna(
         subset=FEATURE_COLUMNS + ["target", "future_return", "future_date"]
     )
@@ -136,6 +141,7 @@ def build_labeled_dataset(
     # Ordenamos por fecha y ticker para dejar el dataset limpio.
     dataset = dataset.sort_values(["date", "ticker"]).reset_index(drop=True)
 
+    # Devolvemos el dataset final listo para entrenar.
     return dataset
 
 
@@ -143,22 +149,23 @@ def temporal_train_test_split(
     dataset: pd.DataFrame,
     train_end_date: str = "2021-12-31",
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    # cutoff es la fecha límite entre train y test.
+    # cutoff = fecha que separa train y test.
     cutoff = pd.Timestamp(train_end_date)
 
-    # train_df contiene solo filas hasta la fecha límite.
+    # train_df = filas hasta la fecha límite.
     train_df = dataset[dataset["date"] <= cutoff].copy()
 
-    # test_df contiene solo filas posteriores a la fecha límite.
+    # test_df = filas posteriores a la fecha límite.
     test_df = dataset[dataset["date"] > cutoff].copy()
 
-    # Si uno de los dos queda vacío, el split no sirve.
+    # Si uno sale vacío, este split no sirve.
     if train_df.empty or test_df.empty:
         raise ValueError(
             "Temporal split produced an empty train or test set. "
             "Adjust the cutoff date."
         )
 
+    # Devolvemos train y test ya separados.
     return train_df, test_df
 
 
@@ -166,18 +173,20 @@ def filter_training_data_for_prediction_date(
     dataset: pd.DataFrame,
     prediction_date: str,
 ) -> pd.DataFrame:
-    # prediction_cutoff es la fecha del escenario que queremos predecir.
+    # prediction_cutoff = fecha del escenario que queremos evaluar.
     prediction_cutoff = pd.Timestamp(prediction_date)
 
-    # Solo usamos filas cuyo future_date es anterior a prediction_cutoff.
-    # Así el entrenamiento no usa ejemplos que necesiten "futuro" del escenario actual.
+    # Solo usamos filas cuyo future_date cae antes del escenario.
+    # Así evitamos meter "futuro" que el modelo no debería conocer.
     train_df = dataset[dataset["future_date"] < prediction_cutoff].copy()
 
+    # Si no queda nada, no hay datos válidos para entrenar.
     if train_df.empty:
         raise ValueError(
             "No training rows are available before the requested prediction date."
         )
 
+    # Devolvemos solo las filas válidas para entrenar este escenario.
     return train_df
 
 
@@ -188,7 +197,7 @@ def build_temporal_dataset_split(
     sell_threshold: float = -0.02,
     train_end_date: str = "2021-12-31",
 ) -> TemporalDatasetSplit:
-    # Primero construimos el dataset completo con etiquetas.
+    # Construimos el dataset completo ya etiquetado.
     dataset = build_labeled_dataset(
         tickers=tickers,
         horizon_days=horizon_days,
@@ -196,13 +205,13 @@ def build_temporal_dataset_split(
         sell_threshold=sell_threshold,
     )
 
-    # Luego lo dividimos temporalmente en train y test.
+    # Lo partimos en train y test usando train_end_date.
     train_df, test_df = temporal_train_test_split(
         dataset,
         train_end_date=train_end_date,
     )
 
-    # Devolvemos todo empaquetado en una sola estructura.
+    # Devolvemos todo agrupado en TemporalDatasetSplit.
     return TemporalDatasetSplit(
         train_df=train_df,
         test_df=test_df,
@@ -221,7 +230,7 @@ def build_training_dataset_for_prediction_date(
     buy_threshold: float = 0.02,
     sell_threshold: float = -0.02,
 ) -> TemporalDatasetSplit:
-    # Construimos primero el dataset completo etiquetado.
+    # Construimos el dataset completo con X e y.
     dataset = build_labeled_dataset(
         tickers=tickers,
         horizon_days=horizon_days,
@@ -229,13 +238,13 @@ def build_training_dataset_for_prediction_date(
         sell_threshold=sell_threshold,
     )
 
-    # Nos quedamos solo con las filas válidas para entrenar antes del escenario.
+    # Filtramos solo las filas válidas anteriores a prediction_date.
     train_df = filter_training_data_for_prediction_date(
         dataset,
         prediction_date=prediction_date,
     )
 
-    # Aquí no devolvemos test real, porque esta ruta se usa para predecir un escenario concreto.
+    # Aquí no devolvemos test real porque esta ruta sirve para un escenario concreto.
     return TemporalDatasetSplit(
         train_df=train_df,
         test_df=pd.DataFrame(),
