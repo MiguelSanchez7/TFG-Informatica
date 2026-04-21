@@ -1,0 +1,38 @@
+[
+  {
+    "id": "activo",
+    "term": "Activo",
+    "definition": "Instrumento financiero como una accion, criptomoneda, indice o ETF.",
+    "orderIndex": 1
+  },
+  {
+    "id": "volatilidad",
+    "term": "Volatilidad",
+    "definition": "Medida de cuanto se mueve el precio. Mas volatilidad implica mas incertidumbre.",
+    "orderIndex": 2
+  },
+  {
+    "id": "liquidez",
+    "term": "Liquidez",
+    "definition": "Facilidad para comprar o vender sin mover demasiado el precio.",
+    "orderIndex": 3
+  },
+  {
+    "id": "stop",
+    "term": "Stop",
+    "definition": "Nivel definido para limitar una perdida si la idea no funciona.",
+    "orderIndex": 4
+  },
+  {
+    "id": "horizonte-temporal",
+    "term": "Horizonte temporal",
+    "definition": "Tiempo durante el que se espera mantener una decision.",
+    "orderIndex": 5
+  },
+  {
+    "id": "backtest",
+    "term": "Backtest",
+    "definition": "Prueba de una estrategia con datos historicos.",
+    "orderIndex": 6
+  }
+]

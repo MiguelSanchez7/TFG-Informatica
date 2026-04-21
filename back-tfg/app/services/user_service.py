@@ -122,8 +122,8 @@ def update_user(user_id: str, update_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def add_user_xp(user_id: str, xp_delta: int) -> Dict[str, Any]:
-    if xp_delta <= 0:
-        raise ValueError("La experiencia a sumar debe ser mayor que 0")
+    if xp_delta == 0:
+        raise ValueError("La experiencia no puede ser 0")
 
     current_response = (
         supabase.table("users")
@@ -136,7 +136,7 @@ def add_user_xp(user_id: str, xp_delta: int) -> Dict[str, Any]:
     if not users:
         raise ValueError("Usuario no encontrado")
 
-    new_xp = int(users[0].get("xp") or 0) + int(xp_delta)
+    new_xp = max(0, int(users[0].get("xp") or 0) + int(xp_delta))
     progression = get_level_progression(new_xp)
 
     response = (

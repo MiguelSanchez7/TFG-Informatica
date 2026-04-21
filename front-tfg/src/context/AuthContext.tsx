@@ -4,10 +4,8 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
   type ReactNode,
 } from "react";
-import { getUser } from "../lib/api";
 
 export type AuthUser = {
   id: string;
@@ -45,37 +43,6 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-
-  // cargar usuario desde localStorage al iniciar
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem("tfg-user");
-    if (stored) {
-      try {
-        const storedUser = JSON.parse(stored) as AuthUser;
-        setUser(storedUser);
-
-        getUser(storedUser.id)
-          .then((freshUser) => setUser(freshUser))
-          .catch(() => {
-            window.localStorage.removeItem("tfg-user");
-            setUser(null);
-          });
-      } catch {
-        window.localStorage.removeItem("tfg-user");
-      }
-    }
-  }, []);
-
-  // guardar usuario en localStorage cuando cambie
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (user) {
-      window.localStorage.setItem("tfg-user", JSON.stringify(user));
-    } else {
-      window.localStorage.removeItem("tfg-user");
-    }
-  }, [user]);
 
   const login = (u: AuthUser) => setUser(u);
   const logout = () => setUser(null);

@@ -22,6 +22,7 @@ from app.services.user_service import (
     add_user_xp,
 )
 from app.services.concept_service import get_concepts
+from app.services.tutor_service import ask_finance_tutor
 
 # ======================================================
 # APP
@@ -114,9 +115,47 @@ class ConceptGlossaryItem(BaseModel):
     orderIndex: Optional[int] = None
 
 
+class ConceptQuizOption(BaseModel):
+    id: str
+    label: str
+
+
+class ConceptQuizQuestion(BaseModel):
+    id: str
+    question: str
+    options: List[ConceptQuizOption]
+    correctOptionId: str
+    explanation: str
+
+
+class ConceptQuiz(BaseModel):
+    level: str
+    title: str
+    description: str
+    xpRewardPerCorrect: int
+    xpPenaltyPerWrong: int
+    questions: List[ConceptQuizQuestion]
+
+
 class ConceptsResponse(BaseModel):
     lessons: List[ConceptLesson]
     glossary: List[ConceptGlossaryItem]
+    quizzes: List[ConceptQuiz]
+
+
+class TutorMessage(BaseModel):
+    role: str
+    content: str
+
+
+class TutorQuestionRequest(BaseModel):
+    question: constr(min_length=1, max_length=800)
+    history: List[TutorMessage] = []
+
+
+class TutorQuestionResponse(BaseModel):
+    answer: str
+    model: str
 
 
 # ======================================================
@@ -205,6 +244,17 @@ def add_user_xp_endpoint(user_id: str, payload: UserXpAdd):
 def get_concepts_endpoint():
     try:
         return get_concepts()
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/assistant/tutor", response_model=TutorQuestionResponse)
+def ask_tutor_endpoint(payload: TutorQuestionRequest):
+    try:
+        history = [item.dict() for item in payload.history]
+        return ask_finance_tutor(payload.question, history)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
 

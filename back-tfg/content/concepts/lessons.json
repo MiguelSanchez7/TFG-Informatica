@@ -1,0 +1,308 @@
+[
+  {
+    "id": "rentabilidad-riesgo",
+    "slug": "rentabilidad-riesgo",
+    "level": "base",
+    "title": "Rentabilidad y riesgo",
+    "summary": "La rentabilidad mide cuanto gana o pierde una inversion. El riesgo mide cuanto puede variar ese resultado.",
+    "whyItMatters": "Dos decisiones pueden tener la misma rentabilidad esperada, pero no el mismo peligro. Aprender a comparar ambas cosas evita elegir solo por la posible ganancia.",
+    "keyIdeas": [
+      "Mas rentabilidad potencial suele venir con mas incertidumbre.",
+      "Una perdida grande necesita una ganancia mayor para recuperarse.",
+      "El objetivo no es acertar siempre, sino tomar decisiones compensadas."
+    ],
+    "example": "Si una accion puede subir un 8% pero tambien caer un 20%, la recompensa posible no compensa automaticamente el riesgo.",
+    "checkQuestion": "Si una inversion puede ganar mucho pero tambien caer mucho, que deberias mirar ademas de la ganancia potencial?",
+    "checkAnswer": "El riesgo asumido, la posible perdida y si la recompensa compensa ese riesgo.",
+    "orderIndex": 1
+  },
+  {
+    "id": "diversificacion",
+    "slug": "diversificacion",
+    "level": "base",
+    "title": "Diversificacion",
+    "summary": "Diversificar consiste en no concentrar todo el capital en una sola empresa, sector o tipo de activo.",
+    "whyItMatters": "Reduce el impacto de un error concreto. Si una posicion sale mal, el resto de la cartera puede amortiguar el golpe.",
+    "keyIdeas": [
+      "No es comprar muchas cosas al azar.",
+      "Tiene sentido combinar activos que no se comporten igual.",
+      "Demasiada concentracion aumenta la dependencia de una sola decision."
+    ],
+    "example": "Una cartera formada solo por tecnologia puede sufrir mucho si el sector cae. Incluir sectores distintos reduce esa dependencia.",
+    "checkQuestion": "Diversificar significa comprar cualquier activo solo para tener muchos?",
+    "checkAnswer": "No. Significa repartir el riesgo con criterio entre activos o sectores diferentes.",
+    "orderIndex": 2
+  },
+  {
+    "id": "tendencia",
+    "slug": "tendencia",
+    "level": "base",
+    "title": "Tendencia",
+    "summary": "La tendencia describe la direccion dominante del precio: alcista, bajista o lateral.",
+    "whyItMatters": "Ayuda a entender el contexto antes de tomar una decision. Comprar contra una tendencia bajista suele exigir mas cautela.",
+    "keyIdeas": [
+      "Una tendencia alcista tiene maximos y minimos crecientes.",
+      "Una tendencia bajista tiene maximos y minimos decrecientes.",
+      "Un mercado lateral no tiene direccion clara."
+    ],
+    "example": "Si el precio marca varios minimos cada vez mas altos, puede indicar que los compradores estan ganando fuerza.",
+    "checkQuestion": "Que suele indicar una secuencia de maximos y minimos crecientes?",
+    "checkAnswer": "Una posible tendencia alcista.",
+    "orderIndex": 3
+  },
+  {
+    "id": "horizonte-temporal",
+    "slug": "horizonte-temporal",
+    "level": "base",
+    "title": "Horizonte temporal",
+    "summary": "El horizonte temporal es el tiempo durante el que planeas mantener una idea de inversion o trading.",
+    "whyItMatters": "Una misma operacion puede tener sentido a seis meses y no a tres dias. Sin horizonte temporal es facil mezclar expectativas y tomar malas decisiones.",
+    "keyIdeas": [
+      "El plazo condiciona la forma de analizar una oportunidad.",
+      "No todos los movimientos cortos invalidan una idea de largo plazo.",
+      "Tu estrategia debe encajar con el tiempo que puedes esperar."
+    ],
+    "example": "Una empresa puede caer un 4% en una semana y seguir teniendo sentido para un inversor que piensa a varios anos.",
+    "checkQuestion": "Por que importa definir el horizonte temporal antes de invertir?",
+    "checkAnswer": "Porque cambia como interpretas el precio, el riesgo y las expectativas de la operacion.",
+    "orderIndex": 4
+  },
+  {
+    "id": "volatilidad-basica",
+    "slug": "volatilidad-basica",
+    "level": "base",
+    "title": "Volatilidad",
+    "summary": "La volatilidad mide cuanto se mueve el precio de un activo en un periodo determinado.",
+    "whyItMatters": "No todos los activos se comportan igual. Entender cuanto se mueven ayuda a ajustar expectativas, tamano y tolerancia al riesgo.",
+    "keyIdeas": [
+      "Mas volatilidad implica mas incertidumbre en el resultado.",
+      "Un activo muy volatil puede subir rapido, pero tambien caer rapido.",
+      "La volatilidad no es mala por si sola; depende de como la gestiones."
+    ],
+    "example": "Dos activos pueden subir un 10% al ano, pero si uno tiene oscilaciones mucho mas bruscas sera mas dificil de mantener psicologicamente.",
+    "checkQuestion": "Que te dice la volatilidad de un activo?",
+    "checkAnswer": "Te da una idea de cuanto puede moverse y de cuanta incertidumbre tiene su comportamiento.",
+    "orderIndex": 5
+  },
+  {
+    "id": "liquidez-basica",
+    "slug": "liquidez-basica",
+    "level": "base",
+    "title": "Liquidez",
+    "summary": "La liquidez es la facilidad con la que puedes comprar o vender un activo sin alterar demasiado su precio.",
+    "whyItMatters": "En activos poco liquidos puedes tener mas dificultad para entrar o salir al precio que esperabas, sobre todo en momentos de tension.",
+    "keyIdeas": [
+      "Mas liquidez suele significar ejecuciones mas faciles.",
+      "La falta de liquidez puede aumentar costes y deslizamientos.",
+      "No basta con tener una buena idea; tambien hay que poder ejecutarla bien."
+    ],
+    "example": "Una accion poco negociada puede mostrar un precio en pantalla, pero si quieres vender una posicion grande quizas debas aceptar bastante menos.",
+    "checkQuestion": "Que riesgo aparece en un activo poco liquido?",
+    "checkAnswer": "Que entrar o salir sea mas dificil y que el precio real de ejecucion se aleje del esperado.",
+    "orderIndex": 6
+  },
+  {
+    "id": "soporte-resistencia",
+    "slug": "soporte-resistencia",
+    "level": "intermedio",
+    "title": "Soportes y resistencias",
+    "summary": "Un soporte es una zona donde el precio suele encontrar compradores. Una resistencia es una zona donde suelen aparecer vendedores.",
+    "whyItMatters": "Sirven para plantear entradas, salidas y zonas de invalidacion de una idea.",
+    "keyIdeas": [
+      "Son zonas, no lineas exactas.",
+      "Un soporte perdido puede convertirse en resistencia.",
+      "Funcionan mejor si se combinan con volumen, tendencia y riesgo."
+    ],
+    "example": "Si una accion rebota varias veces cerca de 50 euros, esa zona puede actuar como soporte mientras no se rompa con claridad.",
+    "checkQuestion": "Por que es mejor hablar de zonas y no de precios exactos?",
+    "checkAnswer": "Porque el mercado rara vez respeta un punto exacto; suele moverse por areas de interes.",
+    "orderIndex": 7
+  },
+  {
+    "id": "medias-moviles",
+    "slug": "medias-moviles",
+    "level": "intermedio",
+    "title": "Medias moviles",
+    "summary": "Una media movil suaviza el precio para ver mejor la direccion general del mercado.",
+    "whyItMatters": "Ayuda a filtrar ruido y comparar el precio actual con su comportamiento reciente.",
+    "keyIdeas": [
+      "Una media corta reacciona antes, pero da mas senales falsas.",
+      "Una media larga reacciona mas lento, pero filtra mejor el ruido.",
+      "El cruce de medias no garantiza una operacion rentable."
+    ],
+    "example": "Si el precio esta por encima de la media de 50 sesiones y esta subiendo, puede reforzar una lectura alcista.",
+    "checkQuestion": "Que problema tiene una media movil muy corta?",
+    "checkAnswer": "Reacciona rapido, pero puede generar mas senales falsas por el ruido del precio.",
+    "orderIndex": 8
+  },
+  {
+    "id": "rsi",
+    "slug": "rsi",
+    "level": "intermedio",
+    "title": "RSI",
+    "summary": "El RSI es un indicador de momento que intenta medir si un activo esta muy comprado o muy vendido.",
+    "whyItMatters": "Puede ayudar a detectar agotamiento, pero no debe usarse como senal aislada.",
+    "keyIdeas": [
+      "Valores altos pueden indicar sobrecompra.",
+      "Valores bajos pueden indicar sobreventa.",
+      "En tendencias fuertes, el RSI puede mantenerse extremo durante tiempo."
+    ],
+    "example": "Un RSI alto no significa vender automaticamente. Puede indicar fuerza si el activo esta en tendencia alcista.",
+    "checkQuestion": "Un RSI alto obliga siempre a vender?",
+    "checkAnswer": "No. Hay que interpretarlo junto con tendencia, volumen y contexto.",
+    "orderIndex": 9
+  },
+  {
+    "id": "volumen",
+    "slug": "volumen",
+    "level": "intermedio",
+    "title": "Volumen",
+    "summary": "El volumen refleja cuantas acciones, contratos o unidades se negocian en un periodo.",
+    "whyItMatters": "Ayuda a valorar si un movimiento tiene participacion real o si podria ser debil y poco fiable.",
+    "keyIdeas": [
+      "Un movimiento con volumen suele tener mas conviccion detras.",
+      "El volumen puede reforzar o debilitar una ruptura.",
+      "No siempre anticipa el precio, pero aporta contexto."
+    ],
+    "example": "Si una resistencia se rompe con mucho volumen, la ruptura suele tener mas credibilidad que si apenas hubo actividad.",
+    "checkQuestion": "Que puede indicar una ruptura con volumen alto?",
+    "checkAnswer": "Que hay mas participacion del mercado y que el movimiento puede tener mas consistencia.",
+    "orderIndex": 10
+  },
+  {
+    "id": "rupturas-falsas",
+    "slug": "rupturas-falsas",
+    "level": "intermedio",
+    "title": "Rupturas falsas",
+    "summary": "Una ruptura falsa ocurre cuando el precio supera una zona clave, pero luego vuelve rapidamente al rango anterior.",
+    "whyItMatters": "Ayuda a no comprar o vender impulsivamente solo porque el precio ha tocado un nivel.",
+    "keyIdeas": [
+      "No toda ruptura es valida por si sola.",
+      "Conviene mirar volumen, contexto y confirmacion posterior.",
+      "Las trampas del mercado suelen castigar la impaciencia."
+    ],
+    "example": "Una accion supera resistencia por la manana, pero cierra el dia por debajo de ella. Eso puede ser una ruptura fallida.",
+    "checkQuestion": "Que deberias evitar ante una ruptura?",
+    "checkAnswer": "Entrar automaticamente sin confirmar si el movimiento tiene consistencia real.",
+    "orderIndex": 11
+  },
+  {
+    "id": "relacion-riesgo-beneficio",
+    "slug": "relacion-riesgo-beneficio",
+    "level": "intermedio",
+    "title": "Relacion riesgo beneficio",
+    "summary": "La relacion riesgo beneficio compara cuanto puedes perder frente a cuanto aspiras a ganar en una operacion.",
+    "whyItMatters": "Ayuda a decidir si una idea compensa antes de entrar, no despues de que el mercado se mueva.",
+    "keyIdeas": [
+      "Una buena idea no depende solo de acertar la direccion.",
+      "Perder poco y ganar mas mejora la sostenibilidad del sistema.",
+      "La relacion debe evaluarse junto con la probabilidad de exito."
+    ],
+    "example": "Si arriesgas 1 para intentar ganar 3, no necesitas acertar tanto como si arriesgas 1 para ganar 0,5.",
+    "checkQuestion": "Cuando se analiza mejor la relacion riesgo beneficio?",
+    "checkAnswer": "Antes de abrir la operacion, para decidir si merece la pena.",
+    "orderIndex": 12
+  },
+  {
+    "id": "drawdown",
+    "slug": "drawdown",
+    "level": "avanzado",
+    "title": "Drawdown",
+    "summary": "El drawdown mide la caida desde un maximo hasta un minimo posterior en una cartera o activo.",
+    "whyItMatters": "Permite evaluar cuanto dolor puede sufrir una estrategia antes de recuperarse.",
+    "keyIdeas": [
+      "Una estrategia rentable puede ser mala si sus caidas son demasiado grandes.",
+      "El drawdown afecta al capital y tambien a la disciplina del inversor.",
+      "Controlarlo ayuda a sobrevivir a rachas negativas."
+    ],
+    "example": "Si una cartera pasa de 10.000 a 8.000 euros, ha sufrido un drawdown del 20%.",
+    "checkQuestion": "Por que importa el drawdown si una estrategia acaba ganando dinero?",
+    "checkAnswer": "Porque una caida excesiva puede hacer que el usuario abandone o no pueda recuperarse bien.",
+    "orderIndex": 13
+  },
+  {
+    "id": "tamano-posicion",
+    "slug": "tamano-posicion",
+    "level": "avanzado",
+    "title": "Tamano de posicion",
+    "summary": "El tamano de posicion define cuanto capital se arriesga en una decision concreta.",
+    "whyItMatters": "Es una de las herramientas mas importantes para controlar perdidas y evitar que una sola decision destruya la cartera.",
+    "keyIdeas": [
+      "No todas las ideas merecen el mismo capital.",
+      "Arriesgar poco permite aprender y sobrevivir a errores.",
+      "El tamano debe relacionarse con el stop, la volatilidad y la confianza."
+    ],
+    "example": "Si decides no perder mas de 100 euros y tu stop esta a 2 euros por accion, el tamano maximo seria 50 acciones.",
+    "checkQuestion": "Que relacion hay entre stop y tamano de posicion?",
+    "checkAnswer": "Cuanto mas lejos este el stop, menor deberia ser el numero de acciones para mantener controlado el riesgo.",
+    "orderIndex": 14
+  },
+  {
+    "id": "sesgo-confirmacion",
+    "slug": "sesgo-confirmacion",
+    "level": "avanzado",
+    "title": "Sesgo de confirmacion",
+    "summary": "Es la tendencia a buscar informacion que confirma lo que ya pensamos e ignorar senales contrarias.",
+    "whyItMatters": "En inversion puede hacer que mantengamos una mala idea demasiado tiempo.",
+    "keyIdeas": [
+      "Una buena decision tambien busca argumentos en contra.",
+      "Cambiar de opinion no es fallar; es actualizarse.",
+      "Las explicaciones de IA ayudan si se usan para cuestionar, no para justificar."
+    ],
+    "example": "Si quieres comprar una accion, conviene revisar tambien que podria salir mal antes de entrar.",
+    "checkQuestion": "Que pregunta ayuda a reducir este sesgo?",
+    "checkAnswer": "Que tendria que pasar para demostrar que mi idea era equivocada?",
+    "orderIndex": 15
+  },
+  {
+    "id": "backtesting",
+    "slug": "backtesting",
+    "level": "avanzado",
+    "title": "Backtesting",
+    "summary": "El backtesting consiste en probar una estrategia con datos historicos para ver como se habria comportado.",
+    "whyItMatters": "Permite detectar si una idea tiene cierta coherencia antes de arriesgar dinero real, aunque no garantiza resultados futuros.",
+    "keyIdeas": [
+      "Un backtest no predice el futuro, solo aporta evidencia historica.",
+      "Cuanto mas realista sea, mas util sera su lectura.",
+      "Ajustar demasiado una estrategia al pasado puede ser enganoso."
+    ],
+    "example": "Una estrategia puede parecer brillante en el historico porque estaba demasiado adaptada a ese periodo y luego fallar fuera de muestra.",
+    "checkQuestion": "Que error comun puede aparecer al hacer backtesting?",
+    "checkAnswer": "Sobreajustar la estrategia al pasado y creer que eso se repetira igual en el futuro.",
+    "orderIndex": 16
+  },
+  {
+    "id": "correlacion",
+    "slug": "correlacion",
+    "level": "avanzado",
+    "title": "Correlacion",
+    "summary": "La correlacion mide hasta que punto dos activos tienden a moverse de forma parecida o diferente.",
+    "whyItMatters": "Ayuda a construir carteras mas equilibradas y a no confundir diversificacion con acumular activos que se mueven igual.",
+    "keyIdeas": [
+      "Dos activos distintos pueden estar muy correlacionados.",
+      "La diversificacion mejora cuando las piezas no reaccionan igual.",
+      "La correlacion puede cambiar con el tiempo."
+    ],
+    "example": "Comprar varias empresas del mismo sector puede parecer diversificar, pero si todas caen juntas la proteccion es limitada.",
+    "checkQuestion": "Que problema hay si dos activos de la cartera estan muy correlacionados?",
+    "checkAnswer": "Que pueden caer o subir a la vez, reduciendo el efecto real de la diversificacion.",
+    "orderIndex": 17
+  },
+  {
+    "id": "esperanza-matematica",
+    "slug": "esperanza-matematica",
+    "level": "avanzado",
+    "title": "Esperanza matematica",
+    "summary": "La esperanza matematica combina la probabilidad de ganar y perder con el tamano medio de esas ganancias y perdidas.",
+    "whyItMatters": "Sirve para evaluar si una estrategia tiene sentido en conjunto, no solo por una operacion aislada.",
+    "keyIdeas": [
+      "No hace falta acertar siempre para ser rentable.",
+      "Una estrategia puede ganar poco muchas veces y perder demasiado pocas veces.",
+      "La clave es la combinacion entre frecuencia de acierto y relacion riesgo beneficio."
+    ],
+    "example": "Un sistema que acierta el 40% de las veces puede ser rentable si cuando acierta gana mucho mas de lo que pierde cuando falla.",
+    "checkQuestion": "Que intenta responder la esperanza matematica de una estrategia?",
+    "checkAnswer": "Si, a lo largo de muchas operaciones, la estrategia tiene una expectativa positiva o negativa.",
+    "orderIndex": 18
+  }
+]

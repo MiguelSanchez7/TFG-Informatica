@@ -1,0 +1,425 @@
+[
+  {
+    "level": "base",
+    "title": "Test de fundamentos",
+    "description": "Comprueba si dominas riesgo, diversificacion, tendencia y los pilares basicos antes de pasar al siguiente bloque.",
+    "xpRewardPerCorrect": 15,
+    "xpPenaltyPerWrong": 5,
+    "questions": [
+      {
+        "id": "base-1",
+        "question": "Si una inversion promete mucha rentabilidad, que deberias revisar tambien?",
+        "correctOptionId": "b",
+        "explanation": "La rentabilidad sin contexto no sirve. Siempre hay que compararla con el riesgo asumido y con la posible perdida.",
+        "options": [
+          { "id": "a", "label": "Solo si ha subido mucho recientemente" },
+          { "id": "b", "label": "El riesgo y la posible perdida asociada" },
+          { "id": "c", "label": "Si todo el mundo habla de ella" }
+        ]
+      },
+      {
+        "id": "base-2",
+        "question": "Que significa diversificar correctamente?",
+        "correctOptionId": "c",
+        "explanation": "Diversificar no es acumular activos al azar, sino repartir el riesgo entre activos o sectores que no dependan todos de lo mismo.",
+        "options": [
+          { "id": "a", "label": "Comprar muchas empresas del mismo sector" },
+          { "id": "b", "label": "Comprar cualquier activo sin criterio" },
+          { "id": "c", "label": "Repartir el riesgo entre activos o sectores distintos" }
+        ]
+      },
+      {
+        "id": "base-3",
+        "question": "Una secuencia de maximos y minimos crecientes suele indicar:",
+        "correctOptionId": "a",
+        "explanation": "Cuando tanto los maximos como los minimos suben de forma progresiva, suele haber una estructura alcista.",
+        "options": [
+          { "id": "a", "label": "Posible tendencia alcista" },
+          { "id": "b", "label": "Mercado sin direccion" },
+          { "id": "c", "label": "Senal segura de venta" }
+        ]
+      },
+      {
+        "id": "base-4",
+        "question": "Que problema tiene concentrar toda la cartera en una sola empresa?",
+        "correctOptionId": "b",
+        "explanation": "La concentracion aumenta mucho la dependencia de una sola idea. Si sale mal, el impacto en la cartera es mucho mayor.",
+        "options": [
+          { "id": "a", "label": "Que es imposible ganar dinero" },
+          { "id": "b", "label": "Que una sola decision puede afectar demasiado al resultado" },
+          { "id": "c", "label": "Que el broker te cobra mas comisiones" }
+        ]
+      },
+      {
+        "id": "base-5",
+        "question": "En un mercado lateral, que suele pasar con la direccion del precio?",
+        "correctOptionId": "c",
+        "explanation": "En un lateral no hay una direccion dominante clara; el precio se mueve dentro de un rango sin tendencia definida.",
+        "options": [
+          { "id": "a", "label": "Sube con fuerza y continuidad" },
+          { "id": "b", "label": "Cae con maximos crecientes" },
+          { "id": "c", "label": "No muestra una direccion clara" }
+        ]
+      },
+      {
+        "id": "base-6",
+        "question": "Si una posicion cae mucho, por que cuesta mas recuperarse?",
+        "correctOptionId": "a",
+        "explanation": "Tras una gran perdida, hace falta una rentabilidad porcentual mayor para volver al punto inicial. Por eso controlar caidas es tan importante.",
+        "options": [
+          { "id": "a", "label": "Porque una gran perdida exige una ganancia aun mayor para volver al inicio" },
+          { "id": "b", "label": "Porque ya no se puede vender el activo" },
+          { "id": "c", "label": "Porque el mercado deja de moverse" }
+        ]
+      },
+      {
+        "id": "base-7",
+        "question": "Que define el horizonte temporal de una inversion?",
+        "correctOptionId": "b",
+        "explanation": "El horizonte temporal es el tiempo previsto para mantener una idea, y condiciona el analisis, el riesgo y la paciencia necesaria.",
+        "options": [
+          { "id": "a", "label": "El numero de acciones que compras" },
+          { "id": "b", "label": "El tiempo durante el que planeas mantener la idea" },
+          { "id": "c", "label": "La comision que cobra el broker" }
+        ]
+      },
+      {
+        "id": "base-8",
+        "question": "Que indica principalmente la volatilidad?",
+        "correctOptionId": "a",
+        "explanation": "La volatilidad da una idea de cuanto puede moverse un activo y, por tanto, de cuanta incertidumbre tiene su comportamiento.",
+        "options": [
+          { "id": "a", "label": "Cuanto puede variar el precio" },
+          { "id": "b", "label": "Cuanto dividendo reparte la empresa" },
+          { "id": "c", "label": "Cuantos anos lleva cotizando" }
+        ]
+      },
+      {
+        "id": "base-9",
+        "question": "Que ventaja aporta un activo liquido?",
+        "correctOptionId": "c",
+        "explanation": "La liquidez facilita entrar o salir del mercado sin distorsionar demasiado el precio, algo clave cuando necesitas ejecutar una decision.",
+        "options": [
+          { "id": "a", "label": "Garantiza que subira mas rapido" },
+          { "id": "b", "label": "Reduce automaticamente el riesgo de mercado" },
+          { "id": "c", "label": "Permite comprar o vender con mas facilidad" }
+        ]
+      },
+      {
+        "id": "base-10",
+        "question": "Que error suele cometer alguien que solo mira la posible ganancia?",
+        "correctOptionId": "b",
+        "explanation": "Centrarse solo en lo que se puede ganar hace olvidar cuanto se puede perder y si el escenario realmente compensa el riesgo.",
+        "options": [
+          { "id": "a", "label": "Elegir siempre activos demasiado liquidos" },
+          { "id": "b", "label": "Ignorar la posible perdida y el riesgo asumido" },
+          { "id": "c", "label": "Analizar demasiado el contexto" }
+        ]
+      },
+      {
+        "id": "base-11",
+        "question": "Que suele ser mas prudente si no entiendes bien un activo?",
+        "correctOptionId": "a",
+        "explanation": "Si no comprendes el activo o su riesgo, lo sensato es reducir exposicion o simplemente no entrar todavia.",
+        "options": [
+          { "id": "a", "label": "No entrar o hacerlo con mucha cautela" },
+          { "id": "b", "label": "Comprar mas porque puede sorprender" },
+          { "id": "c", "label": "Esperar a que otros lo compren antes" }
+        ]
+      },
+      {
+        "id": "base-12",
+        "question": "Que relacion existe entre diversificacion y concentracion?",
+        "correctOptionId": "c",
+        "explanation": "La diversificacion reduce dependencia de una sola idea; la concentracion hace justo lo contrario.",
+        "options": [
+          { "id": "a", "label": "No tienen ninguna relacion" },
+          { "id": "b", "label": "Son lo mismo con distinto nombre" },
+          { "id": "c", "label": "Una reparte riesgo y la otra lo concentra en menos decisiones" }
+        ]
+      }
+    ]
+  },
+  {
+    "level": "intermedio",
+    "title": "Test de lectura tecnica",
+    "description": "Valida si sabes interpretar zonas, indicadores y estructuras sin depender de una sola senal.",
+    "xpRewardPerCorrect": 20,
+    "xpPenaltyPerWrong": 8,
+    "questions": [
+      {
+        "id": "intermedio-1",
+        "question": "Por que hablamos de soporte y resistencia como zonas?",
+        "correctOptionId": "b",
+        "explanation": "El mercado rara vez gira en un precio exacto. Normalmente reacciona en areas donde se concentra el interes comprador o vendedor.",
+        "options": [
+          { "id": "a", "label": "Porque cambian cada hora de forma aleatoria" },
+          { "id": "b", "label": "Porque el mercado rara vez respeta un precio exacto" },
+          { "id": "c", "label": "Porque solo sirven en criptomonedas" }
+        ]
+      },
+      {
+        "id": "intermedio-2",
+        "question": "Que desventaja tiene una media movil muy corta?",
+        "correctOptionId": "a",
+        "explanation": "Una media muy corta reacciona muy rapido, pero tambien absorbe mucho ruido y puede lanzar mas senales falsas.",
+        "options": [
+          { "id": "a", "label": "Puede generar mas ruido y senales falsas" },
+          { "id": "b", "label": "No permite ver nunca la tendencia" },
+          { "id": "c", "label": "Solo funciona en marcos mensuales" }
+        ]
+      },
+      {
+        "id": "intermedio-3",
+        "question": "Que significa un RSI alto por si solo?",
+        "correctOptionId": "c",
+        "explanation": "El RSI no debe leerse de forma aislada. Un valor alto puede ser agotamiento o simplemente fuerza en una tendencia alcista.",
+        "options": [
+          { "id": "a", "label": "Que hay que vender inmediatamente" },
+          { "id": "b", "label": "Que el activo va a caer seguro" },
+          { "id": "c", "label": "Que debe interpretarse junto con el contexto" }
+        ]
+      },
+      {
+        "id": "intermedio-4",
+        "question": "Si un soporte se rompe con claridad, que puede pasar despues?",
+        "correctOptionId": "b",
+        "explanation": "Una zona que antes frenaba caidas puede pasar a actuar como resistencia si el precio intenta recuperarla desde abajo.",
+        "options": [
+          { "id": "a", "label": "Siempre deja de tener importancia" },
+          { "id": "b", "label": "Puede convertirse en resistencia" },
+          { "id": "c", "label": "Se convierte automaticamente en una senal de compra" }
+        ]
+      },
+      {
+        "id": "intermedio-5",
+        "question": "Que ventaja suele tener una media movil larga frente a una corta?",
+        "correctOptionId": "c",
+        "explanation": "Las medias largas reaccionan mas despacio, pero filtran mejor el ruido y muestran mejor la direccion general.",
+        "options": [
+          { "id": "a", "label": "Acertar siempre el mejor punto de entrada" },
+          { "id": "b", "label": "Dar mas senales por semana" },
+          { "id": "c", "label": "Filtrar mejor el ruido del precio" }
+        ]
+      },
+      {
+        "id": "intermedio-6",
+        "question": "Que combinacion mejora la lectura de soportes o resistencias?",
+        "correctOptionId": "a",
+        "explanation": "Estas zonas funcionan mejor cuando se apoyan en mas contexto: volumen, tendencia, volatilidad y gestion del riesgo.",
+        "options": [
+          { "id": "a", "label": "Combinar la zona con volumen, tendencia y riesgo" },
+          { "id": "b", "label": "Mirarla sin usar ningun otro dato" },
+          { "id": "c", "label": "Cambiar de zona cada vez que cierra una vela" }
+        ]
+      },
+      {
+        "id": "intermedio-7",
+        "question": "Que puede indicar una ruptura con volumen alto?",
+        "correctOptionId": "b",
+        "explanation": "Cuando una ruptura viene acompanada de volumen elevado, suele haber mas participacion del mercado y mas conviccion detras del movimiento.",
+        "options": [
+          { "id": "a", "label": "Que la ruptura es irrelevante" },
+          { "id": "b", "label": "Que el movimiento puede tener mas credibilidad" },
+          { "id": "c", "label": "Que el precio se movera menos despues" }
+        ]
+      },
+      {
+        "id": "intermedio-8",
+        "question": "Que es una ruptura falsa?",
+        "correctOptionId": "c",
+        "explanation": "Una ruptura falsa supera temporalmente una zona clave, pero luego el precio vuelve al rango previo y atrapa a quien entro demasiado pronto.",
+        "options": [
+          { "id": "a", "label": "Una ruptura con mucho volumen" },
+          { "id": "b", "label": "Una ruptura que se mantiene varios dias" },
+          { "id": "c", "label": "Una superacion temporal que pierde fuerza y vuelve al rango" }
+        ]
+      },
+      {
+        "id": "intermedio-9",
+        "question": "Que evalua la relacion riesgo beneficio?",
+        "correctOptionId": "a",
+        "explanation": "Compara cuanto puedes perder frente a cuanto aspiras a ganar, para decidir si la operacion compensa antes de abrirla.",
+        "options": [
+          { "id": "a", "label": "La proporcion entre posible perdida y posible ganancia" },
+          { "id": "b", "label": "La relacion entre volumen y liquidez" },
+          { "id": "c", "label": "La diferencia entre dos medias moviles" }
+        ]
+      },
+      {
+        "id": "intermedio-10",
+        "question": "Cuando conviene evaluar la relacion riesgo beneficio?",
+        "correctOptionId": "b",
+        "explanation": "La relacion riesgo beneficio sirve para decidir antes de entrar, no para justificar una posicion cuando ya esta abierta.",
+        "options": [
+          { "id": "a", "label": "Solo al cerrar la operacion" },
+          { "id": "b", "label": "Antes de abrir la operacion" },
+          { "id": "c", "label": "Solo si el activo tiene mucho volumen" }
+        ]
+      },
+      {
+        "id": "intermedio-11",
+        "question": "Que lectura puede reforzar un precio por encima de la media de 50 sesiones que sigue subiendo?",
+        "correctOptionId": "a",
+        "explanation": "Si el precio se mantiene sobre una media relevante y esta ademas asciende, suele reforzar una lectura alcista del contexto.",
+        "options": [
+          { "id": "a", "label": "Una posible continuidad alcista" },
+          { "id": "b", "label": "Una senal segura de agotamiento" },
+          { "id": "c", "label": "Que el activo esta sin tendencia" }
+        ]
+      },
+      {
+        "id": "intermedio-12",
+        "question": "Cual es uno de los riesgos de usar un indicador de forma aislada?",
+        "correctOptionId": "c",
+        "explanation": "Un indicador sin contexto puede llevar a conclusiones pobres o precipitadas. El precio, la tendencia y el riesgo tambien importan.",
+        "options": [
+          { "id": "a", "label": "Que siempre acierta demasiado" },
+          { "id": "b", "label": "Que elimina la necesidad de gestionar riesgo" },
+          { "id": "c", "label": "Que puedes sacar una conclusion incompleta o enganosa" }
+        ]
+      }
+    ]
+  },
+  {
+    "level": "avanzado",
+    "title": "Test de gestion avanzada",
+    "description": "Cierra el recorrido con gestion del riesgo, psicologia, backtesting y construccion de carteras.",
+    "xpRewardPerCorrect": 25,
+    "xpPenaltyPerWrong": 10,
+    "questions": [
+      {
+        "id": "avanzado-1",
+        "question": "Por que importa el drawdown aunque una estrategia termine ganando dinero?",
+        "correctOptionId": "a",
+        "explanation": "Una estrategia puede ser rentable al final, pero si sus caidas son demasiado duras puede volverse psicologicamente y financieramente inviable.",
+        "options": [
+          { "id": "a", "label": "Porque una caida excesiva puede ser dificil de soportar y recuperar" },
+          { "id": "b", "label": "Porque elimina automaticamente la rentabilidad futura" },
+          { "id": "c", "label": "Porque solo afecta a carteras institucionales" }
+        ]
+      },
+      {
+        "id": "avanzado-2",
+        "question": "Si colocas un stop mas alejado, que deberia pasar con el tamano de posicion?",
+        "correctOptionId": "b",
+        "explanation": "Cuanto mayor sea la distancia al stop, menor deberia ser el numero de acciones para no disparar el riesgo total.",
+        "options": [
+          { "id": "a", "label": "Aumentar para aprovechar mas el movimiento" },
+          { "id": "b", "label": "Reducirse para mantener el riesgo controlado" },
+          { "id": "c", "label": "Quedarse siempre igual" }
+        ]
+      },
+      {
+        "id": "avanzado-3",
+        "question": "Que practica ayuda a reducir el sesgo de confirmacion?",
+        "correctOptionId": "c",
+        "explanation": "Buscar evidencia en contra de tu propia idea te obliga a contrastarla y evita usar informacion solo para reafirmarte.",
+        "options": [
+          { "id": "a", "label": "Buscar solo opiniones que confirmen tu idea" },
+          { "id": "b", "label": "Mantener una operacion aunque aparezcan senales contrarias" },
+          { "id": "c", "label": "Preguntarte que evidencias demostrarian que estabas equivocado" }
+        ]
+      },
+      {
+        "id": "avanzado-4",
+        "question": "Que riesgo tiene dar el mismo tamano a todas las operaciones?",
+        "correctOptionId": "a",
+        "explanation": "No todas las ideas tienen el mismo riesgo. Igualar tamano sin contexto puede hacer que una operacion demasiado arriesgada pese mas de la cuenta.",
+        "options": [
+          { "id": "a", "label": "Que ignores diferencias de volatilidad, stop o calidad de la idea" },
+          { "id": "b", "label": "Que el beneficio siempre sea menor" },
+          { "id": "c", "label": "Que no puedas diversificar nunca" }
+        ]
+      },
+      {
+        "id": "avanzado-5",
+        "question": "Que efecto suele tener un drawdown grande en el inversor?",
+        "correctOptionId": "b",
+        "explanation": "El drawdown no afecta solo al capital; tambien afecta a la disciplina y a la capacidad de seguir el plan sin abandonarlo.",
+        "options": [
+          { "id": "a", "label": "Ninguno, si la estrategia era buena" },
+          { "id": "b", "label": "Puede erosionar la confianza y hacer abandonar el sistema" },
+          { "id": "c", "label": "Solo afecta cuando se opera con derivados" }
+        ]
+      },
+      {
+        "id": "avanzado-6",
+        "question": "Por que cambiar de opinion no siempre significa fallar?",
+        "correctOptionId": "c",
+        "explanation": "En inversion actualizar una idea con datos nuevos es una fortaleza. Lo peligroso es aferrarse a una tesis rota por orgullo.",
+        "options": [
+          { "id": "a", "label": "Porque el mercado siempre da una segunda oportunidad inmediata" },
+          { "id": "b", "label": "Porque vender una mala posicion garantiza beneficio" },
+          { "id": "c", "label": "Porque revisar la tesis con nueva informacion forma parte de decidir bien" }
+        ]
+      },
+      {
+        "id": "avanzado-7",
+        "question": "Que intenta responder un backtesting?",
+        "correctOptionId": "a",
+        "explanation": "El backtesting intenta ver como se habria comportado una estrategia en el pasado para obtener evidencia historica sobre su coherencia.",
+        "options": [
+          { "id": "a", "label": "Como se habria comportado una estrategia con datos historicos" },
+          { "id": "b", "label": "Que precio tendra un activo manana" },
+          { "id": "c", "label": "Que empresa va a publicar mejores resultados" }
+        ]
+      },
+      {
+        "id": "avanzado-8",
+        "question": "Que riesgo tiene sobreajustar una estrategia al pasado?",
+        "correctOptionId": "c",
+        "explanation": "Una estrategia demasiado adaptada al historico puede funcionar muy bien en los datos usados y muy mal fuera de muestra.",
+        "options": [
+          { "id": "a", "label": "Que se vuelva demasiado simple" },
+          { "id": "b", "label": "Que deje de tener costes" },
+          { "id": "c", "label": "Que parezca robusta en el pasado pero falle en el futuro" }
+        ]
+      },
+      {
+        "id": "avanzado-9",
+        "question": "Que aporta estudiar la correlacion entre activos?",
+        "correctOptionId": "b",
+        "explanation": "La correlacion ayuda a saber si activos distintos realmente diversifican o si tenderan a moverse en la misma direccion.",
+        "options": [
+          { "id": "a", "label": "Asegurar que todos subiran a la vez" },
+          { "id": "b", "label": "Entender si se mueven de forma parecida o diferente" },
+          { "id": "c", "label": "Reducir automaticamente el drawdown" }
+        ]
+      },
+      {
+        "id": "avanzado-10",
+        "question": "Que problema hay en una cartera con activos muy correlacionados?",
+        "correctOptionId": "a",
+        "explanation": "Si varios activos se mueven casi igual, la diversificacion real es menor de lo que parece y la cartera puede sufrir al mismo tiempo.",
+        "options": [
+          { "id": "a", "label": "Que la diversificacion puede ser mas aparente que real" },
+          { "id": "b", "label": "Que siempre ganara menos" },
+          { "id": "c", "label": "Que no podras vender ninguno" }
+        ]
+      },
+      {
+        "id": "avanzado-11",
+        "question": "Que combina la esperanza matematica de una estrategia?",
+        "correctOptionId": "c",
+        "explanation": "La esperanza matematica mezcla frecuencia de acierto con magnitud de ganancias y perdidas para estimar si el sistema tiene expectativa positiva.",
+        "options": [
+          { "id": "a", "label": "Solo el porcentaje de operaciones ganadoras" },
+          { "id": "b", "label": "Solo el ratio beneficio riesgo" },
+          { "id": "c", "label": "La probabilidad de ganar y perder con el tamano medio de cada resultado" }
+        ]
+      },
+      {
+        "id": "avanzado-12",
+        "question": "Puede una estrategia ser rentable aunque no acierte la mayoria de veces?",
+        "correctOptionId": "b",
+        "explanation": "Si las operaciones ganadoras compensan suficientemente a las perdedoras, una estrategia puede funcionar aunque no acierte mas del 50%.",
+        "options": [
+          { "id": "a", "label": "No, siempre necesita acertar mas de la mitad" },
+          { "id": "b", "label": "Si, si gana bastante mas cuando acierta que lo que pierde cuando falla" },
+          { "id": "c", "label": "Solo si usa apalancamiento" }
+        ]
+      }
+    ]
+  }
+]

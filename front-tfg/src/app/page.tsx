@@ -9,6 +9,49 @@ import { TestSupabase } from "../components/TestSupabase";
 export default function Home() {
   const { user } = useAuth();
 
+  if (!user) {
+    return (
+      <main className="relative font-sans tracking-tight min-h-screen bg-[#020617] text-[#e5e7eb]">
+        <Navbar />
+
+        <div className="mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-6 pb-16 pt-28">
+          <section className="w-full max-w-3xl rounded-2xl border border-[#1f2937] bg-[#020617]/70 p-8 text-center shadow-[0_18px_45px_rgba(15,23,42,0.55)]">
+            <p className="text-xs tracking-[0.25em] text-[#64748b] uppercase font-medium">
+              TFG · Plataforma educativa con IA
+            </p>
+
+            <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#f9fafb]">
+              Empieza iniciando sesion
+              <span className="block mt-1 bg-gradient-to-r from-[#38bdf8] via-[#22c55e] to-[#facc15] bg-clip-text text-transparent">
+                o creando tu cuenta
+              </span>
+            </h1>
+
+            <p className="mx-auto mt-5 max-w-2xl text-base md:text-lg text-[#cbd5e1]/80 font-light">
+              Accede para guardar tu progreso, desbloquear niveles y continuar con
+              retos historicos, teoria y laboratorio de estrategia.
+            </p>
+
+            <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center rounded-md border border-[#334155] bg-[#1e293b] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-[#e5e7eb] transition hover:bg-[#334155]"
+              >
+                Iniciar sesion
+              </Link>
+              <Link
+                href="/register"
+                className="inline-flex items-center justify-center rounded-md border border-[#334155] bg-transparent px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-[#e5e7eb] transition hover:bg-[#111827]"
+              >
+                Registrarse
+              </Link>
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   const displayName = user?.username || user?.email || "Inversor";
   const level = user?.level ?? 1;
   const levelName = user?.level_name ?? "Novato";

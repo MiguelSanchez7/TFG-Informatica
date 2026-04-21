@@ -102,12 +102,45 @@ export async function addUserXp(userId: string, xp: number) {
 }
 
 export async function getConcepts() {
-  const response = await fetch(`${API_URL}/concepts`, {
-    method: "GET",
+  try {
+    const response = await fetch(`${API_URL}/concepts`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      let errText = "Error obteniendo conceptos";
+      try {
+        const err = await response.json();
+        errText = err.detail || errText;
+      } catch {}
+
+      throw new Error(errText);
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error instanceof Error && error.message === "Failed to fetch") {
+      throw new Error("No se pudo conectar con el backend");
+    }
+
+    throw error;
+  }
+}
+
+export async function askTutor(
+  question: string,
+  history: Array<{ role: "user" | "assistant"; content: string }> = []
+) {
+  const response = await fetch(`${API_URL}/assistant/tutor`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ question, history }),
   });
 
   if (!response.ok) {
-    let errText = "Error obteniendo conceptos";
+    let errText = "Error consultando al tutor";
     try {
       const err = await response.json();
       errText = err.detail || errText;
