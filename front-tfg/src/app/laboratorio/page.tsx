@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { getRandomScenario, getScenarioById, API_URL } from "@/lib/api";
 import MarketChart from "@/components/marketchart";
+import Navbar from "@/components/Navbar";
 
 type Action = "BUY" | "HOLD" | "SELL";
 
@@ -170,6 +171,25 @@ export default function LaboratorioPage() {
       ? "border border-rose-500/60 bg-rose-900/25 text-rose-100"
       : "border border-slate-500/60 bg-slate-900/25 text-slate-100";
 
+  const userDecisionScore = Number(userScoreAccum);
+  const aiDecisionScore = Number(aiScoreAccum);
+  const hasDecisionComparison =
+    Number.isFinite(userDecisionScore) && Number.isFinite(aiDecisionScore);
+  const decisionWinner = !hasDecisionComparison
+    ? null
+    : userDecisionScore > aiDecisionScore
+    ? "USER"
+    : userDecisionScore < aiDecisionScore
+    ? "AI"
+    : "TIE";
+
+  const decisionBoxClass =
+    decisionWinner === "USER"
+      ? "border border-emerald-500/60 bg-emerald-900/25 text-emerald-100"
+      : decisionWinner === "AI"
+      ? "border border-rose-500/60 bg-rose-900/25 text-rose-100"
+      : "border border-slate-500/60 bg-slate-900/25 text-slate-100";
+
   /* =========================
      MULTI-TURN API
   ========================= */
@@ -329,9 +349,6 @@ export default function LaboratorioPage() {
       ? "border border-emerald-500/60 bg-emerald-900/25 text-emerald-100"
       : "border border-rose-500/60 bg-rose-900/25 text-rose-100";
 
-  const endBoxClass =
-    "border border-indigo-400/60 bg-indigo-900/30 text-indigo-100";
-
   const actionsDisabled = loading || !started || finished;
 
   /* =========================
@@ -339,7 +356,9 @@ export default function LaboratorioPage() {
   ========================= */
 
   return (
-    <main className="min-h-screen bg-[#020617] p-6 text-[#e5e7eb]">
+    <main className="min-h-screen bg-[#020617] px-6 pb-6 pt-24 text-[#e5e7eb]">
+      <Navbar />
+
       <div className="max-w-5xl mx-auto">
         <h1 className="text-2xl font-semibold">Escenarios (Market Engine)</h1>
         <p className="mt-2 text-sm opacity-80">
@@ -366,6 +385,77 @@ export default function LaboratorioPage() {
         </div>
 
         {error && <p className="mt-4 text-rose-300">{error}</p>}
+
+        {scenario && finished && (
+          <section className="mt-6 border border-slate-600 rounded-lg p-5 text-sm text-[#e5e7eb]">
+            <div className="rounded-lg border border-sky-400/60 bg-sky-950/40 p-4">
+              <h2 className="text-lg font-semibold text-[#f9fafb]">
+                <span className="mr-2 text-emerald-300">✓</span>
+                Resultados de la sesión
+              </h2>
+              <p className="mt-1 text-[#cbd5e1]">
+                Sesión finalizada: has llegado al máximo de turnos ({maxTurns}).
+                Para continuar, pulsa <b>Random</b> o carga otro <b>ID</b>.
+              </p>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {finalValue != null && deltaValue != null && (
+                <div className={`rounded-lg p-4 ${outcomeBoxClass}`}>
+                  <div className="font-semibold text-base">
+                    {outcome === "WIN"
+                      ? "Has terminado con ganancias"
+                      : outcome === "LOSS"
+                      ? "Has terminado con pérdidas"
+                      : "Has terminado en tablas"}
+                  </div>
+
+                  <div className="mt-2 grid grid-cols-[8rem_1fr] gap-x-3 opacity-90">
+                    <span>Capital inicial:</span>
+                    <b>{fmtEurES(INITIAL_CAPITAL)}</b>
+                  </div>
+                  <div className="grid grid-cols-[8rem_1fr] gap-x-3 opacity-90">
+                    <span>Valor final:</span>
+                    <b>{fmtEurES(finalValue)}</b>
+                  </div>
+                  <div className="grid grid-cols-[8rem_auto_auto] gap-x-3 opacity-90">
+                    <span>Resultado:</span>
+                    <b>
+                      {deltaValue > 0 ? "+" : ""}
+                      {fmtEurES(deltaValue)}
+                    </b>
+                    <b>{walletReturn != null ? fmtPct2(walletReturn) : "—"}</b>
+                  </div>
+                </div>
+              )}
+
+              {hasDecisionComparison && (
+                <div className={`rounded-lg p-4 ${decisionBoxClass}`}>
+                  <div className="font-semibold text-base">
+                    {decisionWinner === "USER"
+                      ? "Has superado a la IA en decisiones"
+                      : decisionWinner === "AI"
+                      ? "La IA ha obtenido mejor rendimiento de decisiones"
+                      : "Empate en rendimiento de decisiones"}
+                  </div>
+
+                  <div className="mt-2 grid grid-cols-[9rem_1fr] gap-x-3 opacity-90">
+                    <span>Tu rendimiento:</span>
+                    <b>{fmtPct2(userDecisionScore)}</b>
+                  </div>
+                  <div className="grid grid-cols-[9rem_1fr] gap-x-3 opacity-90">
+                    <span>Rendimiento IA:</span>
+                    <b>{fmtPct2(aiDecisionScore)}</b>
+                  </div>
+                  <p className="mt-2 opacity-80">
+                    Esta comparación mide el acierto de las decisiones BUY, HOLD
+                    o SELL.
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* INFO */}
         <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
@@ -398,41 +488,6 @@ export default function LaboratorioPage() {
               <b className="font-semibold">{fmtMaybePct2(aiScoreAccum)}</b>
             </div>
           </div>
-
-          {scenario && finished && (
-            <>
-              <div className={`mt-4 p-3 rounded-lg text-sm ${endBoxClass}`}>
-                <div className="font-semibold text-base">✅ Sesión finalizada</div>
-                <div className="opacity-90 mt-1">
-                  Has llegado al máximo de turnos ({maxTurns}). Para continuar,
-                  pulsa <b>Random</b> o carga otro <b>ID</b>.
-                </div>
-              </div>
-
-              {/* ✅ NUEVO: Mensaje final de resultado */}
-              {finalValue != null && deltaValue != null && (
-                <div className={`mt-3 p-3 rounded-lg text-sm ${outcomeBoxClass}`}>
-                  <div className="font-semibold text-base">
-                    {outcome === "WIN"
-                      ? "🏆 Has terminado con ganancias"
-                      : outcome === "LOSS"
-                      ? "📉 Has terminado con pérdidas"
-                      : "➖ Has terminado en tablas"}
-                  </div>
-
-                  <div className="opacity-90 mt-1">
-                    Capital inicial: <b>{fmtEurES(INITIAL_CAPITAL)}</b> ·
-                    Valor final: <b>{fmtEurES(finalValue)}</b> ·
-                    Resultado:{" "}
-                    <b>
-                      {deltaValue > 0 ? "+" : ""}
-                      {fmtEurES(deltaValue)}
-                    </b>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
         </div>
 
         {/* IA */}

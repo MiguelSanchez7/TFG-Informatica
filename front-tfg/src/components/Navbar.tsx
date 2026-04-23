@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import UserBadge from "./UserBadge";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const { user } = useAuth();
+  const pathname = usePathname();
+  const showScenariosButton = user && pathname !== "/laboratorio";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-[#0a0f1f] border-b border-slate-300 dark:border-[#1e293b] shadow-sm">
@@ -22,7 +25,7 @@ export default function Navbar() {
               className="rounded"
             />
           </Link>
-          {user && (
+          {showScenariosButton && (
             <Link
               href="/laboratorio"
               className="inline-flex items-center justify-center cursor-pointer
