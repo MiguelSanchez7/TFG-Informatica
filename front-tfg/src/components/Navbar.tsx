@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import ThemeToggle from "./ThemeToggle";
 import UserBadge from "./UserBadge";
 import { useAuth } from "../context/AuthContext";
 
@@ -23,13 +22,10 @@ export default function Navbar() {
               className="rounded"
             />
           </Link>
-
-          <ThemeToggle />
-
           {user && (
             <Link
               href="/laboratorio"
-              className="ml-2 inline-flex items-center justify-center cursor-pointer
+              className="inline-flex items-center justify-center cursor-pointer
                 px-4 py-2 text-xs sm:text-sm font-medium tracking-wide uppercase
                 bg-[#1e293b] text-[#e5e7eb] border border-[#334155]
                 hover:bg-[#334155] hover:border-[#475569]

@@ -73,7 +73,7 @@ export default function Home() {
 
           <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#f9fafb]">
             Aprende a invertir de manera
-            <span className="block mt-1 bg-gradient-to-r from-[#38bdf8] via-[#a855f7] to-[#f97316] bg-clip-text text-transparent">
+            <span className="block mt-1 text-[#f9fafb]">
               sencilla y divertida
             </span>
           </h1>

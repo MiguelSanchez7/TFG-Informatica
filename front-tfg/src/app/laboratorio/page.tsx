@@ -129,6 +129,13 @@ export default function LaboratorioPage() {
   const aiScoreAccum = scenario?.ai_score ?? null;
 
   const wallet = scenario?.wallet ?? null;
+  const walletReturn =
+    wallet &&
+    Number.isFinite(Number(wallet.portfolio_value)) &&
+    Number.isFinite(Number(wallet.initial_cash)) &&
+    Number(wallet.initial_cash) !== 0
+      ? Number(wallet.portfolio_value) / Number(wallet.initial_cash) - 1
+      : null;
 
   /* =========================
      ✅ NUEVO: RESULTADO FINAL (GANAS/PIERDES)
@@ -332,7 +339,7 @@ export default function LaboratorioPage() {
   ========================= */
 
   return (
-    <main className="p-6">
+    <main className="min-h-screen bg-[#020617] p-6 text-[#e5e7eb]">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-2xl font-semibold">Escenarios (Market Engine)</h1>
         <p className="mt-2 text-sm opacity-80">
@@ -379,11 +386,15 @@ export default function LaboratorioPage() {
             </div>
 
             <div>
-              <span className="opacity-70">Rentabilidad acumulada (tú):</span>{" "}
+              <span className="opacity-70">
+                Rendimiento acumulado de decisiones (tú):
+              </span>{" "}
               <b className="font-semibold">{fmtMaybePct2(userScoreAccum)}</b>
             </div>
             <div>
-              <span className="opacity-70">Rentabilidad acumulada (IA):</span>{" "}
+              <span className="opacity-70">
+                Rendimiento acumulado de decisiones (IA):
+              </span>{" "}
               <b className="font-semibold">{fmtMaybePct2(aiScoreAccum)}</b>
             </div>
           </div>
@@ -452,7 +463,7 @@ export default function LaboratorioPage() {
         {wallet && (
           <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
             <div className="font-semibold mb-2">Cartera</div>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-4 gap-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-x-4 gap-y-2">
               <div>
                 <span className="opacity-70">Cash:</span>{" "}
                 <b className="font-semibold">{fmtEurES(wallet.cash)}</b>
@@ -472,6 +483,12 @@ export default function LaboratorioPage() {
                 <b className="font-semibold">
                   {Number(wallet.pnl_total) >= 0 ? "+" : ""}
                   {fmtEurES(wallet.pnl_total)}
+                </b>
+              </div>
+              <div>
+                <span className="opacity-70">Rentabilidad cartera:</span>{" "}
+                <b className="font-semibold">
+                  {walletReturn != null ? fmtPct2(walletReturn) : "—"}
                 </b>
               </div>
             </div>

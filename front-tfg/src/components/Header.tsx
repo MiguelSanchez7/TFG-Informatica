@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Navbar from "./Navbar";
-import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   const headerBase =
@@ -27,11 +26,7 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Nav + toggle */}
-        <div className="flex items-center gap-2">
-          <Navbar />
-          <ThemeToggle />
-        </div>
+        <Navbar />
       </div>
     </header>
   );
