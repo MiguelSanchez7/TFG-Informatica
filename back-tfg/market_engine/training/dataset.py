@@ -157,11 +157,19 @@ def temporal_train_test_split(
     # cutoff = fecha que separa train y test
     cutoff = pd.Timestamp(train_end_date)
 
-    # train_df = filas hasta la fecha límite
-    train_df = dataset[dataset["date"] <= cutoff].copy()
+    # train_df = filas cuya fecha futura no cruza el corte temporal.
+    # Asi evitamos fuga temporal en la etiqueta.
+    train_df = dataset[dataset["future_date"] <= cutoff].copy()
 
-    # test_df = filas posteriores a la fecha límite
+    # test_df = filas cuyo punto de partida ya cae despues del corte.
     test_df = dataset[dataset["date"] > cutoff].copy()
+
+    # Si alguna fila de train usa futuro posterior al corte, el split es invalido.
+    if not train_df.empty and (train_df["future_date"] > cutoff).any():
+        raise ValueError(
+            "Temporal split leakage detected: train rows use future data "
+            "after the cutoff date."
+        )
 
     # Si uno sale vacío, este split no sirve
     if train_df.empty or test_df.empty:
