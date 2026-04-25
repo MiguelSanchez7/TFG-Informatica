@@ -1,11 +1,53 @@
 "use client";
 
-import { useState } from "react";
-import { getRandomScenario, getScenarioById, API_URL } from "@/lib/api";
+import { useEffect, useState } from "react";
+import {
+  getRandomScenario,
+  getScenarioByDateRange,
+  getScenarioById,
+  API_URL,
+} from "@/lib/api";
 import MarketChart from "@/components/marketchart";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 type Action = "BUY" | "HOLD" | "SELL";
+
+const HISTORICAL_CHALLENGES: Record<
+  string,
+  {
+    title: string;
+    startDate: string;
+    endDate: string;
+    requiredLevel: number;
+  }
+> = {
+  "mercado-lateral": {
+    title: "Mercado lateral prolongado",
+    startDate: "2015-01-01",
+    endDate: "2016-12-31",
+    requiredLevel: 2,
+  },
+  "crisis-2008": {
+    title: "Crisis financiera de 2008",
+    startDate: "2009-04-01",
+    endDate: "2009-12-31",
+    requiredLevel: 5,
+  },
+  "covid-2020": {
+    title: "Crash COVID y recuperacion",
+    startDate: "2020-04-01",
+    endDate: "2020-12-31",
+    requiredLevel: 7,
+  },
+  "subidas-tipos-2022": {
+    title: "Mercado bajista por subidas de tipos",
+    startDate: "2022-01-01",
+    endDate: "2022-12-31",
+    requiredLevel: 7,
+  },
+};
 
 /* =====================================================
    HELPERS (FORMATO ES)
@@ -89,6 +131,7 @@ function fmtMaybePct2(x: any): string {
 ===================================================== */
 
 export default function LaboratorioPage() {
+  const { user } = useAuth();
   const [scenario, setScenario] = useState<any>(null);
   const [scenarioId, setScenarioId] = useState("");
 
@@ -108,6 +151,20 @@ export default function LaboratorioPage() {
     prevAnchor: string;
     newAnchor: string;
   }>(null);
+  const [challengeTitle, setChallengeTitle] = useState<string | null>(null);
+  const [challenge, setChallenge] = useState<
+    (typeof HISTORICAL_CHALLENGES)[string] | null
+  >(null);
+  const [showTechnicalJson, setShowTechnicalJson] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const challengeId = params.get("reto") ?? "";
+    const selectedChallenge = HISTORICAL_CHALLENGES[challengeId] ?? null;
+    setChallenge(selectedChallenge);
+    setChallengeTitle(selectedChallenge?.title ?? null);
+  }, []);
 
   /* =========================
      DERIVADOS
@@ -137,6 +194,37 @@ export default function LaboratorioPage() {
     Number(wallet.initial_cash) !== 0
       ? Number(wallet.portfolio_value) / Number(wallet.initial_cash) - 1
       : null;
+  const features = scenario?.features_at_t ?? null;
+  const currentPrice = Number(features?.adj_close);
+  const sma20 = Number(features?.sma20);
+  const sma50 = Number(features?.sma50);
+  const rsi14 = Number(features?.rsi14);
+  const vol20 = Number(features?.vol20);
+  const drawdown60 = Number(features?.drawdown60);
+  const volRel20 = Number(features?.vol_rel20);
+
+  const trendReading =
+    Number.isFinite(currentPrice) && Number.isFinite(sma20) && Number.isFinite(sma50)
+      ? currentPrice > sma20 && sma20 > sma50
+        ? "Alcista"
+        : currentPrice < sma20 && sma20 < sma50
+        ? "Bajista"
+        : "Mixta"
+      : "Sin datos";
+  const rsiReading = Number.isFinite(rsi14)
+    ? rsi14 >= 70
+      ? "Sobrecompra"
+      : rsi14 <= 30
+      ? "Sobreventa"
+      : "Zona neutral"
+    : "Sin datos";
+  const riskReading = Number.isFinite(drawdown60)
+    ? drawdown60 <= -0.15
+      ? "Caida fuerte"
+      : drawdown60 <= -0.07
+      ? "Caida moderada"
+      : "Drawdown contenido"
+    : "Sin datos";
 
   /* =========================
      ✅ NUEVO: RESULTADO FINAL (GANAS/PIERDES)
@@ -217,11 +305,39 @@ export default function LaboratorioPage() {
      UI ACTIONS
   ========================= */
 
+  async function onHistoricalChallenge() {
+    if (!challenge) return;
+
+    setLoading(true);
+    setError("");
+    setStarted(false);
+    setLastResult(null);
+    setChallengeTitle(challenge.title);
+
+    try {
+      const data = await getScenarioByDateRange(
+        challenge.startDate,
+        challenge.endDate
+      );
+      const id = extractScenarioId(data);
+      setScenario(data);
+      setScenarioId(id);
+      setQuantity(1);
+
+      if (id) await startMultiTurn(id);
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando el reto historico");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function onRandom() {
     setLoading(true);
     setError("");
     setStarted(false);
     setLastResult(null);
+    setChallengeTitle(null);
 
     try {
       const data = await getRandomScenario();
@@ -250,6 +366,7 @@ export default function LaboratorioPage() {
     setError("");
     setStarted(false);
     setLastResult(null);
+    setChallengeTitle(null);
 
     try {
       const data = await getScenarioById(id);
@@ -350,6 +467,45 @@ export default function LaboratorioPage() {
       : "border border-rose-500/60 bg-rose-900/25 text-rose-100";
 
   const actionsDisabled = loading || !started || finished;
+  const userLevel = Math.max(1, user?.level ?? 1);
+  const requiredAccessLevel = challenge?.requiredLevel ?? 3;
+  const scenariosUnlocked = userLevel >= requiredAccessLevel;
+
+  if (!scenariosUnlocked) {
+    return (
+      <main className="min-h-screen bg-[#020617] px-6 pb-6 pt-24 text-[#e5e7eb]">
+        <Navbar />
+
+        <section className="mx-auto max-w-5xl rounded-lg border border-slate-700 bg-slate-900/70 p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            Escenarios bloqueados
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold text-white">
+            Necesitas alcanzar el nivel {requiredAccessLevel}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+            {challenge
+              ? "Este reto historico usa simulacion multi-turn y se habilita al alcanzar su nivel requerido."
+              : "Los escenarios libres usan simulacion multi-turn y se habilitan cuando tu perfil llega como minimo al nivel 3."} Puedes subir de nivel con los conceptos y sus tests.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/conceptos"
+              className="rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+            >
+              Ir a conceptos
+            </Link>
+            <Link
+              href="/retos-historicos"
+              className="rounded-md border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-800"
+            >
+              Ver retos historicos
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   /* =========================
      RENDER
@@ -365,11 +521,31 @@ export default function LaboratorioPage() {
           Simulación histórica multi-turn con decisiones BUY / HOLD / SELL.
         </p>
 
-        {/* CONTROLES */}
+        {challengeTitle && (
+          <div className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-950/30 p-4 text-sm text-emerald-100">
+            <p className="font-semibold">Reto historico: {challengeTitle}</p>
+            <p className="mt-1 opacity-90">
+              Genera un escenario dentro del periodo del reto para practicar sin usar el aleatorio general.
+            </p>
+          </div>
+        )}
+
         <div className="mt-6 flex flex-wrap gap-3 items-center">
-          <button className={btnClass} onClick={onRandom} disabled={loading}>
-            Random
-          </button>
+          {challenge && (
+            <button
+              className={btnClass}
+              onClick={onHistoricalChallenge}
+              disabled={loading}
+            >
+              Generar escenario del reto
+            </button>
+          )}
+
+          {!challenge && (
+            <button className={btnClass} onClick={onRandom} disabled={loading}>
+              Random
+            </button>
+          )}
 
           <input
             className={inputClass}
@@ -489,6 +665,74 @@ export default function LaboratorioPage() {
             </div>
           </div>
         </div>
+
+        {scenario && features && (
+          <section className="mt-6 rounded-lg border border-slate-600 bg-slate-900/35 p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-50">
+                  Datos para decidir
+                </h2>
+                <p className="mt-1 text-sm text-slate-400">
+                  Lectura rapida del momento actual antes de elegir BUY, HOLD o SELL.
+                </p>
+              </div>
+              <div className="rounded-md border border-slate-700 bg-slate-950/50 px-3 py-2 text-sm">
+                <span className="text-slate-400">Precio actual: </span>
+                <b>{Number.isFinite(currentPrice) ? fmtPrice2(currentPrice) : "-"}</b>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <DecisionMetric
+                label="Tendencia"
+                value={trendReading}
+                detail={`SMA20 ${Number.isFinite(sma20) ? fmtPrice2(sma20) : "-"} - SMA50 ${
+                  Number.isFinite(sma50) ? fmtPrice2(sma50) : "-"
+                }`}
+              />
+              <DecisionMetric
+                label="RSI 14"
+                value={Number.isFinite(rsi14) ? fmtNumberES2(rsi14) : "-"}
+                detail={rsiReading}
+              />
+              <DecisionMetric
+                label="Volatilidad 20d"
+                value={Number.isFinite(vol20) ? fmtPct2(vol20) : "-"}
+                detail="Movimiento reciente esperado"
+              />
+              <DecisionMetric
+                label="Drawdown 60d"
+                value={Number.isFinite(drawdown60) ? fmtPct2(drawdown60) : "-"}
+                detail={riskReading}
+              />
+              <DecisionMetric
+                label="Volumen relativo"
+                value={Number.isFinite(volRel20) ? `${fmtNumberES2(volRel20)}x` : "-"}
+                detail={
+                  Number.isFinite(volRel20) && volRel20 > 1.2
+                    ? "Actividad por encima de lo normal"
+                    : "Actividad normal o baja"
+                }
+              />
+              <DecisionMetric
+                label="Turno"
+                value={`${turn ?? "-"} / ${maxTurns}`}
+                detail="Progreso de la partida"
+              />
+              <DecisionMetric
+                label="Tu decision acumulada"
+                value={fmtMaybePct2(userScoreAccum)}
+                detail="Suma de aciertos de direccion"
+              />
+              <DecisionMetric
+                label="Decision IA acumulada"
+                value={fmtMaybePct2(aiScoreAccum)}
+                detail="Referencia, no respuesta obligatoria"
+              />
+            </div>
+          </section>
+        )}
 
         {/* IA */}
         {scenario && aiAction && (
@@ -614,14 +858,50 @@ export default function LaboratorioPage() {
 
         <MarketChart scenario={scenario} />
 
-        {/* JSON */}
-        <div className="mt-8">
-          <h2 className="text-lg font-medium">Respuesta (JSON)</h2>
+        {/* Detalle tecnico */}
+        <div className="mt-8 rounded-lg border border-slate-700 bg-slate-900/30 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-medium">Detalle tecnico</h2>
+              <p className="mt-1 text-sm text-slate-400">
+                Datos crudos del escenario para depurar o revisar la respuesta del backend.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowTechnicalJson((value) => !value)}
+              className="rounded-md border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-800"
+            >
+              {showTechnicalJson ? "Ocultar JSON" : "Ver JSON"}
+            </button>
+          </div>
+          {showTechnicalJson && (
           <pre className="mt-2 p-4 border border-slate-600 rounded overflow-auto max-h-[55vh] text-sm">
             {scenario ? JSON.stringify(scenario, null, 2) : "Sin escenario aún"}
           </pre>
+          )}
         </div>
       </div>
     </main>
+  );
+}
+
+function DecisionMetric({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-700 bg-slate-950/45 p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        {label}
+      </p>
+      <p className="mt-2 text-lg font-semibold text-slate-50">{value}</p>
+      <p className="mt-1 text-xs leading-5 text-slate-400">{detail}</p>
+    </div>
   );
 }

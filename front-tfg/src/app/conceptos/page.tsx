@@ -858,6 +858,22 @@ export default function ConceptosPage() {
                           Cambio total de XP: {quizResult.xpDelta > 0 ? "+" : ""}
                           {quizResult.xpDelta}
                         </p>
+                        {quizResult.correct === activeQuizQuestions.length && (
+                          <div className="mt-4 rounded-md border border-[#d7f365] bg-[#17352b] p-4">
+                            <p className="text-sm font-semibold text-white">
+                              Test perfecto. Buen momento para practicar con contexto real.
+                            </p>
+                            <p className="mt-2 text-sm leading-6 text-[#d8e8df]">
+                              Te recomiendo pasar a retos historicos: veras una introduccion del evento y despues podras entrenar como en un escenario de mercado.
+                            </p>
+                            <Link
+                              href="/retos-historicos"
+                              className="mt-4 inline-flex rounded-md bg-[#d7f365] px-4 py-2 text-sm font-semibold text-[#07110f] transition hover:bg-[#e7ff8d]"
+                            >
+                              Ir a retos historicos
+                            </Link>
+                          </div>
+                        )}
                         {quizResult.reviewedQuestions
                           .filter((question) => !question.wasCorrect)
                           .map((question) => (

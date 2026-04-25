@@ -127,6 +127,27 @@ def get_random_scenario(seed: int | None = None) -> dict:
     return get_scenario(str(s["scenario_id"]))  # devolvemos ese escenario completo
 
 
+def get_scenario_by_date_range(
+    start_date: str,
+    end_date: str,
+    seed: int | None = None,
+) -> dict:
+    scenarios = _load_scenarios_df()
+    start = pd.to_datetime(start_date)
+    end = pd.to_datetime(end_date)
+
+    if start > end:
+        raise ValueError("Invalid date range")
+
+    anchors = pd.to_datetime(scenarios["anchor_date"])
+    filtered = scenarios[(anchors >= start) & (anchors <= end)]
+    if filtered.empty:
+        raise ValueError("No scenarios found for date range")
+
+    s = filtered.sample(1, random_state=seed).iloc[0]
+    return get_scenario(str(s["scenario_id"]))
+
+
 # Aquí guardamos las partidas multi-turn que están activas.
 # La clave será el scenario_id.
 ACTIVE_SESSIONS: Dict[str, dict] = {}

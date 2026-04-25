@@ -7,6 +7,7 @@ from pydantic import BaseModel, EmailStr, constr
 
 from market_engine.service import (
     get_random_scenario,
+    get_scenario_by_date_range,
     get_scenario,
     start_multiturn_session,
     get_multiturn_state,
@@ -263,6 +264,20 @@ def ask_tutor_endpoint(payload: TutorQuestionRequest):
 def api_random_scenario():
     try:
         return get_random_scenario()
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/market/scenario/by-date")
+def api_scenario_by_date(
+    start_date: str,
+    end_date: str,
+    seed: Optional[int] = None,
+):
+    try:
+        return get_scenario_by_date_range(start_date, end_date, seed)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:

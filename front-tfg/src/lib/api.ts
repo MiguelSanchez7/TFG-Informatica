@@ -190,6 +190,37 @@ export async function getRandomScenario() {
   return response.json();
 }
 
+export async function getScenarioByDateRange(
+  startDate: string,
+  endDate: string,
+  seed?: number
+) {
+  const params = new URLSearchParams({
+    start_date: startDate,
+    end_date: endDate,
+  });
+
+  if (typeof seed === "number") {
+    params.set("seed", String(seed));
+  }
+
+  const response = await fetch(`${API_URL}/market/scenario/by-date?${params}`, {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let errText = "Error obteniendo escenario historico";
+    try {
+      const err = await response.json();
+      errText = err.detail || errText;
+    } catch {}
+    throw new Error(errText);
+  }
+
+  return response.json();
+}
+
 export async function getScenarioById(scenarioId: string) {
   const response = await fetch(`${API_URL}/market/scenario/${scenarioId}`, {
     method: "GET",

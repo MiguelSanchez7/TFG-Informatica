@@ -1,4 +1,3 @@
-// src/app/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -17,7 +16,7 @@ export default function Home() {
         <div className="mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-6 pb-16 pt-28">
           <section className="w-full max-w-3xl rounded-2xl border border-[#1f2937] bg-[#020617]/70 p-8 text-center shadow-[0_18px_45px_rgba(15,23,42,0.55)]">
             <p className="text-xs tracking-[0.25em] text-[#64748b] uppercase font-medium">
-              TFG · Plataforma educativa con IA
+              TFG - Plataforma educativa con IA
             </p>
 
             <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#f9fafb]">
@@ -29,7 +28,7 @@ export default function Home() {
 
             <p className="mx-auto mt-5 max-w-2xl text-base md:text-lg text-[#cbd5e1]/80 font-light">
               Accede para guardar tu progreso, desbloquear niveles y continuar con
-              retos historicos, teoria y laboratorio de estrategia.
+              retos historicos, teoria y escenarios de mercado.
             </p>
 
             <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
@@ -59,13 +58,13 @@ export default function Home() {
   const xpInLevel = user?.xp_in_level ?? xp;
   const xpForNextLevel = user?.xp_for_next_level ?? 100;
   const progress = user?.level_progress ?? 0;
+  const scenariosUnlocked = level >= 3;
 
   return (
     <main className="relative font-sans tracking-tight min-h-screen bg-[#020617] text-[#e5e7eb]">
       <Navbar />
 
       <div className="mx-auto max-w-6xl px-6 pt-28 pb-16">
-        {/* Cabecera principal */}
         <header className="text-center mb-10">
           <p className="text-xs tracking-[0.25em] text-[#64748b] uppercase font-medium">
             Hola, {displayName}
@@ -79,11 +78,10 @@ export default function Home() {
           </h1>
 
           <p className="mx-auto mt-4 max-w-2xl text-base md:text-lg text-[#cbd5e1]/80 font-light">
-            Descubre y entiende conceptos de inversión desde nivel básico a nivel experto.
-            Entrena tus decisiones con datos históricos y disfruta del proceso en un entorno seguro.
+            Descubre conceptos de inversion, practica con datos historicos y
+            desbloquea escenarios cuando alcances el nivel 3.
           </p>
 
-          {/* Barra de nivel / XP */}
           <div className="mt-6 mx-auto max-w-xl">
             <div className="flex items-center justify-between text-xs text-[#94a3b8] mb-1">
               <span>
@@ -102,15 +100,12 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Tarjetas principales */}
         <section className="grid gap-6 md:grid-cols-3">
-          {/* Retos históricos */}
           <Link
             href="/retos-historicos"
             className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
           >
             <div className="mb-4 flex h-20 items-center justify-center">
-              {/* Icono tipo velas */}
               <div className="relative h-14 w-14 rounded-lg border border-[#1f2937] bg-[#020617] flex items-end justify-center gap-1 px-2">
                 <div className="w-1.5 h-6 bg-[#38bdf8] rounded-sm" />
                 <div className="w-1.5 h-9 bg-[#22c55e] rounded-sm" />
@@ -118,23 +113,21 @@ export default function Home() {
               </div>
             </div>
             <h2 className="text-lg font-semibold text-[#f9fafb] mb-2 text-center md:text-left">
-              Retos históricos
+              Retos historicos
             </h2>
             <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
-              Practica con datos históricos reales. Decide comprar, mantener o evitar sin fuga de futuro.
+              Practica con episodios historicos y entiende que condiciones de mercado vas a enfrentar.
             </p>
             <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
-              Ir a retos históricos →
+              Ir a retos historicos
             </span>
           </Link>
 
-          {/* Aprende conceptos */}
           <Link
             href="/conceptos"
             className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
           >
             <div className="mb-4 flex h-20 items-center justify-center">
-              {/* Icono tipo pizarra */}
               <div className="relative h-14 w-16 rounded-lg border border-[#1f2937] bg-[#020617] flex items-center justify-center">
                 <div className="absolute inset-2 border border-[#1f2937] rounded-md" />
                 <div className="w-8 h-0.5 bg-[#38bdf8] absolute top-4 left-4" />
@@ -146,54 +139,77 @@ export default function Home() {
               Aprende conceptos
             </h2>
             <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
-              Revisa conceptos clave de inversión con ejemplos visuales y preguntas cortas para afianzar la teoría.
+              Revisa conceptos clave de inversion con ejemplos y tests cortos para afianzar la teoria.
             </p>
             <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
-              Ir a conceptos →
+              Ir a conceptos
             </span>
           </Link>
 
-          {/* Diseña tu estrategia */}
-          <Link
-            href="/estrategia"
-            className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-          >
-            <div className="mb-4 flex h-20 items-center justify-center">
-              {/* Icono tipo gráfico de línea */}
-              <div className="relative h-14 w-16 rounded-lg border border-[#1f2937] bg-[#020617] flex items-center justify-center">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-8 w-8 text-[#22c55e]"
-                  aria-hidden="true"
-                >
-                  <polyline
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    points="3 17 9 11 13 15 21 7"
-                  />
-                </svg>
+          {scenariosUnlocked ? (
+            <Link
+              href="/laboratorio"
+              className="group relative flex flex-col rounded-xl border border-[#1f2937] bg-[#020617]/60 px-6 py-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <ScenarioIcon unlocked />
+              <h2 className="text-lg font-semibold text-[#f9fafb] mb-2 text-center md:text-left">
+                Escenarios
+              </h2>
+              <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
+                Entra al simulador multi-turn, decide BUY, HOLD o SELL y compara tu criterio con la IA.
+              </p>
+              <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
+                Ir a escenarios
+              </span>
+            </Link>
+          ) : (
+            <div className="relative flex flex-col rounded-xl border border-[#243244] bg-[#020617]/45 px-6 py-6 opacity-80 shadow-sm">
+              <ScenarioIcon unlocked={false} />
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold text-[#f9fafb] text-center md:text-left">
+                  Escenarios
+                </h2>
+                <span className="rounded-md bg-[#111827] px-2 py-1 text-xs font-semibold uppercase text-[#94a3b8]">
+                  Lvl 3
+                </span>
               </div>
+              <p className="text-sm text-[#cbd5e1]/70 mb-4 text-center md:text-left">
+                El simulador se desbloquea cuando alcances el nivel 3. Completa conceptos y retos para seguir progresando.
+              </p>
+              <span className="mt-auto text-sm font-medium text-[#94a3b8] text-center md:text-left">
+                Bloqueado por nivel
+              </span>
             </div>
-            <h2 className="text-lg font-semibold text-[#f9fafb] mb-2 text-center md:text-left">
-              Diseña tu estrategia
-            </h2>
-            <p className="text-sm text-[#cbd5e1]/80 mb-4 text-center md:text-left">
-              Define tamaño de posición, stops y objetivos. Simula el impacto en tu curva de capital antes de ejecutar.
-            </p>
-            <span className="mt-auto text-sm font-medium text-[#e5e7eb] group-hover:underline underline-offset-4 text-center md:text-left">
-              Ir al laboratorio de estrategia →
-            </span>
-          </Link>
+          )}
         </section>
 
-        {/* Solo para tus pruebas con Supabase */}
         <div className="mt-10">
           <TestSupabase />
         </div>
       </div>
     </main>
+  );
+}
+
+function ScenarioIcon({ unlocked }: { unlocked: boolean }) {
+  return (
+    <div className="mb-4 flex h-20 items-center justify-center">
+      <div className="relative h-14 w-16 rounded-lg border border-[#1f2937] bg-[#020617] flex items-center justify-center">
+        <svg
+          viewBox="0 0 24 24"
+          className={`h-8 w-8 ${unlocked ? "text-[#22c55e]" : "text-[#64748b]"}`}
+          aria-hidden="true"
+        >
+          <polyline
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            points="3 17 9 11 13 15 21 7"
+          />
+        </svg>
+      </div>
+    </div>
   );
 }
