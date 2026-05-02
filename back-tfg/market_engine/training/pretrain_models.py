@@ -61,7 +61,7 @@ def pretrain_all_models(skip_existing: bool = True) -> None:
                 print(f"[{index}/{total}] {anchor_date} -> skipped (already exists)")
                 continue
 
-            # Si falta el modelo o la metadata, entrenamos esa fecha.
+            # Si falta el modelo o la metadata, entrenamos esa fecha
             print(f"[{index}/{total}] {anchor_date} -> training...")
             start = time.time()                                         # guardamos su tiempo de inicio para calcular su tiempo de entreno
 
@@ -72,7 +72,7 @@ def pretrain_all_models(skip_existing: bool = True) -> None:
                 #
                 train_mlp_classifier(prediction_date=anchor_date)
 
-                # Medimos cuanto ha tardado este modelo concreto.
+                # Medimos cuanto ha tardado este modelo concreto
                 elapsed = time.time() - start
                 trained += 1
                 print(
@@ -89,10 +89,10 @@ def pretrain_all_models(skip_existing: bool = True) -> None:
                 
     except KeyboardInterrupt:
         
-        # Si el usuario corta el proceso, paramos sin ocultar lo ya entrenado.
+        # Si el usuario corta el proceso, paramos sin ocultar lo ya entrenado
         print("\nPretraining interrupted by user (Ctrl + C).")
 
-    # Al terminar, mostramos un resumen corto del preentrenamiento.
+    # Al terminar, mostramos un resumen corto del preentrenamiento
     total_elapsed = time.time() - global_start
     print("\nPretraining finished.")
     print(f"Trained: {trained}")
@@ -102,5 +102,5 @@ def pretrain_all_models(skip_existing: bool = True) -> None:
 
 
 if __name__ == "__main__":
-    # Si ejecutamos este archivo directamente, empieza el preentrenamiento completo.
+    
     pretrain_all_models()
