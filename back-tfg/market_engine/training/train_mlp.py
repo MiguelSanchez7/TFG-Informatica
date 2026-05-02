@@ -5,11 +5,6 @@ from pathlib import Path
 import warnings
 
 import joblib
-from sklearn.metrics import classification_report
-from sklearn.neural_network import MLPClassifier
-from sklearn.exceptions import ConvergenceWarning
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 
 from market_engine.config import MODELS_DIR
 from market_engine.training.dataset import (
@@ -44,6 +39,10 @@ def get_model_paths(prediction_date: str | None = None) -> tuple[Path, Path]:
 
 
 def _build_pipeline() -> Pipeline:
+    from sklearn.neural_network import MLPClassifier
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+
     # El pipeline une en orden el preprocesado y el modelo.
     return Pipeline(
         steps=[
@@ -89,6 +88,8 @@ def _build_pipeline() -> Pipeline:
 
 
 def train_mlp_classifier(prediction_date: str | None = None) -> tuple[Path, Path]:
+    from sklearn.exceptions import ConvergenceWarning
+
     # Si prediction_date es None, entrenamos un modelo global con train y test.
     if prediction_date is None:
         split = build_temporal_dataset_split()
@@ -148,6 +149,8 @@ def train_mlp_classifier(prediction_date: str | None = None) -> tuple[Path, Path
 
     # El classification report solo tiene sentido si hay test separado.
     if has_test_split:
+        from sklearn.metrics import classification_report
+
         # y_pred = predicción del modelo sobre el conjunto de test.
         y_pred = pipeline.predict(x_test)
         print("\nClassification report:\n")

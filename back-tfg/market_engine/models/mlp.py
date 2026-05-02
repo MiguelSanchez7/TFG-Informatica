@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import joblib
 import pandas as pd
 
+from market_engine.explain.shap_explainer import MLPShapExplainer
 from market_engine.training.dataset import FEATURE_COLUMNS, add_model_features
 from market_engine.training.train_mlp import get_model_paths
 
@@ -16,6 +17,7 @@ class MLPPrediction:
     confidence: str                   # confianza resumida: high, medium o low
     probabilities: dict[str, float]   # probabilidad de cada clase
     feature_columns: list[str]        # columnas X que ha usado el modelo
+    shap: dict | None = None          # explicacion local SHAP si esta disponible
     model_type: str = "MLPClassifier" # tipo de modelo usado
 
 
@@ -39,6 +41,9 @@ class MLPPredictor:
 
         # _metadatas = metadata cargada en memoria por fecha.
         self._metadatas: dict[str, dict] = {}
+
+        # _shap_explainer genera explicaciones locales para cada prediccion.
+        self._shap_explainer = MLPShapExplainer()
 
     def _date_key(self, prediction_date: str) -> str:
         # Convertimos prediction_date a un formato corto tipo 2021-06-15.
@@ -118,12 +123,32 @@ class MLPPredictor:
         # confidence = version simplificada de la probabilidad ganadora.
         confidence = _confidence_from_probability(probabilities[action])
 
+        # shap_summary = explicacion local de la clase predicha.
+        shap_result = self._shap_explainer.explain_prediction(
+            pipeline=pipeline,
+            row=row,
+            prediction_date=prediction_date,
+            feature_columns=feature_columns,
+            predicted_action=action,
+            probabilities=probabilities,
+        )
+
+        shap_summary = None
+        if shap_result.available:
+            shap_summary = shap_result.summary
+        else:
+            shap_summary = {
+                "available": False,
+                "reason": shap_result.reason,
+            }
+
         # Devolvemos la prediccion empaquetada en MLPPrediction.
         return MLPPrediction(
             action=action,
             confidence=confidence,
             probabilities=probabilities,
             feature_columns=feature_columns,
+            shap=shap_summary,
         )
 
 
@@ -135,4 +160,5 @@ def prediction_to_dict(prediction: MLPPrediction) -> dict:
         "model_type": prediction.model_type,
         "probabilities": prediction.probabilities,
         "feature_columns": prediction.feature_columns,
+        "shap": prediction.shap,
     }

@@ -1,4 +1,5 @@
 import pandas as pd
+import random
 from typing import Dict
 
 from market_engine.config import (
@@ -40,16 +41,19 @@ def _normalize_scenario_id(value) -> str:
 # Calcula la puntuación de una acción respecto al resultado real.
 # action puede ser BUY, HOLD o SELL.
 # y_real es el retorno real que hubo después.
+HOLD_SCORE_EPS = 0.02
+
+
 def _score_action(action: str, y_real: float) -> float:
     action = action.upper().strip()  # normalizamos el texto de entrada
     if action not in ("BUY", "HOLD", "SELL"):
         raise ValueError("Invalid action")
 
     if action == "BUY":
-        return float(y_real)  # si compras, ganarás si el retorno sube
+        return float(y_real - HOLD_SCORE_EPS)
     if action == "SELL":
-        return float(-y_real)  # si vendes, ganarás si el retorno baja
-    return 0.0  # HOLD no suma ni resta
+        return float((-y_real) - HOLD_SCORE_EPS)
+    return float(HOLD_SCORE_EPS - abs(y_real))
 
 
 # Creamos una sola instancia del predictor MLP.
@@ -152,8 +156,40 @@ def get_scenario_by_date_range(
 # La clave será el scenario_id.
 ACTIVE_SESSIONS: Dict[str, dict] = {}
 
-# Dinero inicial con el que empieza cada partida.
-INITIAL_CASH = 100_000.0
+# Valor aproximado con el que empieza cada partida.
+INITIAL_PORTFOLIO_VALUE = 100_000.0
+
+# Caja inicial objetivo para que las cantidades se vean redondas.
+MIN_STARTING_CASH = 10_000.0
+MAX_STARTING_CASH = 60_000.0
+STARTING_CASH_STEP = 5_000.0
+
+
+def _build_starting_portfolio(price: float, scenario_id: str) -> dict:
+    if price <= 0:
+        return {
+            "initial_cash": float(INITIAL_PORTFOLIO_VALUE),
+            "cash": float(INITIAL_PORTFOLIO_VALUE),
+            "shares": 0,
+        }
+
+    rng = random.Random(f"{scenario_id}:{price:.4f}")
+
+    cash_options: list[float] = []
+    current_cash = MIN_STARTING_CASH
+    while current_cash <= MAX_STARTING_CASH:
+        cash_options.append(float(current_cash))
+        current_cash += STARTING_CASH_STEP
+
+    starting_cash = float(rng.choice(cash_options))
+    shares = max(1, int((INITIAL_PORTFOLIO_VALUE - starting_cash) // price))
+    initial_portfolio_value = float(starting_cash + shares * price)
+
+    return {
+        "initial_cash": initial_portfolio_value,
+        "cash": starting_cash,
+        "shares": shares,
+    }
 
 
 # Crea una nueva sesión multi-turn para un escenario concreto.
@@ -173,6 +209,12 @@ def start_multiturn_session(scenario_id: str) -> dict:
     if anchor not in df.index:
         raise ValueError("Anchor not in features")
 
+    price_t = float(df.loc[anchor]["adj_close"])
+    starting_portfolio = _build_starting_portfolio(
+        price=price_t,
+        scenario_id=scenario_id,
+    )
+
     # Guardamos el estado inicial de la partida.
     ACTIVE_SESSIONS[scenario_id] = {
         "scenario_id": scenario_id,
@@ -184,9 +226,9 @@ def start_multiturn_session(scenario_id: str) -> dict:
         "ai_score": 0.0,  # puntuación acumulada de la IA
         "finished": False,  # indica si la partida ya terminó
         "history": [],  # historial de movimientos por turno
-        "initial_cash": float(INITIAL_CASH),  # dinero inicial
-        "cash": float(INITIAL_CASH),  # dinero actual disponible
-        "shares": 0,  # acciones actuales que tiene el usuario
+        "initial_cash": float(starting_portfolio["initial_cash"]),  # valor inicial de referencia
+        "cash": float(starting_portfolio["cash"]),  # dinero actual disponible
+        "shares": int(starting_portfolio["shares"]),  # acciones actuales que tiene el usuario
     }
 
     return get_multiturn_state(scenario_id)  # devolvemos el estado recién creado

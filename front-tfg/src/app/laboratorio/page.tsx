@@ -98,7 +98,7 @@ function findAdjCloseByDateFromHistory(
 }
 
 /**
- * ✅ Baremo coherente (zona neutral):
+ * Baremo coherente (zona neutral):
  * - BUY correcto si y > +eps
  * - SELL correcto si y < -eps
  * - HOLD correcto si |y| <= eps
@@ -108,6 +108,13 @@ function isActionCorrect(action: Action, y: number): boolean {
   if (action === "BUY") return y > HOLD_EPS;
   if (action === "SELL") return y < -HOLD_EPS;
   return Math.abs(y) <= HOLD_EPS;
+}
+
+function expectedActionFromReturn(y: number): Action {
+  const HOLD_EPS = 0.02;
+  if (y > HOLD_EPS) return "BUY";
+  if (y < -HOLD_EPS) return "SELL";
+  return "HOLD";
 }
 
 function fmtPct2(x: number): string {
@@ -122,8 +129,33 @@ function fmtPrice2(x: number): string {
 
 function fmtMaybePct2(x: any): string {
   const n = Number(x);
-  if (!Number.isFinite(n)) return "—";
+  if (!Number.isFinite(n)) return "-";
   return fmtPct2(n);
+}
+
+
+function fmtShapValue(x: any): string {
+  const n = Number(x);
+  if (!Number.isFinite(n)) return "-";
+  const sign = n > 0 ? "+" : "";
+  return `${sign}${n.toFixed(4)}`;
+}
+
+function formatFeatureLabel(feature: string): string {
+  const labels: Record<string, string> = {
+    ret_1d: "Retorno 1d",
+    sma20: "SMA 20",
+    sma50: "SMA 50",
+    rsi14: "RSI 14",
+    vol20: "Volatilidad 20d",
+    drawdown60: "Drawdown 60d",
+    vol_rel20: "Volumen relativo",
+    trend_gap: "Gap de tendencia",
+    price_vs_sma20: "Precio vs SMA 20",
+    price_vs_sma50: "Precio vs SMA 50",
+  };
+
+  return labels[feature] ?? feature;
 }
 
 /* =====================================================
@@ -144,6 +176,9 @@ export default function LaboratorioPage() {
 
   const [lastResult, setLastResult] = useState<null | {
     action: Action;
+    aiAction: Action | null;
+    expectedAction: Action;
+    matchedAi: boolean;
     y: number;
     correct: boolean;
     prevPrice: number;
@@ -170,8 +205,8 @@ export default function LaboratorioPage() {
      DERIVADOS
   ========================= */
 
-  const ticker = scenario?.ticker ?? "—";
-  const anchor = scenario?.anchor_date ?? "—";
+  const ticker = scenario?.ticker ?? "-";
+  const anchor = scenario?.anchor_date ?? "-";
 
   const finished = Boolean(scenario?.finished);
   const turn = typeof scenario?.turn === "number" ? scenario.turn : null;
@@ -182,11 +217,20 @@ export default function LaboratorioPage() {
   const aiConfidence =
     scenario?.ai?.confidence ?? scenario?.ai_confidence ?? null;
   const aiModelType = scenario?.ai?.model_type ?? "MLPClassifier";
+  const aiProbabilities = scenario?.ai?.probabilities ?? {};
+  const aiShap = scenario?.ai?.shap ?? null;
+  const aiShapTopFeatures = Array.isArray(aiShap?.top_features)
+    ? aiShap.top_features
+    : [];
+  const aiShapAvailable = Boolean(aiShap?.target_action);
+  const hasUserMadeDecision = typeof turn === "number" && turn > 0;
 
   const userScoreAccum = scenario?.user_score ?? null;
   const aiScoreAccum = scenario?.ai_score ?? null;
 
   const wallet = scenario?.wallet ?? null;
+  const availableCash = wallet ? Number(wallet.cash) : 0;
+  const ownedShares = wallet ? Number(wallet.shares) : 0;
   const walletReturn =
     wallet &&
     Number.isFinite(Number(wallet.portfolio_value)) &&
@@ -194,6 +238,7 @@ export default function LaboratorioPage() {
     Number(wallet.initial_cash) !== 0
       ? Number(wallet.portfolio_value) / Number(wallet.initial_cash) - 1
       : null;
+
   const features = scenario?.features_at_t ?? null;
   const currentPrice = Number(features?.adj_close);
   const sma20 = Number(features?.sma20);
@@ -202,6 +247,13 @@ export default function LaboratorioPage() {
   const vol20 = Number(features?.vol20);
   const drawdown60 = Number(features?.drawdown60);
   const volRel20 = Number(features?.vol_rel20);
+  const maxBuyQuantity =
+    Number.isFinite(currentPrice) && currentPrice > 0 && Number.isFinite(availableCash)
+      ? Math.max(0, Math.floor(availableCash / currentPrice))
+      : 0;
+  const maxSellQuantity = Number.isFinite(ownedShares)
+    ? Math.max(0, Math.floor(ownedShares))
+    : 0;
 
   const trendReading =
     Number.isFinite(currentPrice) && Number.isFinite(sma20) && Number.isFinite(sma50)
@@ -220,9 +272,9 @@ export default function LaboratorioPage() {
     : "Sin datos";
   const riskReading = Number.isFinite(drawdown60)
     ? drawdown60 <= -0.15
-      ? "Caida fuerte"
+      ? "Ca?da fuerte"
       : drawdown60 <= -0.07
-      ? "Caida moderada"
+      ? "Ca?da moderada"
       : "Drawdown contenido"
     : "Sin datos";
 
@@ -230,8 +282,10 @@ export default function LaboratorioPage() {
      ✅ NUEVO: RESULTADO FINAL (GANAS/PIERDES)
   ========================= */
 
-  // Capital inicial (tu juego arranca siempre en 100k)
-  const INITIAL_CAPITAL = 100000;
+  const initialPortfolioValue =
+    wallet && Number.isFinite(Number(wallet.initial_cash))
+      ? Number(wallet.initial_cash)
+      : 100000;
 
   const finalValue =
     wallet && Number.isFinite(Number(wallet.portfolio_value))
@@ -239,7 +293,7 @@ export default function LaboratorioPage() {
       : null;
 
   const deltaValue =
-    finalValue != null ? finalValue - INITIAL_CAPITAL : null;
+    finalValue != null ? finalValue - initialPortfolioValue : null;
 
   const EPS_EUR = 0.01; // tolerancia por redondeos (1 céntimo)
 
@@ -326,7 +380,7 @@ export default function LaboratorioPage() {
 
       if (id) await startMultiTurn(id);
     } catch (e: any) {
-      setError(e?.message ?? "Error cargando el reto historico");
+      setError(e?.message ?? "Error cargando el reto histórico");
     } finally {
       setLoading(false);
     }
@@ -402,11 +456,33 @@ export default function LaboratorioPage() {
     setError("");
 
     try {
+      const aiSuggestedAction =
+        scenario?.ai?.action ?? scenario?.ai_action ?? null;
       const prevAnchor = scenario?.anchor_date;
       const prevPrice = findAdjCloseByDateFromHistory(scenario, prevAnchor);
 
-      const qtyToSend =
-        action === "HOLD" ? 0 : Math.max(1, Math.floor(quantity || 1));
+      let qtyToSend = 0;
+      if (action === "BUY") {
+        qtyToSend = Math.min(
+          Math.max(1, Math.floor(quantity || 1)),
+          maxBuyQuantity
+        );
+      } else if (action === "SELL") {
+        qtyToSend = Math.min(
+          Math.max(1, Math.floor(quantity || 1)),
+          maxSellQuantity
+        );
+      }
+
+      if ((action === "BUY" && qtyToSend <= 0) || (action === "SELL" && qtyToSend <= 0)) {
+        setError(
+          action === "BUY"
+            ? "No tienes suficiente cash para comprar esa cantidad."
+            : "No tienes suficientes acciones para vender esa cantidad."
+        );
+        setLoading(false);
+        return;
+      }
 
       const nextScenario = await stepMultiTurn(id, action, qtyToSend);
 
@@ -422,9 +498,13 @@ export default function LaboratorioPage() {
       ) {
         const y = newPrice / prevPrice - 1.0;
         const correct = isActionCorrect(action, y);
+        const expectedAction = expectedActionFromReturn(y);
 
         setLastResult({
           action,
+          aiAction: aiSuggestedAction,
+          expectedAction,
+          matchedAi: aiSuggestedAction === action,
           y,
           correct,
           prevPrice,
@@ -485,8 +565,8 @@ export default function LaboratorioPage() {
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
             {challenge
-              ? "Este reto historico usa simulacion multi-turn y se habilita al alcanzar su nivel requerido."
-              : "Los escenarios libres usan simulacion multi-turn y se habilitan cuando tu perfil llega como minimo al nivel 3."} Puedes subir de nivel con los conceptos y sus tests.
+              ? "Este reto histórico usa simulación multi-turn y se habilita al alcanzar su nivel requerido."
+              : "Los escenarios libres usan simulación multi-turn y se habilitan cuando tu perfil llega como mínimo al nivel 3."} Puedes subir de nivel con los conceptos y sus tests.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -499,7 +579,7 @@ export default function LaboratorioPage() {
               href="/retos-historicos"
               className="rounded-md border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-800"
             >
-              Ver retos historicos
+              Ver retos históricos
             </Link>
           </div>
         </section>
@@ -523,7 +603,7 @@ export default function LaboratorioPage() {
 
         {challengeTitle && (
           <div className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-950/30 p-4 text-sm text-emerald-100">
-            <p className="font-semibold">Reto historico: {challengeTitle}</p>
+            <p className="font-semibold">Reto histórico: {challengeTitle}</p>
             <p className="mt-1 opacity-90">
               Genera un escenario dentro del periodo del reto para practicar sin usar el aleatorio general.
             </p>
@@ -566,7 +646,7 @@ export default function LaboratorioPage() {
           <section className="mt-6 border border-slate-600 rounded-lg p-5 text-sm text-[#e5e7eb]">
             <div className="rounded-lg border border-sky-400/60 bg-sky-950/40 p-4">
               <h2 className="text-lg font-semibold text-[#f9fafb]">
-                <span className="mr-2 text-emerald-300">✓</span>
+                <span className="mr-2 text-emerald-300">OK</span>
                 Resultados de la sesión
               </h2>
               <p className="mt-1 text-[#cbd5e1]">
@@ -588,7 +668,7 @@ export default function LaboratorioPage() {
 
                   <div className="mt-2 grid grid-cols-[8rem_1fr] gap-x-3 opacity-90">
                     <span>Capital inicial:</span>
-                    <b>{fmtEurES(INITIAL_CAPITAL)}</b>
+                    <b>{fmtEurES(initialPortfolioValue)}</b>
                   </div>
                   <div className="grid grid-cols-[8rem_1fr] gap-x-3 opacity-90">
                     <span>Valor final:</span>
@@ -600,7 +680,7 @@ export default function LaboratorioPage() {
                       {deltaValue > 0 ? "+" : ""}
                       {fmtEurES(deltaValue)}
                     </b>
-                    <b>{walletReturn != null ? fmtPct2(walletReturn) : "—"}</b>
+                    <b>{walletReturn != null ? fmtPct2(walletReturn) : "-"}</b>
                   </div>
                 </div>
               )}
@@ -609,23 +689,24 @@ export default function LaboratorioPage() {
                 <div className={`rounded-lg p-4 ${decisionBoxClass}`}>
                   <div className="font-semibold text-base">
                     {decisionWinner === "USER"
-                      ? "Has superado a la IA en decisiones"
+                      ? "Has obtenido mejor puntuación de decisiones que la IA"
                       : decisionWinner === "AI"
-                      ? "La IA ha obtenido mejor rendimiento de decisiones"
-                      : "Empate en rendimiento de decisiones"}
+                      ? "La IA ha obtenido mejor puntuación de decisiones"
+                      : "Empate en puntuación de decisiones"}
                   </div>
 
                   <div className="mt-2 grid grid-cols-[9rem_1fr] gap-x-3 opacity-90">
-                    <span>Tu rendimiento:</span>
+                    <span>Tu puntuación:</span>
                     <b>{fmtPct2(userDecisionScore)}</b>
                   </div>
                   <div className="grid grid-cols-[9rem_1fr] gap-x-3 opacity-90">
-                    <span>Rendimiento IA:</span>
+                    <span>Puntuación IA:</span>
                     <b>{fmtPct2(aiDecisionScore)}</b>
                   </div>
                   <p className="mt-2 opacity-80">
-                    Esta comparación mide el acierto de las decisiones BUY, HOLD
-                    o SELL.
+                    Esta comparación no mide el dinero final de la cartera. Mide
+                    cómo de alineadas estuvieron tus decisiones BUY, HOLD o SELL
+                    con el movimiento real posterior del precio.
                   </p>
                 </div>
               )}
@@ -647,7 +728,7 @@ export default function LaboratorioPage() {
             <div>
               <span className="opacity-70">Turno:</span>{" "}
               <b className="font-semibold">
-                {turn ?? "—"} / {maxTurns}
+                {turn ?? "-"} / {maxTurns}
               </b>
             </div>
 
@@ -674,7 +755,7 @@ export default function LaboratorioPage() {
                   Datos para decidir
                 </h2>
                 <p className="mt-1 text-sm text-slate-400">
-                  Lectura rapida del momento actual antes de elegir BUY, HOLD o SELL.
+                  Lectura rápida del momento actual antes de elegir BUY, HOLD o SELL.
                 </p>
               </div>
               <div className="rounded-md border border-slate-700 bg-slate-950/50 px-3 py-2 text-sm">
@@ -721,41 +802,17 @@ export default function LaboratorioPage() {
                 detail="Progreso de la partida"
               />
               <DecisionMetric
-                label="Tu decision acumulada"
+                label="Tu decisión acumulada"
                 value={fmtMaybePct2(userScoreAccum)}
-                detail="Suma de aciertos de direccion"
+                detail="Suma de aciertos de dirección"
               />
               <DecisionMetric
-                label="Decision IA acumulada"
+                label="Decisión IA acumulada"
                 value={fmtMaybePct2(aiScoreAccum)}
                 detail="Referencia, no respuesta obligatoria"
               />
             </div>
           </section>
-        )}
-
-        {/* IA */}
-        {scenario && aiAction && (
-          <div className="mt-6 border border-slate-600 rounded-lg p-5">
-            <h2 className="text-lg font-semibold">Recomendación IA</h2>
-
-            <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm text-center">
-              <div>
-                <div className="opacity-70">Acción IA</div>
-                <div className="font-semibold">{aiAction}</div>
-              </div>
-
-              <div>
-                <div className="opacity-70">Confianza</div>
-                <div className="font-semibold">{aiConfidence ?? "—"}</div>
-              </div>
-
-              <div>
-                <div className="opacity-70">Modelo</div>
-                <div className="font-semibold">{aiModelType}</div>
-              </div>
-            </div>
-          </div>
         )}
 
         {/* CARTERA */}
@@ -787,14 +844,14 @@ export default function LaboratorioPage() {
               <div>
                 <span className="opacity-70">Rentabilidad cartera:</span>{" "}
                 <b className="font-semibold">
-                  {walletReturn != null ? fmtPct2(walletReturn) : "—"}
+                  {walletReturn != null ? fmtPct2(walletReturn) : "-"}
                 </b>
               </div>
             </div>
           </div>
         )}
 
-        {/* GRÁFICO */}
+        {/* GRAFICO */}
         <h2 className="mt-8 text-lg font-medium">Gráfico</h2>
 
         {/* cantidad */}
@@ -804,19 +861,32 @@ export default function LaboratorioPage() {
             <input
               type="number"
               min={1}
+              max={Math.max(maxBuyQuantity, maxSellQuantity, 1)}
               value={quantity}
               onChange={(e) =>
-                setQuantity(Math.max(1, Math.floor(Number(e.target.value) || 1)))
+                setQuantity(
+                  Math.max(
+                    1,
+                    Math.min(
+                      Math.floor(Number(e.target.value) || 1),
+                      Math.max(maxBuyQuantity, maxSellQuantity, 1)
+                    )
+                  )
+                )
               }
               className="px-3 py-2 border border-slate-500 rounded w-28 bg-transparent"
               disabled={actionsDisabled}
             />
           </div>
 
+          <div className="text-xs text-slate-400">
+            Max comprar: {fmtIntES(maxBuyQuantity)} | Max vender: {fmtIntES(maxSellQuantity)}
+          </div>
+
           <button
             className={actionBtnClass}
             onClick={() => onAction("BUY")}
-            disabled={actionsDisabled}
+            disabled={actionsDisabled || maxBuyQuantity <= 0}
             title="Compra (usa la cantidad indicada)"
           >
             BUY
@@ -832,7 +902,7 @@ export default function LaboratorioPage() {
           <button
             className={actionBtnClass}
             onClick={() => onAction("SELL")}
-            disabled={actionsDisabled}
+            disabled={actionsDisabled || maxSellQuantity <= 0}
             title="Vende (usa la cantidad indicada)"
           >
             SELL
@@ -846,23 +916,34 @@ export default function LaboratorioPage() {
             )}`}
           >
             <div className="font-semibold">
-              {lastResult.correct ? "✔ Acción correcta" : "✘ Acción incorrecta"}
+              {lastResult.correct ? "Acción alineada con el movimiento real" : "Acción no alineada con el movimiento real"}
             </div>
             <div className="opacity-90 mt-1">
-              <b>{lastResult.action}</b> · {lastResult.prevAnchor} (
-              {fmtPrice2(lastResult.prevPrice)}) → {lastResult.newAnchor} (
-              {fmtPrice2(lastResult.newPrice)}) · <b>{fmtPct2(lastResult.y)}</b>
+              <b>{lastResult.action}</b> | {lastResult.prevAnchor} (
+              {fmtPrice2(lastResult.prevPrice)}) {"->"} {lastResult.newAnchor} (
+              {fmtPrice2(lastResult.newPrice)}) | <b>{fmtPct2(lastResult.y)}</b>
+            </div>
+            <div className="opacity-80 mt-1">
+              La acción que mejor encajaba con ese movimiento era <b>{lastResult.expectedAction}</b>.
+              {lastResult.aiAction && (
+                <>
+                  {" "}La IA sugirió <b>{lastResult.aiAction}</b> y tú{" "}
+                  {lastResult.matchedAi ? "coincidiste" : "no coincidiste"} con ella.
+                </>
+              )}
             </div>
           </div>
         )}
 
         <MarketChart scenario={scenario} />
 
+
+
         {/* Detalle tecnico */}
         <div className="mt-8 rounded-lg border border-slate-700 bg-slate-900/30 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-medium">Detalle tecnico</h2>
+              <h2 className="text-lg font-medium">Detalle técnico</h2>
               <p className="mt-1 text-sm text-slate-400">
                 Datos crudos del escenario para depurar o revisar la respuesta del backend.
               </p>
@@ -881,6 +962,138 @@ export default function LaboratorioPage() {
           </pre>
           )}
         </div>
+        {/* IA */}
+        {scenario && aiAction && (
+          <details className="mt-8 rounded-lg border border-slate-700 bg-slate-900/30 p-4">
+            <summary className="cursor-pointer list-none text-base font-medium text-slate-100">
+              Ver recomendación IA
+            </summary>
+            <p className="mt-2 text-sm text-slate-400">
+              Esta sección está oculta por defecto para no darte una pista inmediata antes de decidir.
+            </p>
+
+            <div className="mt-4 border border-slate-600 rounded-lg p-5">
+              <h2 className="text-lg font-semibold">Recomendación IA</h2>
+
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm text-center">
+                <div>
+                  <div className="opacity-70">Acción IA</div>
+                  <div className="font-semibold">{aiAction}</div>
+                </div>
+
+                <div>
+                  <div className="opacity-70">Confianza</div>
+                  <div className="font-semibold">{aiConfidence ?? "?"}</div>
+                </div>
+
+                <div>
+                  <div className="opacity-70">Modelo</div>
+                  <div className="font-semibold">{aiModelType}</div>
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {(["BUY", "HOLD", "SELL"] as Action[]).map((action) => {
+                  const probability = Number(aiProbabilities?.[action]);
+                  const isSelected = aiAction === action;
+
+                  return (
+                    <div
+                      key={action}
+                      className={`rounded-lg border px-4 py-3 text-sm ${
+                        isSelected
+                          ? "border-sky-400/60 bg-sky-950/30 text-sky-100"
+                          : "border-slate-700 bg-slate-950/40 text-slate-200"
+                      }`}
+                    >
+                      <div className="text-xs font-semibold uppercase tracking-wide opacity-75">
+                        {action}
+                      </div>
+                      <div className="mt-2 text-lg font-semibold">
+                        {Number.isFinite(probability) ? fmtPct2(probability) : "-"}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {hasUserMadeDecision && aiShapAvailable && (
+                <div className="mt-5 rounded-lg border border-slate-700 bg-slate-950/40 p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-200">
+                        Por qué la IA recomienda {aiShap.target_action}
+                      </h3>
+                      <p className="mt-1 text-sm text-slate-400">
+                        La IA partía de una probabilidad base de {fmtPct2(Number(aiShap.base_value))} para {aiShap.target_action}. Estas variables la empujan a favor o en contra.
+                      </p>
+                    </div>
+
+                    <div className="rounded-md border border-slate-700 bg-slate-900/70 px-3 py-2 text-right">
+                      <div className="text-xs uppercase tracking-wide text-slate-400">
+                        Probabilidad
+                      </div>
+                      <div className="text-lg font-semibold text-slate-50">
+                        {fmtPct2(Number(aiShap.predicted_probability))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 overflow-x-auto">
+                    <table className="min-w-full text-left text-sm">
+                      <thead className="text-slate-400">
+                        <tr className="border-b border-slate-800">
+                          <th className="px-0 py-2 font-medium">Variable</th>
+                          <th className="px-3 py-2 font-medium">Valor</th>
+                          <th className="px-3 py-2 font-medium">Impacto SHAP</th>
+                          <th className="px-3 py-2 font-medium">Lectura</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {aiShapTopFeatures.map((item: any) => {
+                          const shapValue = Number(item?.shap_value);
+                          const isPositive = Number.isFinite(shapValue) && shapValue >= 0;
+
+                          return (
+                            <tr
+                              key={`${item?.feature}-${item?.shap_value}`}
+                              className="border-b border-slate-900/80 last:border-b-0"
+                            >
+                              <td className="px-0 py-3 font-medium text-slate-100">
+                                {formatFeatureLabel(String(item?.feature ?? ""))}
+                              </td>
+                              <td className="px-3 py-3 text-slate-300">
+                                {fmtNumberES2(item?.feature_value)}
+                              </td>
+                              <td
+                                className={`px-3 py-3 font-semibold ${
+                                  isPositive ? "text-emerald-300" : "text-rose-300"
+                                }`}
+                              >
+                                {fmtShapValue(item?.shap_value)}
+                              </td>
+                              <td className="px-3 py-3 text-slate-300">
+                                {isPositive
+                                  ? `Empuja hacia ${aiShap.target_action}`
+                                  : `Resta fuerza a ${aiShap.target_action}`}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {hasUserMadeDecision && !aiShapAvailable && aiShap?.available === false && (
+                <div className="mt-5 rounded-lg border border-amber-500/40 bg-amber-950/20 p-4 text-sm text-amber-100">
+                  La explicación SHAP no está disponible para esta predicción.
+                </div>
+              )}
+            </div>
+          </details>
+        )}
       </div>
     </main>
   );
@@ -905,3 +1118,4 @@ function DecisionMetric({
     </div>
   );
 }
+
