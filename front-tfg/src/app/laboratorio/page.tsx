@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  addUserXp,
   getRandomScenario,
   getScenarioByDateRange,
   getScenarioById,
@@ -13,6 +14,9 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
 type Action = "BUY" | "HOLD" | "SELL";
+
+const XP_REWARD_CORRECT_DECISION = 10;
+const XP_REWARD_PROFITABLE_SCENARIO = 35;
 
 const HISTORICAL_CHALLENGES: Record<
   string,
@@ -133,6 +137,26 @@ function fmtMaybePct2(x: any): string {
   return fmtPct2(n);
 }
 
+function getPortfolioProfit(
+  scenarioData:
+    | {
+        wallet?: {
+          initial_cash?: unknown;
+          portfolio_value?: unknown;
+        } | null;
+      }
+    | null
+    | undefined
+): number | null {
+  const scenarioWallet = scenarioData?.wallet;
+  if (!scenarioWallet) return null;
+
+  const initial = Number(scenarioWallet.initial_cash);
+  const current = Number(scenarioWallet.portfolio_value);
+  if (!Number.isFinite(initial) || !Number.isFinite(current)) return null;
+
+  return current - initial;
+}
 
 function fmtShapValue(x: any): string {
   const n = Number(x);
@@ -163,7 +187,7 @@ function formatFeatureLabel(feature: string): string {
 ===================================================== */
 
 export default function LaboratorioPage() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [scenario, setScenario] = useState<any>(null);
   const [scenarioId, setScenarioId] = useState("");
 
@@ -191,6 +215,18 @@ export default function LaboratorioPage() {
     (typeof HISTORICAL_CHALLENGES)[string] | null
   >(null);
   const [showTechnicalJson, setShowTechnicalJson] = useState(false);
+  const [xpEvents, setXpEvents] = useState<
+    Array<{
+      id: string;
+      amount: number;
+      title: string;
+      detail: string;
+      status: "saved" | "skipped" | "error";
+    }>
+  >([]);
+  const [finalXpAwardedScenarioId, setFinalXpAwardedScenarioId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -355,6 +391,53 @@ export default function LaboratorioPage() {
     return data;
   }
 
+  async function awardXp(amount: number, title: string, detail: string) {
+    const eventId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+    if (!user?.id) {
+      setXpEvents((current) => [
+        {
+          id: eventId,
+          amount,
+          title,
+          detail: "Inicia sesion para guardar esta recompensa de XP.",
+          status: "skipped",
+        },
+        ...current,
+      ]);
+      return;
+    }
+
+    try {
+      const updatedUser = await addUserXp(user.id, amount);
+      setUser(updatedUser);
+      setXpEvents((current) => [
+        {
+          id: eventId,
+          amount,
+          title,
+          detail,
+          status: "saved",
+        },
+        ...current,
+      ]);
+    } catch (xpError) {
+      setXpEvents((current) => [
+        {
+          id: eventId,
+          amount,
+          title,
+          detail:
+            xpError instanceof Error
+              ? xpError.message
+              : "No se pudo guardar la XP.",
+          status: "error",
+        },
+        ...current,
+      ]);
+    }
+  }
+
   /* =========================
      UI ACTIONS
   ========================= */
@@ -366,6 +449,8 @@ export default function LaboratorioPage() {
     setError("");
     setStarted(false);
     setLastResult(null);
+    setXpEvents([]);
+    setFinalXpAwardedScenarioId(null);
     setChallengeTitle(challenge.title);
 
     try {
@@ -391,6 +476,8 @@ export default function LaboratorioPage() {
     setError("");
     setStarted(false);
     setLastResult(null);
+    setXpEvents([]);
+    setFinalXpAwardedScenarioId(null);
     setChallengeTitle(null);
 
     try {
@@ -420,6 +507,8 @@ export default function LaboratorioPage() {
     setError("");
     setStarted(false);
     setLastResult(null);
+    setXpEvents([]);
+    setFinalXpAwardedScenarioId(null);
     setChallengeTitle(null);
 
     try {
@@ -512,8 +601,32 @@ export default function LaboratorioPage() {
           prevAnchor,
           newAnchor,
         });
+
+        if (correct) {
+          await awardXp(
+            XP_REWARD_CORRECT_DECISION,
+            "Decision correcta",
+            `+${XP_REWARD_CORRECT_DECISION} XP por elegir ${action} entre ${prevAnchor} y ${newAnchor}.`
+          );
+        }
       } else {
         setLastResult(null);
+      }
+
+      const nextScenarioId = extractScenarioId(nextScenario) || id;
+      const finalProfit = getPortfolioProfit(nextScenario);
+      if (
+        nextScenario?.finished &&
+        finalXpAwardedScenarioId !== nextScenarioId &&
+        finalProfit != null &&
+        finalProfit > EPS_EUR
+      ) {
+        setFinalXpAwardedScenarioId(nextScenarioId);
+        await awardXp(
+          XP_REWARD_PROFITABLE_SCENARIO,
+          "Escenario con ganancias",
+          `+${XP_REWARD_PROFITABLE_SCENARIO} XP por acabar con ${fmtEurES(finalProfit)} sobre el capital inicial.`
+        );
       }
 
       setScenario(nextScenario);
@@ -641,6 +754,37 @@ export default function LaboratorioPage() {
         </div>
 
         {error && <p className="mt-4 text-rose-300">{error}</p>}
+
+        {xpEvents.length > 0 && (
+          <section className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-950/25 p-4 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-semibold text-emerald-100">XP del escenario</h2>
+              <span className="text-xs text-emerald-200/80">
+                Decision correcta: +{XP_REWARD_CORRECT_DECISION} XP | Final con ganancias: +{XP_REWARD_PROFITABLE_SCENARIO} XP
+              </span>
+            </div>
+            <div className="mt-3 space-y-2">
+              {xpEvents.slice(0, 4).map((event) => (
+                <div
+                  key={event.id}
+                  className={`rounded-md border px-3 py-2 ${
+                    event.status === "saved"
+                      ? "border-emerald-400/50 bg-emerald-900/30 text-emerald-50"
+                      : event.status === "skipped"
+                      ? "border-amber-400/50 bg-amber-900/25 text-amber-50"
+                      : "border-rose-400/50 bg-rose-900/25 text-rose-50"
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-semibold">{event.title}</span>
+                    <span className="font-semibold">+{event.amount} XP</span>
+                  </div>
+                  <p className="mt-1 text-xs opacity-85">{event.detail}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {scenario && finished && (
           <section className="mt-6 border border-slate-600 rounded-lg p-5 text-sm text-[#e5e7eb]">

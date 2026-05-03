@@ -30,14 +30,16 @@ export default function RegisterPage() {
       // 👉 tras registrarse, guardamos al usuario en el contexto
       //    y redirigimos a la home con sesión iniciada
       login(user);
-      router.push("/");
+      router.push("/onboarding/finance-test");
 
       // (opcional: por si la redirección tarda un poco)
       setMessage(`Usuario creado correctamente: ${user.username}`);
       setMessageType("success");
       setPassword("");
-    } catch (err: any) {
-      setMessage(err.message || "Ha ocurrido un error en el registro");
+    } catch (err: unknown) {
+      setMessage(
+        err instanceof Error ? err.message : "Ha ocurrido un error en el registro"
+      );
       setMessageType("error");
     } finally {
       setLoading(false);
