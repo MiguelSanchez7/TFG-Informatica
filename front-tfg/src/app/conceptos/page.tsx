@@ -179,14 +179,13 @@ export default function ConceptosPage() {
       ];
     }
 
-    return questions.slice(0, Math.min(3, questions.length));
+    return questions.slice(0, Math.min(5, questions.length));
   }, [selectedQuiz, quizAttemptSeed]);
   const selectedLesson =
     filteredLessons.find((lesson) => lesson.id === selectedLessonId) ?? filteredLessons[0];
   const selectedLessonIndex = filteredLessons.findIndex(
     (lesson) => lesson.id === selectedLesson?.id
   );
-  const isBaseLevel = selectedLevel === "base";
   const visitedLessonIds = visitedLessonsByLevel[selectedLevel] ?? [];
   const hasCompletedCurrentLevel =
     filteredLessons.length > 0 &&
@@ -250,11 +249,6 @@ export default function ConceptosPage() {
   function chooseLevel(level: LessonLevel) {
     setSelectedLevel(level);
     setSelectedLessonId(lessons.find((lesson) => lesson.level === level)?.id ?? null);
-    setRevealedAnswer(false);
-  }
-
-  function chooseLesson(lessonId: string) {
-    setSelectedLessonId(lessonId);
     setRevealedAnswer(false);
   }
 
@@ -503,46 +497,21 @@ export default function ConceptosPage() {
                   </p>
                 </div>
 
-                {isBaseLevel ? (
-                  <div className="rounded-lg border border-[#2b4a3e] bg-[#0d1f1a] p-4">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#d7f365]">
-                      Recorrido guiado
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#bdd7c9]">
-                      En el nivel base veras una leccion cada vez. Usa las flechas para avanzar
-                      paso a paso hasta completar el bloque.
-                    </p>
-                    <p className="mt-4 text-sm font-semibold text-white">
-                      Leccion {selectedLessonIndex + 1} de {filteredLessons.length}
-                    </p>
-                    <p className="mt-2 text-sm text-[#9bb9aa]">
-                      Progreso del bloque: {visitedLessonIds.length}/{filteredLessons.length} lecciones vistas
-                    </p>
-                  </div>
-                ) : (
-                  filteredLessons.map((lesson) => (
-                    <button
-                      key={lesson.id}
-                      type="button"
-                      onClick={() => chooseLesson(lesson.id)}
-                      className={`w-full rounded-lg border p-4 text-left transition ${
-                        selectedLesson.id === lesson.id
-                          ? "border-[#d7f365] bg-[#17352b]"
-                          : "border-[#2b4a3e] bg-[#0d1f1a] hover:border-[#6fa88a]"
-                      }`}
-                    >
-                      <span className="text-xs font-semibold uppercase text-[#d7f365]">
-                        {levelLabels[lesson.level]}
-                      </span>
-                      <h2 className="mt-1 text-base font-semibold text-white">
-                        {lesson.title}
-                      </h2>
-                      <p className="mt-2 text-sm leading-5 text-[#bdd7c9]">
-                        {lesson.summary}
-                      </p>
-                    </button>
-                  ))
-                )}
+                <div className="rounded-lg border border-[#2b4a3e] bg-[#0d1f1a] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#d7f365]">
+                    Recorrido guiado
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#bdd7c9]">
+                    Veras una leccion cada vez. Usa las flechas para avanzar paso a paso
+                    hasta completar el bloque.
+                  </p>
+                  <p className="mt-4 text-sm font-semibold text-white">
+                    Leccion {selectedLessonIndex + 1} de {filteredLessons.length}
+                  </p>
+                  <p className="mt-2 text-sm text-[#9bb9aa]">
+                    Progreso del bloque: {visitedLessonIds.length}/{filteredLessons.length} lecciones vistas
+                  </p>
+                </div>
               </aside>
 
               <div className="space-y-6">
@@ -564,8 +533,7 @@ export default function ConceptosPage() {
                   </Link>
                 </div>
 
-                {isBaseLevel && (
-                  <div className="mt-5 flex items-center justify-between gap-3 rounded-lg border border-[#416253] bg-[#07110f] p-3">
+                <div className="mt-5 flex items-center justify-between gap-3 rounded-lg border border-[#416253] bg-[#07110f] p-3">
                     <button
                       type="button"
                       onClick={() => goToAdjacentLesson("prev")}
@@ -585,8 +553,7 @@ export default function ConceptosPage() {
                     >
                       Siguiente →
                     </button>
-                  </div>
-                )}
+                </div>
 
                 <div className="mt-6 grid gap-5 xl:grid-cols-2">
                   <section>
@@ -627,7 +594,7 @@ export default function ConceptosPage() {
                   </div>
                 </section>
 
-                {!isBaseLevel && (
+                {selectedLevel !== "base" && (
                   <section className="mt-6 rounded-lg border border-[#416253] bg-[#07110f] p-4">
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-[#d7f365]">
                       Pregunta de repaso
@@ -768,7 +735,7 @@ export default function ConceptosPage() {
                           {selectedQuiz.description}
                         </p>
                         <p className="mt-2 text-sm text-[#9bb9aa]">
-                          En cada intento veras 3 preguntas distintas elegidas del banco del nivel.
+                          En cada intento veras 5 preguntas distintas elegidas del banco del nivel.
                         </p>
                       </div>
                       <div className="rounded-lg border border-[#416253] bg-[#07110f] p-4 text-sm text-[#cfe8da]">

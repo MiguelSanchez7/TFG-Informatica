@@ -137,6 +137,94 @@
           { "id": "b", "label": "Son lo mismo con distinto nombre" },
           { "id": "c", "label": "Una reparte riesgo y la otra lo concentra en menos decisiones" }
         ]
+      },
+      {
+        "id": "base-13",
+        "question": "Que explica el interes compuesto?",
+        "correctOptionId": "a",
+        "explanation": "El interes compuesto aparece cuando las ganancias se reinvierten y pasan a formar parte del capital que genera ganancias futuras.",
+        "options": [
+          { "id": "a", "label": "Que las ganancias reinvertidas tambien pueden generar nuevas ganancias" },
+          { "id": "b", "label": "Que todas las inversiones ganan lo mismo cada ano" },
+          { "id": "c", "label": "Que las comisiones desaparecen con el tiempo" }
+        ]
+      },
+      {
+        "id": "base-14",
+        "question": "Si ganas un 10% sobre 1.000 euros y reinviertes, sobre que capital se calcula el siguiente 10%?",
+        "correctOptionId": "b",
+        "explanation": "Despues del primer 10%, el capital pasa a 1.100 euros. Si reinviertes, el siguiente rendimiento se calcula sobre esa nueva base.",
+        "options": [
+          { "id": "a", "label": "Siempre sobre 1.000 euros" },
+          { "id": "b", "label": "Sobre 1.100 euros" },
+          { "id": "c", "label": "Sobre la comision del broker" }
+        ]
+      },
+      {
+        "id": "base-15",
+        "question": "Que diferencia basica hay entre una accion y un ETF diversificado?",
+        "correctOptionId": "c",
+        "explanation": "Una accion concentra el resultado en una empresa concreta. Un ETF diversificado reparte la exposicion entre varios activos.",
+        "options": [
+          { "id": "a", "label": "Una accion siempre tiene menos riesgo que un ETF" },
+          { "id": "b", "label": "Un ETF solo puede contener una empresa" },
+          { "id": "c", "label": "La accion depende de una empresa y el ETF puede agrupar muchas" }
+        ]
+      },
+      {
+        "id": "base-16",
+        "question": "Que representa un indice bursatil?",
+        "correctOptionId": "a",
+        "explanation": "Un indice resume el comportamiento de un conjunto de valores, como una fotografia agregada de una parte del mercado.",
+        "options": [
+          { "id": "a", "label": "El comportamiento agregado de un grupo de activos" },
+          { "id": "b", "label": "La deuda exacta de una empresa" },
+          { "id": "c", "label": "Una orden obligatoria de compra" }
+        ]
+      },
+      {
+        "id": "base-17",
+        "question": "Un dividendo alto significa siempre que una accion es buena?",
+        "correctOptionId": "b",
+        "explanation": "Un dividendo alto puede ser atractivo, pero tambien puede ser insostenible si el negocio no genera beneficios suficientes.",
+        "options": [
+          { "id": "a", "label": "Si, porque elimina cualquier riesgo" },
+          { "id": "b", "label": "No, hay que mirar si es sostenible y si el riesgo compensa" },
+          { "id": "c", "label": "Si, porque garantiza que el precio subira" }
+        ]
+      },
+      {
+        "id": "base-18",
+        "question": "Que diferencia hay entre precio y valor?",
+        "correctOptionId": "c",
+        "explanation": "El precio es lo que el mercado paga hoy. El valor intenta estimar lo que deberia valer un activo segun sus fundamentos y expectativas.",
+        "options": [
+          { "id": "a", "label": "No hay ninguna diferencia" },
+          { "id": "b", "label": "El valor cambia cada segundo y el precio nunca cambia" },
+          { "id": "c", "label": "El precio es de mercado y el valor es una estimacion fundamentada" }
+        ]
+      },
+      {
+        "id": "base-19",
+        "question": "Por que una accion que ha caido mucho no es automaticamente barata?",
+        "correctOptionId": "a",
+        "explanation": "Una gran caida puede reflejar que el negocio se ha deteriorado. Para saber si esta barata hay que comparar precio con valor esperado.",
+        "options": [
+          { "id": "a", "label": "Porque puede haber empeorado su valor real" },
+          { "id": "b", "label": "Porque las acciones caidas nunca rebotan" },
+          { "id": "c", "label": "Porque solo importa el volumen" }
+        ]
+      },
+      {
+        "id": "base-20",
+        "question": "Que suele aportar el tiempo a una estrategia de largo plazo bien planteada?",
+        "correctOptionId": "b",
+        "explanation": "El tiempo permite que la reinversion y la acumulacion de rendimientos trabajen a favor, aunque no elimina el riesgo.",
+        "options": [
+          { "id": "a", "label": "Garantia total de no perder" },
+          { "id": "b", "label": "Mas oportunidad para que actue la rentabilidad compuesta" },
+          { "id": "c", "label": "La desaparicion de la volatilidad diaria" }
+        ]
       }
     ]
   },
@@ -278,6 +366,94 @@
           { "id": "b", "label": "Que elimina la necesidad de gestionar riesgo" },
           { "id": "c", "label": "Que puedes sacar una conclusion incompleta o enganosa" }
         ]
+      },
+      {
+        "id": "intermedio-13",
+        "question": "Cual es el primer paso para calcular la varianza de una serie de rendimientos?",
+        "correctOptionId": "b",
+        "explanation": "Para calcular la varianza primero necesitas la media. Luego comparas cada rendimiento con esa media.",
+        "options": [
+          { "id": "a", "label": "Elegir el rendimiento mas alto" },
+          { "id": "b", "label": "Calcular la media de los rendimientos" },
+          { "id": "c", "label": "Multiplicar todos los precios entre si" }
+        ]
+      },
+      {
+        "id": "intermedio-14",
+        "question": "Por que se elevan al cuadrado las diferencias al calcular varianza?",
+        "correctOptionId": "a",
+        "explanation": "Elevar al cuadrado evita que diferencias negativas y positivas se cancelen, y ademas da mas peso a desviaciones grandes.",
+        "options": [
+          { "id": "a", "label": "Para que no se cancelen y para penalizar movimientos grandes" },
+          { "id": "b", "label": "Para convertir siempre una perdida en ganancia" },
+          { "id": "c", "label": "Para eliminar la volatilidad del activo" }
+        ]
+      },
+      {
+        "id": "intermedio-15",
+        "question": "Que relacion hay entre varianza y desviacion estandar?",
+        "correctOptionId": "c",
+        "explanation": "La desviacion estandar es la raiz cuadrada de la varianza. Por eso se expresa en unidades mas faciles de interpretar.",
+        "options": [
+          { "id": "a", "label": "Son conceptos sin relacion" },
+          { "id": "b", "label": "La varianza es la raiz cuadrada de la desviacion" },
+          { "id": "c", "label": "La desviacion estandar es la raiz cuadrada de la varianza" }
+        ]
+      },
+      {
+        "id": "intermedio-16",
+        "question": "Si una inversion gana un 4% y la inflacion es del 6%, que ocurre aproximadamente con la rentabilidad real?",
+        "correctOptionId": "b",
+        "explanation": "Aunque la rentabilidad nominal sea positiva, la inflacion supera esa ganancia. El poder adquisitivo cae en terminos aproximados.",
+        "options": [
+          { "id": "a", "label": "Es claramente positiva" },
+          { "id": "b", "label": "Es negativa en terminos aproximados" },
+          { "id": "c", "label": "No cambia porque la inflacion no importa" }
+        ]
+      },
+      {
+        "id": "intermedio-17",
+        "question": "Que mide la rentabilidad real?",
+        "correctOptionId": "a",
+        "explanation": "La rentabilidad real ajusta la ganancia nominal por la inflacion, aproximando cuanto mejora o empeora el poder adquisitivo.",
+        "options": [
+          { "id": "a", "label": "La rentabilidad despues de considerar la inflacion" },
+          { "id": "b", "label": "Solo el dividendo cobrado" },
+          { "id": "c", "label": "La rentabilidad antes de cualquier ajuste" }
+        ]
+      },
+      {
+        "id": "intermedio-18",
+        "question": "Que compara el PER?",
+        "correctOptionId": "c",
+        "explanation": "El PER relaciona el precio de una accion con el beneficio por accion. Es una referencia inicial de valoracion, no una conclusion final.",
+        "options": [
+          { "id": "a", "label": "Volumen y liquidez" },
+          { "id": "b", "label": "Precio actual y soporte tecnico" },
+          { "id": "c", "label": "Precio de la accion y beneficio por accion" }
+        ]
+      },
+      {
+        "id": "intermedio-19",
+        "question": "Por que un PER bajo puede ser enganoso?",
+        "correctOptionId": "b",
+        "explanation": "Un PER bajo puede indicar oportunidad, pero tambien que el mercado espera caidas de beneficios o problemas importantes.",
+        "options": [
+          { "id": "a", "label": "Porque siempre significa que la empresa crecera mas" },
+          { "id": "b", "label": "Porque puede reflejar deterioro o expectativas negativas" },
+          { "id": "c", "label": "Porque solo existe en criptomonedas" }
+        ]
+      },
+      {
+        "id": "intermedio-20",
+        "question": "Que es el slippage en una operacion?",
+        "correctOptionId": "a",
+        "explanation": "El slippage es la diferencia entre el precio que esperabas y el precio real de ejecucion. Suele empeorar con poca liquidez o mucha tension.",
+        "options": [
+          { "id": "a", "label": "La diferencia entre precio esperado y precio ejecutado" },
+          { "id": "b", "label": "El dividendo anual de una accion" },
+          { "id": "c", "label": "La media movil de largo plazo" }
+        ]
       }
     ]
   },
@@ -418,6 +594,94 @@
           { "id": "a", "label": "No, siempre necesita acertar mas de la mitad" },
           { "id": "b", "label": "Si, si gana bastante mas cuando acierta que lo que pierde cuando falla" },
           { "id": "c", "label": "Solo si usa apalancamiento" }
+        ]
+      },
+      {
+        "id": "avanzado-13",
+        "question": "Que sugiere una beta superior a 1?",
+        "correctOptionId": "a",
+        "explanation": "Una beta superior a 1 suele indicar que el activo se mueve con mas intensidad que el mercado de referencia, aunque es una medida historica.",
+        "options": [
+          { "id": "a", "label": "Que tiende a moverse mas que el mercado" },
+          { "id": "b", "label": "Que no tiene riesgo" },
+          { "id": "c", "label": "Que siempre paga mas dividendos" }
+        ]
+      },
+      {
+        "id": "avanzado-14",
+        "question": "Que mide el ratio Sharpe?",
+        "correctOptionId": "c",
+        "explanation": "El Sharpe compara el exceso de rentabilidad con la volatilidad asumida, ayudando a evaluar rentabilidad ajustada al riesgo.",
+        "options": [
+          { "id": "a", "label": "Solo el numero de operaciones realizadas" },
+          { "id": "b", "label": "La comision media del broker" },
+          { "id": "c", "label": "Rentabilidad extra por unidad de volatilidad" }
+        ]
+      },
+      {
+        "id": "avanzado-15",
+        "question": "Dos estrategias ganan un 12%, pero una tiene mucha menos volatilidad. Que puede decir el Sharpe?",
+        "correctOptionId": "b",
+        "explanation": "Si la rentabilidad es similar pero una estrategia asume menos volatilidad, su rentabilidad ajustada al riesgo puede ser mejor.",
+        "options": [
+          { "id": "a", "label": "Que ambas son identicas en riesgo" },
+          { "id": "b", "label": "Que la menos volatil puede tener mejor rentabilidad ajustada al riesgo" },
+          { "id": "c", "label": "Que la mas volatil siempre es superior" }
+        ]
+      },
+      {
+        "id": "avanzado-16",
+        "question": "Cual es el peligro principal del apalancamiento?",
+        "correctOptionId": "a",
+        "explanation": "El apalancamiento amplifica la exposicion. Por eso puede aumentar ganancias, pero tambien acelerar perdidas y llamadas de margen.",
+        "options": [
+          { "id": "a", "label": "Amplifica las perdidas igual que las ganancias" },
+          { "id": "b", "label": "Elimina la necesidad de stops" },
+          { "id": "c", "label": "Reduce automaticamente la volatilidad" }
+        ]
+      },
+      {
+        "id": "avanzado-17",
+        "question": "Que puede ocurrir con una cartera apalancada si el mercado se mueve en contra?",
+        "correctOptionId": "c",
+        "explanation": "Si las perdidas consumen demasiado margen, el broker puede exigir mas garantias o cerrar posiciones. Por eso el control de riesgo es critico.",
+        "options": [
+          { "id": "a", "label": "Que las perdidas se congelen" },
+          { "id": "b", "label": "Que el riesgo desaparezca" },
+          { "id": "c", "label": "Que aparezcan llamadas de margen o cierres forzados" }
+        ]
+      },
+      {
+        "id": "avanzado-18",
+        "question": "Que es un regimen de mercado?",
+        "correctOptionId": "b",
+        "explanation": "Un regimen describe el entorno dominante: tendencia, lateralidad, alta volatilidad, baja volatilidad o crisis. Afecta a que estrategias funcionan mejor.",
+        "options": [
+          { "id": "a", "label": "Una lista fija de empresas rentables" },
+          { "id": "b", "label": "El entorno dominante en el que se mueve el mercado" },
+          { "id": "c", "label": "Una orden para comprar siempre al cierre" }
+        ]
+      },
+      {
+        "id": "avanzado-19",
+        "question": "Por que una estrategia puede fallar al cambiar el regimen de mercado?",
+        "correctOptionId": "a",
+        "explanation": "Muchas estrategias dependen del entorno. Una tecnica que funciona en tendencia puede sufrir en lateralidad o alta volatilidad.",
+        "options": [
+          { "id": "a", "label": "Porque las condiciones que la favorecian pueden desaparecer" },
+          { "id": "b", "label": "Porque los precios dejan de existir" },
+          { "id": "c", "label": "Porque los indicadores se vuelven ilegales" }
+        ]
+      },
+      {
+        "id": "avanzado-20",
+        "question": "Que limitacion importante tiene la beta?",
+        "correctOptionId": "c",
+        "explanation": "La beta se calcula con datos historicos. Si cambia la empresa, el sector o el mercado, esa sensibilidad puede cambiar.",
+        "options": [
+          { "id": "a", "label": "Que solo sirve para medir dividendos" },
+          { "id": "b", "label": "Que nunca cambia con el tiempo" },
+          { "id": "c", "label": "Que es historica y puede dejar de representar el riesgo futuro" }
         ]
       }
     ]

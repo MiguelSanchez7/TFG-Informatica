@@ -304,5 +304,209 @@
     "checkQuestion": "Que intenta responder la esperanza matematica de una estrategia?",
     "checkAnswer": "Si, a lo largo de muchas operaciones, la estrategia tiene una expectativa positiva o negativa.",
     "orderIndex": 18
+  },
+  {
+    "id": "interes-compuesto",
+    "slug": "interes-compuesto",
+    "level": "base",
+    "title": "Interes compuesto",
+    "summary": "El interes compuesto aparece cuando las ganancias se reinvierten y empiezan a generar nuevas ganancias.",
+    "whyItMatters": "Ayuda a entender por que el tiempo puede ser tan importante como la rentabilidad anual. Pequenas diferencias repetidas durante anos pueden acabar siendo enormes.",
+    "keyIdeas": [
+      "No es lo mismo ganar un 10% una vez que mantener buenos resultados durante muchos periodos.",
+      "Las perdidas tambien afectan al capital sobre el que se calcula el siguiente resultado.",
+      "Reinvertir y tener paciencia puede ser mas potente que buscar golpes rapidos."
+    ],
+    "example": "Si tienes 1.000 euros y ganas un 10%, pasas a 1.100. Si el siguiente ano ganas otro 10%, ganas 110 euros, no 100, porque se calcula sobre 1.100.",
+    "checkQuestion": "Por que el interes compuesto mejora con el tiempo?",
+    "checkAnswer": "Porque las ganancias acumuladas aumentan la base sobre la que se calculan las ganancias futuras.",
+    "orderIndex": 19
+  },
+  {
+    "id": "acciones-etfs-indices",
+    "slug": "acciones-etfs-indices",
+    "level": "base",
+    "title": "Acciones, ETFs e indices",
+    "summary": "Una accion representa una parte de una empresa. Un ETF agrupa varios activos. Un indice resume el comportamiento de un conjunto de valores.",
+    "whyItMatters": "Distinguirlos evita comparar productos que no tienen el mismo riesgo ni la misma funcion dentro de una cartera.",
+    "keyIdeas": [
+      "Una accion concentra el resultado en una empresa concreta.",
+      "Un ETF puede repartir la exposicion entre muchas empresas o activos.",
+      "Un indice no siempre se compra directamente; normalmente se replica mediante fondos o ETFs."
+    ],
+    "example": "Comprar una accion de Apple no es lo mismo que comprar un ETF del S&P 500, que incluye muchas companias.",
+    "checkQuestion": "Que diferencia basica hay entre una accion y un ETF diversificado?",
+    "checkAnswer": "La accion depende de una empresa concreta; el ETF reparte la exposicion entre varios activos.",
+    "orderIndex": 20
+  },
+  {
+    "id": "dividendos",
+    "slug": "dividendos",
+    "level": "base",
+    "title": "Dividendos",
+    "summary": "Un dividendo es una parte del beneficio que una empresa puede repartir entre sus accionistas.",
+    "whyItMatters": "Ayuda a entender que la rentabilidad de una inversion no siempre viene solo de que suba el precio.",
+    "keyIdeas": [
+      "No todas las empresas pagan dividendos.",
+      "Un dividendo alto no garantiza una buena inversion.",
+      "Conviene mirar si el pago es sostenible con los beneficios de la empresa."
+    ],
+    "example": "Una empresa puede subir poco en bolsa pero repartir dividendos periodicos, generando parte de la rentabilidad por esa via.",
+    "checkQuestion": "Un dividendo alto siempre significa que una inversion es buena?",
+    "checkAnswer": "No. Hay que comprobar si la empresa puede sostenerlo y si el riesgo compensa.",
+    "orderIndex": 21
+  },
+  {
+    "id": "precio-valor",
+    "slug": "precio-valor",
+    "level": "base",
+    "title": "Precio y valor",
+    "summary": "El precio es lo que el mercado paga hoy. El valor intenta estimar lo que un activo podria valer segun sus fundamentos y expectativas.",
+    "whyItMatters": "Evita pensar que algo es bueno solo porque sube o malo solo porque cae. Precio y valor pueden separarse durante bastante tiempo.",
+    "keyIdeas": [
+      "El precio cambia cada dia por oferta y demanda.",
+      "El valor depende de beneficios, crecimiento, riesgo y expectativas.",
+      "Comprar barato no significa comprar bien si el valor real tambien esta cayendo."
+    ],
+    "example": "Una accion puede parecer barata porque ha caido un 50%, pero si el negocio se ha deteriorado mucho quizas no este infravalorada.",
+    "checkQuestion": "Por que no basta con mirar si una accion ha caido mucho?",
+    "checkAnswer": "Porque hay que valorar si el negocio sigue teniendo valor o si la caida refleja un deterioro real.",
+    "orderIndex": 22
+  },
+  {
+    "id": "varianza-desviacion",
+    "slug": "varianza-desviacion",
+    "level": "intermedio",
+    "title": "Varianza y desviacion estandar",
+    "summary": "La varianza mide la dispersion de los rendimientos respecto a su media. La desviacion estandar es su raiz cuadrada y suele usarse como medida de volatilidad.",
+    "whyItMatters": "Permite pasar de una sensacion general de riesgo a una medida calculable. Asi puedes comparar activos con mas criterio.",
+    "keyIdeas": [
+      "Primero calculas la media de los rendimientos.",
+      "Despues mides cuanto se aleja cada rendimiento de esa media.",
+      "Elevar al cuadrado evita que diferencias positivas y negativas se cancelen."
+    ],
+    "example": "Con rendimientos 2%, 4% y 6%, la media es 4%. Las diferencias son -2, 0 y 2 puntos; al cuadrarlas obtienes 4, 0 y 4, cuya media da la varianza.",
+    "checkQuestion": "Por que se elevan al cuadrado las diferencias al calcular varianza?",
+    "checkAnswer": "Para que las desviaciones negativas y positivas no se cancelen y para penalizar mas los movimientos grandes.",
+    "orderIndex": 23
+  },
+  {
+    "id": "rentabilidad-real-nominal",
+    "slug": "rentabilidad-real-nominal",
+    "level": "intermedio",
+    "title": "Rentabilidad real y nominal",
+    "summary": "La rentabilidad nominal es la ganancia antes de ajustar por inflacion. La rentabilidad real descuenta la perdida de poder adquisitivo.",
+    "whyItMatters": "Ganar dinero en terminos nominales no siempre significa mejorar tu capacidad de compra.",
+    "keyIdeas": [
+      "La inflacion reduce el valor del dinero con el tiempo.",
+      "La rentabilidad real aproxima cuanto aumenta tu poder adquisitivo.",
+      "Una rentabilidad nominal baja puede ser negativa en terminos reales si la inflacion es alta."
+    ],
+    "example": "Si ganas un 4% pero la inflacion es del 6%, tu rentabilidad real aproximada es negativa.",
+    "checkQuestion": "Que tiene en cuenta la rentabilidad real que no incluye la nominal?",
+    "checkAnswer": "El efecto de la inflacion sobre el poder adquisitivo.",
+    "orderIndex": 24
+  },
+  {
+    "id": "per-valoracion",
+    "slug": "per-valoracion",
+    "level": "intermedio",
+    "title": "PER y valoracion",
+    "summary": "El PER compara el precio de una accion con el beneficio por accion de la empresa.",
+    "whyItMatters": "Sirve como primera referencia de valoracion, aunque nunca deberia usarse sin contexto.",
+    "keyIdeas": [
+      "Un PER alto puede reflejar expectativas de crecimiento.",
+      "Un PER bajo puede indicar oportunidad o problemas del negocio.",
+      "Compararlo con empresas similares suele ser mas util que mirarlo aislado."
+    ],
+    "example": "Una empresa con PER 30 puede no estar cara si crece mucho y de forma sostenible; otra con PER 8 puede estar barata o estar deteriorandose.",
+    "checkQuestion": "Por que un PER bajo no garantiza que una accion este barata?",
+    "checkAnswer": "Porque puede reflejar expectativas negativas o deterioro de beneficios futuros.",
+    "orderIndex": 25
+  },
+  {
+    "id": "costes-comisiones-slippage",
+    "slug": "costes-comisiones-slippage",
+    "level": "intermedio",
+    "title": "Costes, comisiones y slippage",
+    "summary": "Las comisiones son costes explicitos. El slippage es la diferencia entre el precio esperado y el precio real de ejecucion.",
+    "whyItMatters": "Una estrategia que parece rentable en teoria puede dejar de serlo al incluir costes reales, sobre todo si opera con mucha frecuencia.",
+    "keyIdeas": [
+      "Los costes pequenos se acumulan si operas mucho.",
+      "El slippage suele empeorar en activos poco liquidos o momentos de tension.",
+      "Un buen analisis debe incluir el precio real al que puedes ejecutar."
+    ],
+    "example": "Si una operacion espera ganar un 0,3% pero entre comisiones y slippage pierde 0,2%, el margen real es mucho menor.",
+    "checkQuestion": "Que es el slippage?",
+    "checkAnswer": "La diferencia entre el precio que esperabas ejecutar y el precio final al que se ejecuta la operacion.",
+    "orderIndex": 26
+  },
+  {
+    "id": "beta-mercado",
+    "slug": "beta-mercado",
+    "level": "avanzado",
+    "title": "Beta frente al mercado",
+    "summary": "La beta mide la sensibilidad de un activo frente a los movimientos del mercado de referencia.",
+    "whyItMatters": "Ayuda a entender si una cartera esta tomando mas o menos riesgo sistematico que el mercado.",
+    "keyIdeas": [
+      "Una beta mayor que 1 suele moverse mas que el mercado.",
+      "Una beta menor que 1 suele moverse menos que el mercado.",
+      "La beta es historica y puede cambiar si cambia el negocio o el entorno."
+    ],
+    "example": "Si una accion tiene beta 1,5, podria moverse aproximadamente un 1,5% cuando el mercado se mueve un 1%, aunque no es una regla exacta.",
+    "checkQuestion": "Que sugiere una beta superior a 1?",
+    "checkAnswer": "Que el activo tiende a moverse con mas intensidad que el mercado de referencia.",
+    "orderIndex": 27
+  },
+  {
+    "id": "sharpe",
+    "slug": "sharpe",
+    "level": "avanzado",
+    "title": "Ratio Sharpe",
+    "summary": "El ratio Sharpe compara el exceso de rentabilidad de una estrategia con la volatilidad asumida.",
+    "whyItMatters": "Permite distinguir entre ganar mucho por habilidad o ganar mucho asumiendo movimientos muy bruscos.",
+    "keyIdeas": [
+      "Relaciona rentabilidad con riesgo medido como volatilidad.",
+      "Un Sharpe mayor suele indicar mejor rentabilidad ajustada al riesgo.",
+      "Debe compararse entre estrategias similares y periodos coherentes."
+    ],
+    "example": "Dos estrategias ganan un 12%, pero si una lo hace con la mitad de volatilidad, su rentabilidad ajustada al riesgo puede ser mejor.",
+    "checkQuestion": "Que intenta medir el ratio Sharpe?",
+    "checkAnswer": "Cuanta rentabilidad extra se obtiene por unidad de volatilidad asumida.",
+    "orderIndex": 28
+  },
+  {
+    "id": "apalancamiento",
+    "slug": "apalancamiento",
+    "level": "avanzado",
+    "title": "Apalancamiento",
+    "summary": "El apalancamiento permite tomar una exposicion mayor que el capital propio usando deuda, margen o derivados.",
+    "whyItMatters": "Puede amplificar beneficios, pero tambien perdidas. Mal gestionado, convierte un error pequeno en un problema grande.",
+    "keyIdeas": [
+      "Aumenta la sensibilidad de la cartera a movimientos del mercado.",
+      "Puede generar llamadas de margen si las perdidas superan ciertos limites.",
+      "No sustituye a una buena gestion del riesgo."
+    ],
+    "example": "Con apalancamiento 2:1, un movimiento del 5% en el activo puede implicar aproximadamente un 10% sobre tu capital, antes de costes.",
+    "checkQuestion": "Cual es el principal peligro del apalancamiento?",
+    "checkAnswer": "Que amplifica las perdidas igual que puede amplificar las ganancias.",
+    "orderIndex": 29
+  },
+  {
+    "id": "regimen-mercado",
+    "slug": "regimen-mercado",
+    "level": "avanzado",
+    "title": "Regimen de mercado",
+    "summary": "Un regimen de mercado describe el entorno dominante: tendencia fuerte, lateralidad, alta volatilidad, baja volatilidad o crisis.",
+    "whyItMatters": "Una estrategia puede funcionar muy bien en un entorno y mal en otro. Reconocer el regimen evita aplicar siempre la misma receta.",
+    "keyIdeas": [
+      "Los mercados no se comportan igual en todos los periodos.",
+      "Volatilidad, correlaciones y liquidez pueden cambiar rapidamente.",
+      "Una estrategia robusta debe saber cuando reducir exposicion."
+    ],
+    "example": "Una estrategia de comprar rupturas puede funcionar en tendencias fuertes y sufrir muchas senales falsas en mercados laterales.",
+    "checkQuestion": "Por que importa detectar el regimen de mercado?",
+    "checkAnswer": "Porque la eficacia de una estrategia depende mucho del entorno en el que se aplica.",
+    "orderIndex": 30
   }
 ]
