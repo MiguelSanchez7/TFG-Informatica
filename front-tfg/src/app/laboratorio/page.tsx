@@ -214,7 +214,6 @@ export default function LaboratorioPage() {
   const [challenge, setChallenge] = useState<
     (typeof HISTORICAL_CHALLENGES)[string] | null
   >(null);
-  const [showTechnicalJson, setShowTechnicalJson] = useState(false);
   const [xpEvents, setXpEvents] = useState<
     Array<{
       id: string;
@@ -959,161 +958,24 @@ export default function LaboratorioPage() {
           </section>
         )}
 
-        {/* CARTERA */}
-        {wallet && (
-          <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
-            <div className="font-semibold mb-2">Cartera</div>
-            <div className="grid grid-cols-1 sm:grid-cols-5 gap-x-4 gap-y-2">
-              <div>
-                <span className="opacity-70">Cash:</span>{" "}
-                <b className="font-semibold">{fmtEurES(wallet.cash)}</b>
-              </div>
-              <div>
-                <span className="opacity-70">Acciones:</span>{" "}
-                <b className="font-semibold">{fmtIntES(wallet.shares)}</b>
-              </div>
-              <div>
-                <span className="opacity-70">Valor total:</span>{" "}
-                <b className="font-semibold">
-                  {fmtEurES(wallet.portfolio_value)}
-                </b>
-              </div>
-              <div>
-                <span className="opacity-70">Beneficio/Pérdida:</span>{" "}
-                <b className="font-semibold">
-                  {Number(wallet.pnl_total) >= 0 ? "+" : ""}
-                  {fmtEurES(wallet.pnl_total)}
-                </b>
-              </div>
-              <div>
-                <span className="opacity-70">Rentabilidad cartera:</span>{" "}
-                <b className="font-semibold">
-                  {walletReturn != null ? fmtPct2(walletReturn) : "-"}
-                </b>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* GRAFICO */}
-        <h2 className="mt-8 text-lg font-medium">Gráfico</h2>
-
-        {/* cantidad */}
-        <div className="mt-3 flex justify-center gap-3 flex-wrap items-center">
-          <div className="flex items-center gap-2 text-sm opacity-90">
-            <span className="opacity-70">Cantidad:</span>
-            <input
-              type="number"
-              min={1}
-              max={Math.max(maxBuyQuantity, maxSellQuantity, 1)}
-              value={quantity}
-              onChange={(e) =>
-                setQuantity(
-                  Math.max(
-                    1,
-                    Math.min(
-                      Math.floor(Number(e.target.value) || 1),
-                      Math.max(maxBuyQuantity, maxSellQuantity, 1)
-                    )
-                  )
-                )
-              }
-              className="px-3 py-2 border border-slate-500 rounded w-28 bg-transparent"
-              disabled={actionsDisabled}
-            />
-          </div>
-
-          <div className="text-xs text-slate-400">
-            Max comprar: {fmtIntES(maxBuyQuantity)} | Max vender: {fmtIntES(maxSellQuantity)}
-          </div>
-
-          <button
-            className={actionBtnClass}
-            onClick={() => onAction("BUY")}
-            disabled={actionsDisabled || maxBuyQuantity <= 0}
-            title="Compra (usa la cantidad indicada)"
-          >
-            BUY
-          </button>
-          <button
-            className={actionBtnClass}
-            onClick={() => onAction("HOLD")}
-            disabled={actionsDisabled}
-            title="Mantener (ignora cantidad)"
-          >
-            HOLD
-          </button>
-          <button
-            className={actionBtnClass}
-            onClick={() => onAction("SELL")}
-            disabled={actionsDisabled || maxSellQuantity <= 0}
-            title="Vende (usa la cantidad indicada)"
-          >
-            SELL
-          </button>
-        </div>
-
-        {lastResult && (
-          <div
-            className={`mt-3 mx-auto max-w-3xl p-2 rounded-md text-xs ${resultBoxClass(
-              lastResult.correct
-            )}`}
-          >
-            <div className="font-semibold">
-              {lastResult.correct ? "Acción alineada con el movimiento real" : "Acción no alineada con el movimiento real"}
-            </div>
-            <div className="opacity-90 mt-1">
-              <b>{lastResult.action}</b> | {lastResult.prevAnchor} (
-              {fmtPrice2(lastResult.prevPrice)}) {"->"} {lastResult.newAnchor} (
-              {fmtPrice2(lastResult.newPrice)}) | <b>{fmtPct2(lastResult.y)}</b>
-            </div>
-            <div className="opacity-80 mt-1">
-              La acción que mejor encajaba con ese movimiento era <b>{lastResult.expectedAction}</b>.
-              {lastResult.aiAction && (
-                <>
-                  {" "}La IA sugirió <b>{lastResult.aiAction}</b> y tú{" "}
-                  {lastResult.matchedAi ? "coincidiste" : "no coincidiste"} con ella.
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        <MarketChart scenario={scenario} />
-
-
-
-        {/* Detalle tecnico */}
-        <div className="mt-8 rounded-lg border border-slate-700 bg-slate-900/30 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-medium">Detalle técnico</h2>
-              <p className="mt-1 text-sm text-slate-400">
-                Datos crudos del escenario para depurar o revisar la respuesta del backend.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowTechnicalJson((value) => !value)}
-              className="rounded-md border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-800"
-            >
-              {showTechnicalJson ? "Ocultar JSON" : "Ver JSON"}
-            </button>
-          </div>
-          {showTechnicalJson && (
-          <pre className="mt-2 p-4 border border-slate-600 rounded overflow-auto max-h-[55vh] text-sm">
-            {scenario ? JSON.stringify(scenario, null, 2) : "Sin escenario aún"}
-          </pre>
-          )}
-        </div>
         {/* IA */}
         {scenario && aiAction && (
-          <details className="mt-8 rounded-lg border border-slate-700 bg-slate-900/30 p-4">
+          <details className="mt-6 rounded-lg border border-sky-500/35 bg-sky-950/20 p-4">
             <summary className="cursor-pointer list-none text-base font-medium text-slate-100">
-              Ver recomendación IA
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <span>Ver recomendación IA</span>
+                  <p className="mt-1 text-sm font-normal text-slate-400">
+                    Pulsa aquí para desplegar la recomendación del modelo antes de decidir.
+                  </p>
+                </div>
+                <span className="rounded-full border border-sky-400/40 bg-sky-950/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-100">
+                  Click para abrir
+                </span>
+              </div>
             </summary>
-            <p className="mt-2 text-sm text-slate-400">
-              Esta sección está oculta por defecto para no darte una pista inmediata antes de decidir.
+            <p className="mt-3 text-sm text-slate-400">
+              Esta sección está oculta por defecto para no darte una pista inmediata si prefieres decidir por tu cuenta.
             </p>
 
             <div className="mt-4 border border-slate-600 rounded-lg p-5">
@@ -1238,6 +1100,128 @@ export default function LaboratorioPage() {
             </div>
           </details>
         )}
+
+        {/* CARTERA */}
+        {wallet && (
+          <div className="mt-6 border border-slate-600 rounded-lg p-4 text-sm">
+            <div className="font-semibold mb-2">Cartera</div>
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-x-4 gap-y-2">
+              <div>
+                <span className="opacity-70">Cash:</span>{" "}
+                <b className="font-semibold">{fmtEurES(wallet.cash)}</b>
+              </div>
+              <div>
+                <span className="opacity-70">Acciones:</span>{" "}
+                <b className="font-semibold">{fmtIntES(wallet.shares)}</b>
+              </div>
+              <div>
+                <span className="opacity-70">Valor total:</span>{" "}
+                <b className="font-semibold">
+                  {fmtEurES(wallet.portfolio_value)}
+                </b>
+              </div>
+              <div>
+                <span className="opacity-70">Beneficio/Pérdida:</span>{" "}
+                <b className="font-semibold">
+                  {Number(wallet.pnl_total) >= 0 ? "+" : ""}
+                  {fmtEurES(wallet.pnl_total)}
+                </b>
+              </div>
+              <div>
+                <span className="opacity-70">Rentabilidad cartera:</span>{" "}
+                <b className="font-semibold">
+                  {walletReturn != null ? fmtPct2(walletReturn) : "-"}
+                </b>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* GRAFICO */}
+        <h2 className="mt-8 text-lg font-medium">Gráfico</h2>
+
+        {/* cantidad */}
+        <div className="mt-3 flex justify-center gap-3 flex-wrap items-center">
+          <div className="flex items-center gap-2 text-sm opacity-90">
+            <span className="opacity-70">Cantidad:</span>
+            <input
+              type="number"
+              min={1}
+              max={Math.max(maxBuyQuantity, maxSellQuantity, 1)}
+              value={quantity}
+              onChange={(e) =>
+                setQuantity(
+                  Math.max(
+                    1,
+                    Math.min(
+                      Math.floor(Number(e.target.value) || 1),
+                      Math.max(maxBuyQuantity, maxSellQuantity, 1)
+                    )
+                  )
+                )
+              }
+              className="px-3 py-2 border border-slate-500 rounded w-28 bg-transparent"
+              disabled={actionsDisabled}
+            />
+          </div>
+
+          <div className="text-xs text-slate-400">
+            Max comprar: {fmtIntES(maxBuyQuantity)} | Max vender: {fmtIntES(maxSellQuantity)}
+          </div>
+
+          <button
+            className={actionBtnClass}
+            onClick={() => onAction("BUY")}
+            disabled={actionsDisabled || maxBuyQuantity <= 0}
+            title="Compra (usa la cantidad indicada)"
+          >
+            BUY
+          </button>
+          <button
+            className={actionBtnClass}
+            onClick={() => onAction("HOLD")}
+            disabled={actionsDisabled}
+            title="Mantener (ignora cantidad)"
+          >
+            HOLD
+          </button>
+          <button
+            className={actionBtnClass}
+            onClick={() => onAction("SELL")}
+            disabled={actionsDisabled || maxSellQuantity <= 0}
+            title="Vende (usa la cantidad indicada)"
+          >
+            SELL
+          </button>
+        </div>
+
+        {lastResult && (
+          <div
+            className={`mt-3 mx-auto max-w-3xl p-2 rounded-md text-xs ${resultBoxClass(
+              lastResult.correct
+            )}`}
+          >
+            <div className="font-semibold">
+              {lastResult.correct ? "Acción alineada con el movimiento real" : "Acción no alineada con el movimiento real"}
+            </div>
+            <div className="opacity-90 mt-1">
+              <b>{lastResult.action}</b> | {lastResult.prevAnchor} (
+              {fmtPrice2(lastResult.prevPrice)}) {"->"} {lastResult.newAnchor} (
+              {fmtPrice2(lastResult.newPrice)}) | <b>{fmtPct2(lastResult.y)}</b>
+            </div>
+            <div className="opacity-80 mt-1">
+              La acción que mejor encajaba con ese movimiento era <b>{lastResult.expectedAction}</b>.
+              {lastResult.aiAction && (
+                <>
+                  {" "}La IA sugirió <b>{lastResult.aiAction}</b> y tú{" "}
+                  {lastResult.matchedAi ? "coincidiste" : "no coincidiste"} con ella.
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        <MarketChart scenario={scenario} />
       </div>
     </main>
   );

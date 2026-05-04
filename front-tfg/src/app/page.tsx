@@ -20,7 +20,7 @@ export default function Home() {
             </p>
 
             <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#f9fafb]">
-              Empieza iniciando sesion
+              Empieza iniciando sesión
               <span className="block mt-1 bg-gradient-to-r from-[#38bdf8] via-[#22c55e] to-[#facc15] bg-clip-text text-transparent">
                 o creando tu cuenta
               </span>
