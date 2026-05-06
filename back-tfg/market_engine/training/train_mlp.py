@@ -19,8 +19,9 @@ MODEL_PATH = MODELS_DIR / "mlp_model.joblib"
 # METADATA_PATH = ruta de la metadata del modelo "global".
 METADATA_PATH = MODELS_DIR / "mlp_metadata.json"
 
-
+# Aqui decidimos que nombre de archivo usar para guardar o cargar un modelo MLP
 def get_model_paths(prediction_date: str | None = None) -> tuple[Path, Path]:
+    
     # Si no hay prediction_date, usamos el nombre global de siempre.
     if prediction_date is None:
         return MODEL_PATH, METADATA_PATH
@@ -37,7 +38,7 @@ def get_model_paths(prediction_date: str | None = None) -> tuple[Path, Path]:
     # Devolvemos ambas rutas ya preparadas.
     return model_path, metadata_path
 
-
+# Aqui creamos el pipeline completo de machine learning (pasos)
 def _build_pipeline() -> Pipeline:
     from sklearn.neural_network import MLPClassifier
     from sklearn.pipeline import Pipeline
@@ -86,27 +87,27 @@ def _build_pipeline() -> Pipeline:
         ]
     )
 
-
+# Aqui entrenamos el MLP, o guardamos en disco y generamos su metadata
 def train_mlp_classifier(prediction_date: str | None = None) -> tuple[Path, Path]:
     from sklearn.exceptions import ConvergenceWarning
 
-    # Si prediction_date es None, entrenamos un modelo global con train y test.
+    # Si prediction_date es None, entrenamos un modelo global con train y test
     if prediction_date is None:
         split = build_temporal_dataset_split()
     else:
-        # Si hay prediction_date, entrenamos solo con datos anteriores a esa fecha.
+        # Si hay prediction_date, entrenamos solo con datos anteriores a esa fecha
         split = build_training_dataset_for_prediction_date(prediction_date=prediction_date)
 
-    # x_train = columnas X que ve el modelo.
+    # x_train = columnas X que ve el modelo -> sma20, sma50, rsi14, vol20...
     x_train = split.train_df[split.feature_columns]
 
-    # y_train = etiqueta correcta que queremos que aprenda.
+    # y_train = etiqueta correcta que queremos que aprenda -> BUY, HOLD o SELL
     y_train = split.train_df["target"]
 
-    # has_test_split indica si este entrenamiento trae test separado.
+    # has_test_split indica si este entrenamiento trae test separado
     has_test_split = not split.test_df.empty
 
-    # Si hay test, preparamos también x_test e y_test.
+    # Si hay test, preparamos tambien x_test e y_test
     if has_test_split:
         x_test = split.test_df[split.feature_columns]
         y_test = split.test_df["target"]

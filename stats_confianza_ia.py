@@ -110,7 +110,7 @@ def main():
 
     for i in range(1, args.n + 1):
         try:
-            # 1) Pedimos un escenario random directamente al backend local.
+            # 1) Pedimos un escenario random directamente
             scenario = get_random_scenario()
             scenario_id = scenario.get("scenario_id")
             if not scenario_id:
