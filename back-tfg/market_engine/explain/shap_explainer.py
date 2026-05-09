@@ -117,6 +117,10 @@ class MLPShapExplainer:
     def _date_key(self, prediction_date: str) -> str:
         return str(pd.Timestamp(prediction_date).date())
 
+    def _pipeline_key(self, pipeline, prediction_date: str) -> str:
+        model_name = type(pipeline.steps[-1][1]).__name__
+        return f"{self._date_key(prediction_date)}:{model_name}"
+
     def _prepare_row(self, row: pd.Series, feature_columns: list[str]) -> pd.DataFrame:
         row_df = pd.DataFrame([row])
         row_df = add_model_features(row_df)
@@ -149,9 +153,9 @@ class MLPShapExplainer:
         prediction_date: str,
         feature_columns: list[str] | None = None,
     ):
-        date_key = self._date_key(prediction_date)
-        if date_key in self._explainers:
-            return self._explainers[date_key]
+        pipeline_key = self._pipeline_key(pipeline, prediction_date)
+        if pipeline_key in self._explainers:
+            return self._explainers[pipeline_key]
 
         feature_columns = feature_columns or FEATURE_COLUMNS
         background = self._get_background(
@@ -159,11 +163,11 @@ class MLPShapExplainer:
             feature_columns=feature_columns,
         )
 
-        self._explainers[date_key] = shap.Explainer(
+        self._explainers[pipeline_key] = shap.Explainer(
             pipeline.predict_proba,
             background,
             feature_names=feature_columns,
             algorithm="permutation",
             seed=42,
         )
-        return self._explainers[date_key]
+        return self._explainers[pipeline_key]

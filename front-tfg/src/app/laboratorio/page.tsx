@@ -14,9 +14,16 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
 type Action = "BUY" | "HOLD" | "SELL";
+type AiModelType = "auto" | "mlp" | "random_forest" | "gradient_boosting";
 
 const XP_REWARD_CORRECT_DECISION = 10;
 const XP_REWARD_PROFITABLE_SCENARIO = 35;
+const AI_MODEL_OPTIONS: Array<{ value: AiModelType; label: string }> = [
+  { value: "auto", label: "Mejor accuracy" },
+  { value: "mlp", label: "MLPClassifier" },
+  { value: "random_forest", label: "RandomForestClassifier" },
+  { value: "gradient_boosting", label: "GradientBoostingClassifier" },
+];
 
 const HISTORICAL_CHALLENGES: Record<
   string,
@@ -197,6 +204,7 @@ export default function LaboratorioPage() {
   const [started, setStarted] = useState(false);
 
   const [quantity, setQuantity] = useState<number>(1);
+  const [selectedModel, setSelectedModel] = useState<AiModelType>("auto");
 
   const [lastResult, setLastResult] = useState<null | {
     action: Action;
@@ -371,8 +379,9 @@ export default function LaboratorioPage() {
      MULTI-TURN API
   ========================= */
 
-  async function startMultiTurn(id: string) {
-    const res = await fetch(`${API_URL}/market/multiturn/start/${id}`, {
+  async function startMultiTurn(id: string, modelType: AiModelType = selectedModel) {
+    const params = new URLSearchParams({ model_type: modelType });
+    const res = await fetch(`${API_URL}/market/multiturn/start/${id}?${params}`, {
       method: "POST",
     });
     const data = await res.json();
@@ -384,7 +393,7 @@ export default function LaboratorioPage() {
     const res = await fetch(`${API_URL}/market/multiturn/step/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action, quantity: qty }),
+      body: JSON.stringify({ action, quantity: qty, model_type: selectedModel }),
     });
     const data = await res.json();
     return data;
@@ -437,6 +446,30 @@ export default function LaboratorioPage() {
     }
   }
 
+  async function onModelChange(modelType: AiModelType) {
+    setSelectedModel(modelType);
+    if (!scenarioId.trim() || !started) return;
+
+    setLoading(true);
+    setError("");
+    try {
+      const params = new URLSearchParams({ model_type: modelType });
+      const res = await fetch(
+        `${API_URL}/market/multiturn/state/${scenarioId.trim()}?${params}`,
+        { method: "GET" }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.detail ?? "Error cambiando el modelo de IA");
+      }
+      setScenario(data);
+    } catch (e: any) {
+      setError(e?.message ?? "Error cambiando el modelo de IA");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   /* =========================
      UI ACTIONS
   ========================= */
@@ -455,14 +488,16 @@ export default function LaboratorioPage() {
     try {
       const data = await getScenarioByDateRange(
         challenge.startDate,
-        challenge.endDate
+        challenge.endDate,
+        undefined,
+        selectedModel
       );
       const id = extractScenarioId(data);
       setScenario(data);
       setScenarioId(id);
       setQuantity(1);
 
-      if (id) await startMultiTurn(id);
+      if (id) await startMultiTurn(id, selectedModel);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando el reto histórico");
     } finally {
@@ -480,14 +515,14 @@ export default function LaboratorioPage() {
     setChallengeTitle(null);
 
     try {
-      const data = await getRandomScenario();
+      const data = await getRandomScenario(selectedModel);
       const id = extractScenarioId(data);
       setScenario(data);
       setScenarioId(id);
 
       setQuantity(1);
 
-      if (id) await startMultiTurn(id);
+      if (id) await startMultiTurn(id, selectedModel);
     } catch (e: any) {
       setError(e?.message ?? "Error");
     } finally {
@@ -511,13 +546,13 @@ export default function LaboratorioPage() {
     setChallengeTitle(null);
 
     try {
-      const data = await getScenarioById(id);
+      const data = await getScenarioById(id, selectedModel);
       setScenario(data);
       setScenarioId(id);
 
       setQuantity(1);
 
-      await startMultiTurn(id);
+      await startMultiTurn(id, selectedModel);
     } catch (e: any) {
       setError(e?.message ?? "Error");
     } finally {
@@ -750,6 +785,22 @@ export default function LaboratorioPage() {
           <button className={btnClass} onClick={onLoadById} disabled={loading}>
             Cargar por ID
           </button>
+
+          <label className="flex items-center gap-2 text-sm text-slate-300">
+            <span className="opacity-80">Modelo IA</span>
+            <select
+              value={selectedModel}
+              onChange={(e) => onModelChange(e.target.value as AiModelType)}
+              disabled={loading}
+              className="rounded-md border border-slate-500 bg-slate-950 px-3 py-2 text-slate-100"
+            >
+              {AI_MODEL_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {error && <p className="mt-4 text-rose-300">{error}</p>}

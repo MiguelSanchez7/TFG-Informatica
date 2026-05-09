@@ -1,0 +1,31 @@
+{
+  "model_type": "RandomForestClassifier",
+  "model_key": "random_forest",
+  "feature_columns": [
+    "ret_1d",
+    "sma20",
+    "sma50",
+    "rsi14",
+    "vol20",
+    "drawdown60",
+    "vol_rel20",
+    "trend_gap",
+    "price_vs_sma20",
+    "price_vs_sma50"
+  ],
+  "horizon_days": 5,
+  "buy_threshold": 0.02,
+  "sell_threshold": -0.02,
+  "train_end_date": "2021-12-31",
+  "train_samples": 102076,
+  "test_samples": 29910,
+  "classes": [
+    "BUY",
+    "HOLD",
+    "SELL"
+  ],
+  "prediction_date": null,
+  "accuracy": 0.47044466733533935,
+  "train_seconds": 29.08863999999994,
+  "predict_seconds": 0.28122129999974277
+}

@@ -1,0 +1,27 @@
+{
+  "model_type": "MLPClassifier",
+  "feature_columns": [
+    "ret_1d",
+    "sma20",
+    "sma50",
+    "rsi14",
+    "vol20",
+    "drawdown60",
+    "vol_rel20",
+    "trend_gap",
+    "price_vs_sma20",
+    "price_vs_sma50"
+  ],
+  "horizon_days": 5,
+  "buy_threshold": 0.02,
+  "sell_threshold": -0.02,
+  "train_end_date": "2011-12-30",
+  "train_samples": 26696,
+  "test_samples": 0,
+  "classes": [
+    "BUY",
+    "HOLD",
+    "SELL"
+  ],
+  "prediction_date": "2011-12-30"
+}

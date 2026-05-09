@@ -93,6 +93,7 @@ class UserUpdate(BaseModel):
 class StepRequest(BaseModel):
     action: str
     quantity: Optional[int] = 0
+    model_type: Optional[str] = None
 
 
 class ConceptLesson(BaseModel):
@@ -261,9 +262,9 @@ def ask_tutor_endpoint(payload: TutorQuestionRequest):
 
 
 @app.get("/market/scenario/random")
-def api_random_scenario():
+def api_random_scenario(model_type: Optional[str] = None):
     try:
-        return get_random_scenario()
+        return get_random_scenario(model_type=model_type)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
@@ -275,9 +276,10 @@ def api_scenario_by_date(
     start_date: str,
     end_date: str,
     seed: Optional[int] = None,
+    model_type: Optional[str] = None,
 ):
     try:
-        return get_scenario_by_date_range(start_date, end_date, seed)
+        return get_scenario_by_date_range(start_date, end_date, seed, model_type)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
@@ -285,9 +287,9 @@ def api_scenario_by_date(
 
 
 @app.get("/market/scenario/{scenario_id}")
-def api_get_scenario(scenario_id: str):
+def api_get_scenario(scenario_id: str, model_type: Optional[str] = None):
     try:
-        return get_scenario(scenario_id)
+        return get_scenario(scenario_id, model_type=model_type)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
@@ -299,9 +301,9 @@ def api_get_scenario(scenario_id: str):
 # ======================================================
 
 @app.post("/market/multiturn/start/{scenario_id}")
-def api_start_multiturn(scenario_id: str):
+def api_start_multiturn(scenario_id: str, model_type: Optional[str] = None):
     try:
-        return start_multiturn_session(scenario_id)
+        return start_multiturn_session(scenario_id, model_type=model_type)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -309,9 +311,9 @@ def api_start_multiturn(scenario_id: str):
 
 
 @app.get("/market/multiturn/state/{scenario_id}")
-def api_get_multiturn_state(scenario_id: str):
+def api_get_multiturn_state(scenario_id: str, model_type: Optional[str] = None):
     try:
-        return get_multiturn_state(scenario_id)
+        return get_multiturn_state(scenario_id, model_type=model_type)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
@@ -330,7 +332,12 @@ def api_step_multiturn(scenario_id: str, body: StepRequest):
         raise HTTPException(status_code=400, detail="Invalid quantity")
 
     try:
-        return step_multiturn_session(scenario_id, action, quantity)
+        return step_multiturn_session(
+            scenario_id,
+            action,
+            quantity,
+            model_type=body.model_type,
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

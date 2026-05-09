@@ -173,8 +173,12 @@ export async function askTutor(
 // ===============================
 // Market Engine
 // ===============================
-export async function getRandomScenario() {
-  const response = await fetch(`${API_URL}/market/scenario/random`, {
+export async function getRandomScenario(modelType?: string) {
+  const params = new URLSearchParams();
+  if (modelType) params.set("model_type", modelType);
+  const query = params.toString() ? `?${params.toString()}` : "";
+
+  const response = await fetch(`${API_URL}/market/scenario/random${query}`, {
     method: "GET",
   });
 
@@ -193,7 +197,8 @@ export async function getRandomScenario() {
 export async function getScenarioByDateRange(
   startDate: string,
   endDate: string,
-  seed?: number
+  seed?: number,
+  modelType?: string
 ) {
   const params = new URLSearchParams({
     start_date: startDate,
@@ -202,6 +207,9 @@ export async function getScenarioByDateRange(
 
   if (typeof seed === "number") {
     params.set("seed", String(seed));
+  }
+  if (modelType) {
+    params.set("model_type", modelType);
   }
 
   const response = await fetch(`${API_URL}/market/scenario/by-date?${params}`, {
@@ -221,8 +229,12 @@ export async function getScenarioByDateRange(
   return response.json();
 }
 
-export async function getScenarioById(scenarioId: string) {
-  const response = await fetch(`${API_URL}/market/scenario/${scenarioId}`, {
+export async function getScenarioById(scenarioId: string, modelType?: string) {
+  const params = new URLSearchParams();
+  if (modelType) params.set("model_type", modelType);
+  const query = params.toString() ? `?${params.toString()}` : "";
+
+  const response = await fetch(`${API_URL}/market/scenario/${scenarioId}${query}`, {
     method: "GET",
   });
 
