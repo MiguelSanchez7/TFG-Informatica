@@ -49,3 +49,7 @@ secrets.json
 
 back-tfg/.pydeps/
 back-tfg/.venv/
+
+
+# Trained/generated model artifacts
+back-tfg/market_engine/data/models/
