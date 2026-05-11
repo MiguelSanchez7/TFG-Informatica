@@ -1,27 +1,14 @@
-import json
-from pathlib import Path
+from collections import defaultdict
 from typing import Any, Dict, List
 
+from supabase_client import supabase
 
-CONTENT_DIR = Path(__file__).resolve().parents[2] / "content" / "concepts"
-LESSONS_FILE = CONTENT_DIR / "lessons.json"
-GLOSSARY_FILE = CONTENT_DIR / "glossary.json"
-QUIZZES_FILE = CONTENT_DIR / "quizzes.json"
+
 VALID_LEVELS = {"base", "intermedio", "avanzado"}
 
 
-def _read_json_file(path: Path) -> Any:
-    try:
-        with path.open("r", encoding="utf-8") as file:
-            return json.load(file)
-    except FileNotFoundError as exc:
-        raise RuntimeError(f"No se encontro el archivo de contenido: {path.name}") from exc
-    except json.JSONDecodeError as exc:
-        raise RuntimeError(f"El archivo {path.name} no tiene un JSON valido") from exc
-
-
 def _normalize_lesson(lesson: Dict[str, Any]) -> Dict[str, Any]:
-    key_ideas = lesson.get("keyIdeas") or []
+    key_ideas = lesson.get("key_ideas") or []
     if not isinstance(key_ideas, list):
         key_ideas = []
 
@@ -34,17 +21,17 @@ def _normalize_lesson(lesson: Dict[str, Any]) -> Dict[str, Any]:
         raise RuntimeError(f"La leccion {slug} tiene un nivel invalido: {level}")
 
     return {
-        "id": lesson.get("id") or slug,
+        "id": str(lesson.get("id") or slug),
         "slug": slug,
         "level": level,
         "title": str(lesson.get("title") or "").strip(),
         "summary": str(lesson.get("summary") or "").strip(),
-        "whyItMatters": str(lesson.get("whyItMatters") or "").strip(),
+        "whyItMatters": str(lesson.get("why_it_matters") or "").strip(),
         "keyIdeas": [str(idea).strip() for idea in key_ideas if str(idea).strip()],
         "example": str(lesson.get("example") or "").strip(),
-        "checkQuestion": str(lesson.get("checkQuestion") or "").strip(),
-        "checkAnswer": str(lesson.get("checkAnswer") or "").strip(),
-        "orderIndex": int(lesson.get("orderIndex") or 0),
+        "checkQuestion": str(lesson.get("check_question") or "").strip(),
+        "checkAnswer": str(lesson.get("check_answer") or "").strip(),
+        "orderIndex": int(lesson.get("order_index") or 0),
     }
 
 
@@ -58,34 +45,36 @@ def _normalize_glossary_item(item: Dict[str, Any]) -> Dict[str, Any]:
         "id": str(item_id),
         "term": term,
         "definition": str(item.get("definition") or "").strip(),
-        "orderIndex": int(item.get("orderIndex") or 0),
+        "orderIndex": int(item.get("order_index") or 0),
     }
 
 
-def _normalize_quiz_question(question: Dict[str, Any]) -> Dict[str, Any]:
+def _normalize_quiz_question(
+    question: Dict[str, Any],
+    options_by_question: Dict[str, List[Dict[str, Any]]],
+) -> Dict[str, Any]:
     question_id = str(question.get("id") or "").strip()
     prompt = str(question.get("question") or "").strip()
-    options = question.get("options") or []
-    correct_option_id = str(question.get("correctOptionId") or "").strip()
+    correct_option_id = str(question.get("correct_option_id") or "").strip()
     explanation = str(question.get("explanation") or "").strip()
+    options = [
+        {
+            "id": str(option.get("id") or "").strip(),
+            "label": str(option.get("label") or "").strip(),
+        }
+        for option in options_by_question.get(question_id, [])
+    ]
 
     if not question_id:
         raise RuntimeError("Cada pregunta del quiz debe tener id")
     if not prompt:
         raise RuntimeError(f"La pregunta {question_id} no tiene enunciado")
-    if not isinstance(options, list) or len(options) < 2:
+    if len(options) < 2:
         raise RuntimeError(f"La pregunta {question_id} debe tener al menos dos opciones")
 
-    normalized_options = []
-    option_ids = set()
-    for option in options:
-        option_id = str(option.get("id") or "").strip()
-        label = str(option.get("label") or "").strip()
-        if not option_id or not label:
-            raise RuntimeError(f"La pregunta {question_id} tiene una opcion invalida")
-        normalized_options.append({"id": option_id, "label": label})
-        option_ids.add(option_id)
-
+    option_ids = {option["id"] for option in options}
+    if not all(option["id"] and option["label"] for option in options):
+        raise RuntimeError(f"La pregunta {question_id} tiene una opcion invalida")
     if correct_option_id not in option_ids:
         raise RuntimeError(
             f"La pregunta {question_id} tiene un correctOptionId que no existe"
@@ -94,55 +83,98 @@ def _normalize_quiz_question(question: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "id": question_id,
         "question": prompt,
-        "options": normalized_options,
+        "options": options,
         "correctOptionId": correct_option_id,
         "explanation": explanation,
     }
 
 
-def _normalize_quiz(quiz: Dict[str, Any]) -> Dict[str, Any]:
+def _normalize_quiz(
+    quiz: Dict[str, Any],
+    questions_by_level: Dict[str, List[Dict[str, Any]]],
+    options_by_question: Dict[str, List[Dict[str, Any]]],
+) -> Dict[str, Any]:
     level = str(quiz.get("level") or "").strip()
     if level not in VALID_LEVELS:
         raise RuntimeError(f"Quiz con nivel invalido: {level}")
 
-    questions = quiz.get("questions") or []
-    if not isinstance(questions, list) or not questions:
+    questions = questions_by_level.get(level, [])
+    if not questions:
         raise RuntimeError(f"El quiz del nivel {level} debe tener preguntas")
 
     return {
         "level": level,
         "title": str(quiz.get("title") or "").strip(),
         "description": str(quiz.get("description") or "").strip(),
-        "xpRewardPerCorrect": int(quiz.get("xpRewardPerCorrect") or 0),
-        "xpPenaltyPerWrong": int(quiz.get("xpPenaltyPerWrong") or 0),
-        "questions": [_normalize_quiz_question(question) for question in questions],
+        "xpRewardPerCorrect": int(quiz.get("xp_reward_per_correct") or 0),
+        "xpPenaltyPerWrong": int(quiz.get("xp_penalty_per_wrong") or 0),
+        "questions": [
+            _normalize_quiz_question(question, options_by_question)
+            for question in questions
+        ],
     }
 
 
 def get_concept_lessons() -> List[Dict[str, Any]]:
-    payload = _read_json_file(LESSONS_FILE)
-    if not isinstance(payload, list):
-        raise RuntimeError("El archivo lessons.json debe contener una lista")
-
-    lessons = [_normalize_lesson(lesson) for lesson in payload]
+    response = (
+        supabase.table("concept_lessons")
+        .select(
+            "id, slug, level, title, summary, why_it_matters, key_ideas, "
+            "example, check_question, check_answer, order_index"
+        )
+        .order("order_index")
+        .execute()
+    )
+    lessons = [_normalize_lesson(lesson) for lesson in response.data or []]
     return sorted(lessons, key=lambda lesson: (lesson["orderIndex"], lesson["title"]))
 
 
 def get_concept_glossary() -> List[Dict[str, Any]]:
-    payload = _read_json_file(GLOSSARY_FILE)
-    if not isinstance(payload, list):
-        raise RuntimeError("El archivo glossary.json debe contener una lista")
-
-    glossary = [_normalize_glossary_item(item) for item in payload]
+    response = (
+        supabase.table("concept_glossary")
+        .select("id, term, definition, order_index")
+        .order("order_index")
+        .execute()
+    )
+    glossary = [_normalize_glossary_item(item) for item in response.data or []]
     return sorted(glossary, key=lambda item: (item["orderIndex"], item["term"]))
 
 
 def get_concept_quizzes() -> List[Dict[str, Any]]:
-    payload = _read_json_file(QUIZZES_FILE)
-    if not isinstance(payload, list):
-        raise RuntimeError("El archivo quizzes.json debe contener una lista")
+    quizzes_response = (
+        supabase.table("concept_quizzes")
+        .select(
+            "level, title, description, xp_reward_per_correct, "
+            "xp_penalty_per_wrong"
+        )
+        .order("level")
+        .execute()
+    )
+    questions_response = (
+        supabase.table("concept_quiz_questions")
+        .select("id, quiz_level, question, correct_option_id, explanation, order_index")
+        .order("order_index")
+        .execute()
+    )
+    options_response = (
+        supabase.table("concept_quiz_options")
+        .select("id, question_id, label, order_index")
+        .order("order_index")
+        .execute()
+    )
 
-    quizzes = [_normalize_quiz(item) for item in payload]
+    questions_by_level = defaultdict(list)
+    for question in questions_response.data or []:
+        questions_by_level[str(question.get("quiz_level") or "")].append(question)
+
+    options_by_question = defaultdict(list)
+    for option in options_response.data or []:
+        options_by_question[str(option.get("question_id") or "")].append(option)
+
+    quizzes = [
+        _normalize_quiz(quiz, questions_by_level, options_by_question)
+        for quiz in quizzes_response.data or []
+    ]
     return sorted(quizzes, key=lambda quiz: quiz["level"])
 
 

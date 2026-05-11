@@ -53,3 +53,17 @@ back-tfg/.venv/
 
 # Trained/generated model artifacts
 back-tfg/market_engine/data/models/
+
+# Ignorar documentación personal/borradores
+docs/
+
+# Ignorar archivos compilados de Python (muy importante)
+__pycache__/
+*.pyc
+
+# Si tu base de datos genera archivos locales (ej. sqlite), ignóralos también
+# *.sqlite3
+# *.db
+docs/
+__pycache__/
+*.pyc
